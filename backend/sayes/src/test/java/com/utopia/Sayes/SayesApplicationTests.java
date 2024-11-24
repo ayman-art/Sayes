@@ -1,4 +1,4 @@
-package com.example.sayes;
+package com.utopia.Sayes;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
