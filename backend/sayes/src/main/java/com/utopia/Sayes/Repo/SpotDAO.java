@@ -27,12 +27,21 @@ public class SpotDAO {
             System.out.println("Error while updating spot state: " + e);
         }
     }
-    public void getSpotbyId(long spot_id,long lot_id){
+    public void getSpotById(long spot_id,long lot_id){
         String query = "SELECT * FROM spots WHERE spot_id = ? AND lot_id = ?";
         try {
             jdbcTemplate.update(query,spot_id, lot_id);
         } catch (Exception e) {
             System.out.println("Error while Selecting spot : " + e);
+        }
+    }
+    public String getSpotState(long spot_id, long lot_id) {
+        String query = "SELECT state FROM spots WHERE spot_id = ? AND lot_id = ?";
+        try {
+            return jdbcTemplate.queryForObject(query, new Object[]{spot_id, lot_id}, String.class);
+        } catch (Exception e) {
+            System.out.println("Error while fetching spot state: " + e);
+            return null;
         }
     }
 
