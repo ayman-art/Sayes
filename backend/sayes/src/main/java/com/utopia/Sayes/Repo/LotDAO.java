@@ -15,12 +15,17 @@ public class LotDAO {
     @Autowired
     private JdbcTemplate jdbcTemplate;
     private LotAdapter lotAdapter = new LotAdapter();
-    
+
     public void addLot(Lot lot){
         String query = "INSERT INTO Lots " +
                 " (manager, location, price, num_of_spots, details) VALUES (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(query , lot.getManager_id(), lot.getLocation(), lot.getPrice(),
-                lot.getNum_of_spots(), lot.getDetails());
+        try {
+            jdbcTemplate.update(query , lot.getManager_id(), lot.getLocation(), lot.getPrice(),
+                    lot.getNum_of_spots(), lot.getDetails());
+        }
+        catch (Exception e){
+            System.out.println("Error while adding lot: " + e);
+        }
     }
 
     public List<Lot> getLotsByManager(int managerId) {
@@ -48,6 +53,15 @@ public class LotDAO {
         int rowsUpdated = jdbcTemplate.update(query, lotId);
         if (rowsUpdated == 0) {
             throw new IllegalStateException("Can't increment spots fro this manager: " + lotId);
+        }
+    }
+
+    public void getLotById(long lot_id){
+        String query = "SELECT * FROM Lots WHERE lot_id = ?";
+        try {
+            jdbcTemplate.update(query,lot_id);
+        } catch (Exception e) {
+            System.out.println("Error while Selecting lot : " + e);
         }
     }
 }
