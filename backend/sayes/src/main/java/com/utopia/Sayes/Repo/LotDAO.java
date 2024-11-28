@@ -62,4 +62,9 @@ public class LotDAO {
             }
             return lotAdapter.fromMap(resultMap);
     }
+
+    public long getLotTotalSpots(long lot_id){
+        String query = "SELECT COUNT(*) FROM spots WHERE lot_id = ?";
+        return jdbcTemplate.queryForObject(query, Long.class, lot_id);
+    }
 }
