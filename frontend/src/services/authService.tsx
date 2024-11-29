@@ -12,15 +12,13 @@ export const loginUser = async (name: string, password: string, role: string) =>
       }),
     });
   
-    const data = await response.json();
-    console.log(data)
-    if (response.ok && data.token) {
+    if (response.ok) {
+      const token = response.headers.get("Authorization") ?? "";
       // Save JWT to localStorage
-      localStorage.setItem('jwtToken', data.token);
+      localStorage.setItem('jwtToken', token);
     } else {
       throw new Error('Login failed');
     }
-    return data;
   };
   
   export const registerDriver = async (
@@ -44,14 +42,13 @@ export const loginUser = async (name: string, password: string, role: string) =>
       }),
     });
   
-    const data = await response.json();
-    if (response.ok && data.token) {
+    if (response.ok ) {
+      const token = response.headers.get("Authorization") ?? "";
       // Save JWT to localStorage
-      localStorage.setItem('jwtToken', data.token);
+      localStorage.setItem('jwtToken', token);
     } else {
       throw new Error('Registration failed');
     }
-    return data;
   };
 
   export const registerLotManager = async (name: string, password: string, role: string) => {
@@ -67,14 +64,15 @@ export const loginUser = async (name: string, password: string, role: string) =>
       }),
     });
   
-    const data = await response.json();
-    if (response.ok && data.token) {
+    
+    if (response.ok ) {
       // Save JWT to localStorage
-      localStorage.setItem('jwtToken', data.token);
+      const token = response.headers.get("Authorization") ?? "";
+      localStorage.setItem('jwtToken', token);
     } else {
       throw new Error('Registration failed');
     }
-    return data;
+
   };
 
   

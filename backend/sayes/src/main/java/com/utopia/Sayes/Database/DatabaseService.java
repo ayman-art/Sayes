@@ -24,7 +24,7 @@ public class DatabaseService {
                     "user_password VARCHAR(255) NOT NULL)";
 
             //create lot managers table
-            String createLotManagersTable = "CREATE TABLE IF NOT EXISTS lot_mangers (" +
+            String createLotManagersTable = "CREATE TABLE IF NOT EXISTS lot_managers (" +
                     "manager_id BIGINT UNSIGNED NOT NULL PRIMARY KEY, " +
                     "revenue BIGINT NOT NULL, " +
                     "FOREIGN KEY (manager_id) REFERENCES Users (user_id) ON DELETE CASCADE ON UPDATE CASCADE)";
@@ -51,7 +51,7 @@ public class DatabaseService {
                     "price BIGINT NOT NULL, " +
                     "num_of_spots BIGINT NOT NULL, " +
                     "details VARCHAR(255), " +
-                    "FOREIGN KEY (manager) REFERENCES lot_mangers (manager_id) ON DELETE CASCADE ON UPDATE CASCADE)";
+                    "FOREIGN KEY (manager) REFERENCES lot_managers (manager_id) ON DELETE CASCADE ON UPDATE CASCADE)";
 
             //create spots table
             String createSpotsTable = "CREATE TABLE IF NOT EXISTS spots (" +

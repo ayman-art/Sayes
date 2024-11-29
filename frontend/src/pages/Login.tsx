@@ -13,10 +13,8 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await loginUser(username, password, role); 
-      if (response.token) {
-        navigate("/dashboard");
-      }
+      await loginUser(username, password, role); 
+      navigate("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
       alert("Login failed. Please check your credentials.");

@@ -15,14 +15,14 @@ public class SignUpValidation {
         this.data = data;
     }
 
-    public User validate() throws SignUpException {
+    public boolean validate() throws SignUpException {
         ISignUpHandler handler = generateHandlerChain();
         while (handler != null) {
             handler.handle(this.data);
             System.out.println("ay 7aga");
             handler = handler.getNextHandler();
         }
-        return UserFactory.getUser(this.userType, this.data);
+        return true;
     }
 
     private ISignUpHandler generateHandlerChain() {

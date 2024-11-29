@@ -21,7 +21,6 @@ public class UserFactory {
                 return adminAdapter.fromMap(data);
             }
             case "LotManager" -> {
-                System.out.println("pass 5");
                 LotManagerAdapter lotManagerAdapter = new LotManagerAdapter();
                 return lotManagerAdapter.fromMap(data);
             }

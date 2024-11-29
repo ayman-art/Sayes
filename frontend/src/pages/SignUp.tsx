@@ -55,9 +55,8 @@ const SignUp: React.FC = () => {
         response = await registerLotManager(username, password, role);
       }
 
-      if (response.token) {
-        navigate("/dashboard");
-      }
+      navigate("/dashboard");
+      
     } catch (error) {
       console.error("Sign up error:", error);
       setErrorMessage("Sign up failed. Please try again.");

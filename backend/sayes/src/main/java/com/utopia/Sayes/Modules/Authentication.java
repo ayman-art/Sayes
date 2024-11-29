@@ -3,15 +3,15 @@ package com.utopia.Sayes.Modules;
 import com.utopia.Sayes.enums.Role;
 import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-
 import javax.crypto.spec.SecretKeySpec;
-import java.security.Key;
 import java.util.Base64;
+import java.security.Key;
 import java.util.Date;
-
+import io.jsonwebtoken.JwtBuilder;
+import org.springframework.stereotype.Service;
+@Service
 public class Authentication {
     static Dotenv dotenv = Dotenv.configure().load();
 
@@ -21,6 +21,7 @@ public class Authentication {
         Date today = new Date(now);
         SignatureAlgorithm algorithm = SignatureAlgorithm.HS256;
         String envKey = dotenv.get("JWT_Key");
+        System.out.println(envKey);
         byte[] apiKeySecretBytes = Base64.getDecoder().decode(envKey);
         Key signingKey = new SecretKeySpec(apiKeySecretBytes, algorithm.getJcaName());
         JwtBuilder builder = Jwts.builder()

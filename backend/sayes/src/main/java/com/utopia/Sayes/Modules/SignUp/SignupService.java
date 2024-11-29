@@ -8,6 +8,7 @@ import com.utopia.Sayes.Modules.SignUp.Handler.Exceptions.SignUpException;
 import com.utopia.Sayes.Repo.DriverDAO;
 import com.utopia.Sayes.Repo.LotManagerDAO;
 import com.utopia.Sayes.Repo.UserDAO;
+import org.apache.juli.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,13 +31,14 @@ public class SignUpService {
         );
         SignUpValidation validator = new SignUpValidation("Driver", map);
         try {
-            Driver user = (Driver) validator.validate();
+            //validator.validate();
+            Driver user = new Driver(name, password, 0, plate, license);
             this.user_dao.addUser(user);
             long id = user_dao.getUserId(name);
             user.setDriver_id(id);
             this.driver_dao.addDriver(user);
             return user;
-        } catch (SignUpException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -47,22 +49,24 @@ public class SignUpService {
         );
         SignUpValidation validator = new SignUpValidation("LotManager", map);
         try {
-            LotManager user = (LotManager) validator.validate();
-            System.out.println("pass 2");
+            //validator.validate();
+            LotManager user = new LotManager(name, password, 0);
             user_dao.addUser(user);
+
             long id = user_dao.getUserId(name);
+            System.out.println(id);
             user.setManager_id(id);
             manager_dao.addLotManager(user);
+            //System.out.println(user.toString());
             return user;
-        } catch (SignUpException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    public static User loginUser(String name, String password){
+    public User loginUser(String name, String password){
         LoginValidation validator = new LoginValidation(name, password);
         try {
-            validator.validate();
-            UserDAO user_dao = new UserDAO();
+            //validator.validate();
             User user = user_dao.getUser(name);
             if (password.equals(user.getUser_password()))
                 return user;
