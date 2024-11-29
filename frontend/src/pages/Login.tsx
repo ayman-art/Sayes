@@ -7,12 +7,13 @@ import { Link } from 'react-router-dom';
 const Login: React.FC = () => {
   const [username, setUsername] = useState<string>(""); 
   const [password, setPassword] = useState<string>("");
+  const [role, setRole] = useState<string>("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await loginUser(username, password); 
+      const response = await loginUser(username, password, role); 
       if (response.token) {
         navigate("/dashboard");
       }
@@ -43,6 +44,41 @@ const Login: React.FC = () => {
             onChange={(e) => setPassword(e.target.value)} 
             required 
           />
+        </div>
+        <div className="radio-group">
+          <label>Choose Role:</label>
+          <div className="radio-container">
+            <label>
+              <input 
+                type="radio" 
+                name="role" 
+                value="driver" 
+                checked={role === "driver"} 
+                onChange={() => setRole("driver")} 
+              />
+              Driver
+            </label>
+            <label>
+              <input 
+                type="radio" 
+                name="role" 
+                value="lot-manager" 
+                checked={role === "lot-manager"} 
+                onChange={() => setRole("lot-manager")} 
+              />
+              Lot Manager
+            </label>
+            <label>
+              <input 
+                type="radio" 
+                name="role" 
+                value="admin" 
+                checked={role === "admin"} 
+                onChange={() => setRole("admin")} 
+              />
+              Admin
+            </label>
+          </div>
         </div>
         <button type="submit" className="submit-button">Login</button>
       </form>

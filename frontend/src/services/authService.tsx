@@ -1,13 +1,19 @@
-export const loginUser = async (name: string, password: string) => {
-    const response = await fetch('/api/login', {
+const URL = "http://localhost:8080"
+export const loginUser = async (name: string, password: string, role: string) => {
+    const response = await fetch(`${URL}/users/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name, password }),
+      body: JSON.stringify({ 
+        "name":name,
+        "password":password,
+        "role":role 
+      }),
     });
   
     const data = await response.json();
+    console.log(data)
     if (response.ok && data.token) {
       // Save JWT to localStorage
       localStorage.setItem('jwtToken', data.token);
@@ -24,12 +30,18 @@ export const loginUser = async (name: string, password: string) => {
     plateNumber: string,
     licenseNumber: string
   ) => {
-    const response = await fetch('/api/register', {
+    const response = await fetch(`${URL}/users/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name, password, role, plateNumber, licenseNumber }),
+      body: JSON.stringify({ 
+        "name":name, 
+        "password":password,
+        "role":role,
+        "plateNumber": plateNumber,
+        "licenseNumber": licenseNumber 
+      }),
     });
   
     const data = await response.json();
@@ -43,12 +55,16 @@ export const loginUser = async (name: string, password: string) => {
   };
 
   export const registerLotManager = async (name: string, password: string, role: string) => {
-    const response = await fetch('/api/register', {
+    const response = await fetch(`${URL}/users/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name, password, role }),
+      body: JSON.stringify({ 
+        "name":name,
+        "password":password,
+        "role":role 
+      }),
     });
   
     const data = await response.json();
@@ -60,6 +76,7 @@ export const loginUser = async (name: string, password: string) => {
     }
     return data;
   };
+
   
   // Utility to check if the user is authenticated by validating the JWT
   export const getToken = (): string | null => {
