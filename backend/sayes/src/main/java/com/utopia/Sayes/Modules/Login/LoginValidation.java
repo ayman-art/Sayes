@@ -3,6 +3,9 @@ package com.utopia.Sayes.Modules.Login;
 import com.utopia.Sayes.Modules.Login.Handler.Exceptions.LoginException;
 import com.utopia.Sayes.Modules.Login.Handler.ILoginHandler;
 import com.utopia.Sayes.Modules.Login.Handler.PasswordLoginHandler;
+import com.utopia.Sayes.Modules.Login.Handler.UserHandler;
+
+import java.util.logging.Handler;
 
 public class LoginValidation {
     private final String username;
@@ -22,7 +25,9 @@ public class LoginValidation {
     }
 
     private ILoginHandler generateHandlerChain() {
-        return new PasswordLoginHandler();
+        ILoginHandler handler = new PasswordLoginHandler();
+        handler.setNextHandler(new UserHandler());
+        return handler;
     }
 }
 
