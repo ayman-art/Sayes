@@ -11,7 +11,7 @@ public class LoginValidation {
     private final String username;
     private final String password;
 
-    LoginValidation(String username, String password) {
+    public LoginValidation(String username, String password) {
         this.username = username;
         this.password = password;
     }

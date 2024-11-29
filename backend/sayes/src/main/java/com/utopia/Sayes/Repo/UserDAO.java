@@ -16,8 +16,14 @@ public class UserDAO {
     private JdbcTemplate jdbcTemplate;
 
     public void addUser(User user) {
-        String query = "INSERT INTO Users (user_id, username, user_password) VALUES (?, ?, ?)";
-        jdbcTemplate.update(query, user.getUser_id(), user.getUsername(), user.getUser_password());
+        String query = "INSERT INTO Users (username, user_password) VALUES (?, ?)";
+        jdbcTemplate.update(query, user.getUsername(), user.getUser_password());
+    }
+    public long getUserId(String username) throws NullPointerException{
+        String query = "SELECT user_id FROM Users WHERE username = ?";
+        Long id = jdbcTemplate.queryForObject(query, Long.class, username);
+        if(id == null) throw new NullPointerException();
+        return id;
     }
 
     public boolean doesUsernameExist(String username) {

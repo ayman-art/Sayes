@@ -1,11 +1,8 @@
 package com.utopia.Sayes.Modules.SignUp;
 
 import com.utopia.Sayes.Models.User;
-import com.utopia.Sayes.Modules.SignUp.Handler.DataFormatSignUpHandler;
+import com.utopia.Sayes.Modules.SignUp.Handler.*;
 import com.utopia.Sayes.Modules.SignUp.Handler.Exceptions.SignUpException;
-import com.utopia.Sayes.Modules.SignUp.Handler.ISignUpHandler;
-import com.utopia.Sayes.Modules.SignUp.Handler.LicenseNumberSignUpHandler;
-import com.utopia.Sayes.Modules.SignUp.Handler.PlateNumberSignUpHandler;
 
 import java.util.Map;
 
@@ -13,7 +10,7 @@ public class SignUpValidation {
     private final String userType;
     private final Map<String, Object> data;
 
-    SignUpValidation(String userType, Map<String, Object> data) {
+    public SignUpValidation(String userType, Map<String, Object> data) {
         this.userType = userType;
         this.data = data;
     }
@@ -28,11 +25,12 @@ public class SignUpValidation {
     }
 
     private ISignUpHandler generateHandlerChain() {
-        ISignUpHandler handler = new DataFormatSignUpHandler();
-        handler.setNextHandler(new PlateNumberSignUpHandler());
+        ISignUpHandler handler = new UserNameSignUpHandler();
+        handler.setNextHandler(new PasswordSignUpHandler());
         if (this.userType.equals("Driver")) {
-            handler.getNextHandler().setNextHandler(new LicenseNumberSignUpHandler());
+            handler.getNextHandler().setNextHandler(new DataFormatSignUpHandler());
             handler.getNextHandler().getNextHandler().setNextHandler(new PlateNumberSignUpHandler());
+            handler.getNextHandler().getNextHandler().getNextHandler().setNextHandler(new LicenseNumberSignUpHandler());
         }
         return handler;
     }
