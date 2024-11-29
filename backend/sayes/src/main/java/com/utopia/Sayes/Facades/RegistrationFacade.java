@@ -7,20 +7,26 @@ import com.utopia.Sayes.Modules.Authentication;
 import com.utopia.Sayes.Modules.SignUp.SignUpService;
 import com.utopia.Sayes.enums.Role;
 import com.utopia.Sayes.Models.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RegistrationFacade {
-    public static String RegisterDriver(String name, String password, String plate, int license){
-        Driver driver = SignUpService.registerDriver(name, password, plate, license);
+    @Autowired
+    SignUpService registration;
+    public String RegisterDriver(String name, String password, String plate, int license){
+        Driver driver = registration.registerDriver(name, password, plate, license);
         return Authentication.generateJWT(driver.getDriver_id(), name, Role.DRIVER);
     }
 
-    public static String RegisterManager(String name, String password){
-        LotManager manager = SignUpService.registerManager(name, password);
+    public String RegisterManager(String name, String password){
+
+        LotManager manager = registration.registerManager(name, password);
         return Authentication.generateJWT(manager.getManager_id(), name, Role.MANAGER);
 
     }
-    public static String loginUser(String name, String password){
-        User user = SignUpService.loginUser(name, password);
+    public String loginUser(String name, String password){
+        User user = registration.loginUser(name, password);
         if(user.getClass()== Admin.class)
             return Authentication.generateJWT(user.getUser_id(), name, Role.ADMIN);
         else if (user.getClass()== LotManager.class)

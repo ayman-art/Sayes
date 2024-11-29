@@ -19,18 +19,18 @@ public class SignUpValidation {
         ISignUpHandler handler = generateHandlerChain();
         while (handler != null) {
             handler.handle(this.data);
+            System.out.println("ay 7aga");
             handler = handler.getNextHandler();
         }
         return UserFactory.getUser(this.userType, this.data);
     }
 
     private ISignUpHandler generateHandlerChain() {
-        ISignUpHandler handler = new UserNameSignUpHandler();
-        handler.setNextHandler(new PasswordSignUpHandler());
+        ISignUpHandler handler = new PasswordSignUpHandler();
         if (this.userType.equals("Driver")) {
-            handler.getNextHandler().setNextHandler(new DataFormatSignUpHandler());
-            handler.getNextHandler().getNextHandler().setNextHandler(new PlateNumberSignUpHandler());
-            handler.getNextHandler().getNextHandler().getNextHandler().setNextHandler(new LicenseNumberSignUpHandler());
+            handler.setNextHandler(new DataFormatSignUpHandler());
+            handler.getNextHandler().setNextHandler(new PlateNumberSignUpHandler());
+            handler.getNextHandler().getNextHandler().setNextHandler(new LicenseNumberSignUpHandler());
         }
         return handler;
     }
