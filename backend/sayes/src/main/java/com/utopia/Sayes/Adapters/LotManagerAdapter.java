@@ -22,7 +22,7 @@ public class LotManagerAdapter implements IAdapter<LotManager> {
         String user_password = (String) map.get("user_password");
         long revenue = (long) map.get("revenue");
         LotManager lotManager = new LotManager(username , user_password , revenue);
-        lotManager.setManager_id((Long) map.get("manager_id"));
+        lotManager.setUser_id((Long) map.get("manager_id"));
         return lotManager;
     }
 

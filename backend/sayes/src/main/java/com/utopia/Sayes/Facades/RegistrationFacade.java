@@ -16,13 +16,13 @@ public class RegistrationFacade {
     SignUpService registration;
     public String RegisterDriver(String name, String password, String plate, int license){
         Driver driver = registration.registerDriver(name, password, plate, license);
-        return Authentication.generateJWT(driver.getDriver_id(), name, Role.DRIVER);
+        return Authentication.generateJWT(driver.getUser_id(), name, Role.DRIVER);
     }
 
     public String RegisterManager(String name, String password){
 
         LotManager manager = registration.registerManager(name, password);
-        return Authentication.generateJWT(manager.getManager_id(), name, Role.MANAGER);
+        return Authentication.generateJWT(manager.getUser_id(), name, Role.MANAGER);
 
     }
     public String loginUser(String name, String password){

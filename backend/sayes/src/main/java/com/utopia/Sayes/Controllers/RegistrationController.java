@@ -1,6 +1,7 @@
 package com.utopia.Sayes.Controllers;
 
 import com.utopia.Sayes.Facades.RegistrationFacade;
+import com.utopia.Sayes.Modules.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -23,11 +24,9 @@ public class RegistrationController {
         try {
             String jwt = facade.loginUser((String) userdata.get("name"),
                     (String) userdata.get("password"));
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", jwt);
             return new ResponseEntity<>((Object) Map.of(
-                    "message", "User logged in successfully"
-            ), headers, HttpStatusCode.valueOf(200));
+                    "jwt", jwt
+            ), HttpStatusCode.valueOf(200));
 
         }catch (Exception e){
             return new ResponseEntity<>(Map.of(
@@ -53,17 +52,30 @@ public class RegistrationController {
             }else return new ResponseEntity<>(Map.of(
                     "message", "Bad request : could not find role"
                 ),HttpStatusCode.valueOf(500));
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", jwt);
             return new ResponseEntity<>((Object) Map.of(
-                    "message", "User registered successfully"
-            ), headers, HttpStatusCode.valueOf(200));
+                    "jwt", jwt
+            ), HttpStatusCode.valueOf(200));
         }catch(Exception e){
             return new ResponseEntity<>(Map.of(
                     "message", "Registration failed: "+ e.getMessage()
             ),  HttpStatusCode.valueOf(500));
         }
 
+    }
+    @GetMapping("/auth")
+    public ResponseEntity<?> authUser(@RequestHeader("Authorization") String jwt){
+        System.out.println("...");
+        try{
+            String token = jwt.replace("Bearer ", "");
+            Authentication.parseToken(token);
+            return new ResponseEntity<>((Object) Map.of(
+                    "message", "User Authenticated successfully"
+            ), HttpStatusCode.valueOf(200));
+        }catch (Exception e){
+            return new ResponseEntity<>((Object) Map.of(
+                    "jwt", jwt
+            ), HttpStatusCode.valueOf(401));
+        }
     }
 
 }

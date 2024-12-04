@@ -38,20 +38,21 @@ public class UserDAO {
 
     public User getUser(String username) {
         String query = """
-                SELECT * FROM Users lot_mangers Admins Drivers
-                INNER JOIN lot_mangers ON Users.user_id = lot_mangers.manager_id
-                INNER JOIN Admins ON Users.user_id = Admins.Admin_id
-                INNER JOIN Drivers ON Users.user_id = Drivers.Driver_id
+                SELECT * FROM Users
+                LEFT JOIN lot_managers ON Users.user_id = lot_managers.manager_id
+                LEFT JOIN Admins ON Users.user_id = Admins.Admin_id
+                LEFT JOIN Drivers ON Users.user_id = Drivers.Driver_id
                 WHERE username = ?
                 """;
         Map<String, Object> user = jdbcTemplate.queryForMap(query, username);
-        if (user.containsKey("Admin_id")) {
+        if (user.get("Admin_id") != null) {
             AdminAdapter adminAdapter = new AdminAdapter();
             return adminAdapter.fromMap(user);
-        } else if (user.containsKey("manager_id")) {
+        } else if (user.get("Manager_id") != null) {
             LotManagerAdapter lotManagerAdapter = new LotManagerAdapter();
             return lotManagerAdapter.fromMap(user);
-        } else if (user.containsKey("Driver_id")) {
+        } else if (user.get("Driver_id") != null) {
+            System.out.println("here");
             DriverAdapter driverAdapter = new DriverAdapter();
             return driverAdapter.fromMap(user);
         }

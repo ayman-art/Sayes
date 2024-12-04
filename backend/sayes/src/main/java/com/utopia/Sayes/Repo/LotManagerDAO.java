@@ -12,6 +12,6 @@ public class LotManagerDAO {
 
     public void addLotManager(LotManager lotManager) {
         String query = "INSERT INTO lot_managers (manager_id, revenue) VALUES (?, ?)";
-        jdbcTemplate.update(query, lotManager.getManager_id(), lotManager.getRevenue());
+        jdbcTemplate.update(query, lotManager.getUser_id(), lotManager.getRevenue());
     }
 }

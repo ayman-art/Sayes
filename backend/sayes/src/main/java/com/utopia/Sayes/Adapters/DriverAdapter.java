@@ -21,13 +21,16 @@ public class DriverAdapter implements IAdapter<Driver> {
 
     @Override
     public Driver fromMap(Map<String, Object> map) {
+        System.out.println(map.toString());
         String username = (String) map.get("username");
         String user_password = (String) map.get("user_password");
         long balance = (long) map.get("balance");
         long license_number = (long) map.get("license_number");
         String plate_number = (String) map.get("plate_number");
         Driver driver = new Driver(username , user_password , balance , plate_number , license_number);
-        driver.setDriver_id((Long) map.get("Driver_id"));
+        long id = (long) map.get("Driver_id");
+        driver.setUser_id(id);
+        System.out.println("here2");
         driver.setPayment_method((String) map.get("payment_method"));
         return driver;
     }

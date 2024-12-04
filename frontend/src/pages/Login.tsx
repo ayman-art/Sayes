@@ -3,18 +3,20 @@ import { useNavigate } from "react-router-dom";
 import '../styles/components.css';
 import { loginUser } from "../services/authService";
 import { Link } from 'react-router-dom';
-
-const Login: React.FC = () => {
+interface loginProps{
+  onLogin: ()=> void
+}
+const Login: React.FC<loginProps> = ({onLogin}) => {
   const [username, setUsername] = useState<string>(""); 
   const [password, setPassword] = useState<string>("");
-  const [role, setRole] = useState<string>("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await loginUser(username, password, role); 
-      navigate("/dashboard");
+      await loginUser(username, password); 
+      onLogin()
+      navigate("/");
     } catch (error) {
       console.error("Login error:", error);
       alert("Login failed. Please check your credentials.");
@@ -43,41 +45,7 @@ const Login: React.FC = () => {
             required 
           />
         </div>
-        <div className="radio-group">
-          <label>Choose Role:</label>
-          <div className="radio-container">
-            <label>
-              <input 
-                type="radio" 
-                name="role" 
-                value="driver" 
-                checked={role === "driver"} 
-                onChange={() => setRole("driver")} 
-              />
-              Driver
-            </label>
-            <label>
-              <input 
-                type="radio" 
-                name="role" 
-                value="lot-manager" 
-                checked={role === "lot-manager"} 
-                onChange={() => setRole("lot-manager")} 
-              />
-              Lot Manager
-            </label>
-            <label>
-              <input 
-                type="radio" 
-                name="role" 
-                value="admin" 
-                checked={role === "admin"} 
-                onChange={() => setRole("admin")} 
-              />
-              Admin
-            </label>
-          </div>
-        </div>
+        
         <button type="submit" className="submit-button">Login</button>
       </form>
       <div className="link-container">

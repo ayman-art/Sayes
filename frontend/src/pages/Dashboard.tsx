@@ -1,8 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/components.css';
-
-const Dashboard: React.FC = () => {
+interface dashboardProps {
+  onLogout: ()=>void
+}
+const Dashboard: React.FC<dashboardProps> = ({onLogout}) => {
   const navigate = useNavigate();
 
   // Sample placeholder data
@@ -12,7 +14,8 @@ const Dashboard: React.FC = () => {
     // Clear any session data or token if necessary
     // localStorage.clear();
     // Redirect to login page
-    navigate('/login');
+    onLogout()
+    navigate('/');
   };
 
   return (

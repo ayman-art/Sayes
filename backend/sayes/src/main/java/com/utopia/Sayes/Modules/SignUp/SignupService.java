@@ -35,7 +35,7 @@ public class SignUpService {
             Driver user = new Driver(name, password, 0, plate, license);
             this.user_dao.addUser(user);
             long id = user_dao.getUserId(name);
-            user.setDriver_id(id);
+            user.setUser_id(id);
             this.driver_dao.addDriver(user);
             return user;
         } catch (Exception e) {
@@ -55,7 +55,7 @@ public class SignUpService {
 
             long id = user_dao.getUserId(name);
             System.out.println(id);
-            user.setManager_id(id);
+            user.setUser_id(id);
             manager_dao.addLotManager(user);
             //System.out.println(user.toString());
             return user;
@@ -65,9 +65,13 @@ public class SignUpService {
     }
     public User loginUser(String name, String password){
         LoginValidation validator = new LoginValidation(name, password);
+        System.out.println(name);
         try {
             //validator.validate();
+            System.out.println(password);
             User user = user_dao.getUser(name);
+            System.out.println(user.getUsername());
+
             if (password.equals(user.getUser_password()))
                 return user;
             else throw new Exception("Wrong password");
