@@ -1,11 +1,8 @@
 package com.utopia.Sayes.Modules.SignUp;
 
 import com.utopia.Sayes.Models.User;
-import com.utopia.Sayes.Modules.SignUp.Handler.DataFormatSignUpHandler;
+import com.utopia.Sayes.Modules.SignUp.Handler.*;
 import com.utopia.Sayes.Modules.SignUp.Handler.Exceptions.SignUpException;
-import com.utopia.Sayes.Modules.SignUp.Handler.ISignUpHandler;
-import com.utopia.Sayes.Modules.SignUp.Handler.LicenseNumberSignUpHandler;
-import com.utopia.Sayes.Modules.SignUp.Handler.PlateNumberSignUpHandler;
 
 import java.util.Map;
 
@@ -13,26 +10,27 @@ public class SignUpValidation {
     private final String userType;
     private final Map<String, Object> data;
 
-    SignUpValidation(String userType, Map<String, Object> data) {
+    public SignUpValidation(String userType, Map<String, Object> data) {
         this.userType = userType;
         this.data = data;
     }
 
-    public User validate() throws SignUpException {
+    public boolean validate() throws SignUpException {
         ISignUpHandler handler = generateHandlerChain();
         while (handler != null) {
             handler.handle(this.data);
+            System.out.println("ay 7aga");
             handler = handler.getNextHandler();
         }
-        return UserFactory.getUser(this.userType, this.data);
+        return true;
     }
 
     private ISignUpHandler generateHandlerChain() {
-        ISignUpHandler handler = new DataFormatSignUpHandler();
-        handler.setNextHandler(new PlateNumberSignUpHandler());
+        ISignUpHandler handler = new PasswordSignUpHandler();
         if (this.userType.equals("Driver")) {
-            handler.getNextHandler().setNextHandler(new LicenseNumberSignUpHandler());
-            handler.getNextHandler().getNextHandler().setNextHandler(new PlateNumberSignUpHandler());
+            handler.setNextHandler(new DataFormatSignUpHandler());
+            handler.getNextHandler().setNextHandler(new PlateNumberSignUpHandler());
+            handler.getNextHandler().getNextHandler().setNextHandler(new LicenseNumberSignUpHandler());
         }
         return handler;
     }

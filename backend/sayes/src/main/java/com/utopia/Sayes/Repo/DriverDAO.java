@@ -13,7 +13,7 @@ public class DriverDAO {
     public void addDriver(Driver driver) {
         String query = "INSERT INTO Drivers " +
                 "(Driver_id, plate_number, balance, payment_method, license_number) VALUES (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(query, driver.getDriver_id(), driver.getPlate_number(), driver.getBalance(),
+        jdbcTemplate.update(query, driver.getUser_id(), driver.getPlate_number(), driver.getBalance(),
                 driver.getPayment_method(), driver.getLicense_number());
     }
 

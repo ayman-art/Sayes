@@ -12,6 +12,6 @@ public class AdminDAO {
 
     public void addAdmin(Admin admin) {
         String query = "INSERT INTO Admins (Admin_id) VALUES (?)";
-        jdbcTemplate.update(query, admin.getAdmin_id());
+        jdbcTemplate.update(query, admin.getUser_id());
     }
 }

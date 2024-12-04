@@ -20,7 +20,7 @@ public class AdminAdapter implements IAdapter<Admin> {
         String username = (String) map.get("username");
         String user_password = (String) map.get("user_password");
         Admin admin = new Admin(username , user_password);
-        admin.setAdmin_id((Long) map.get("Admin_id"));
+        admin.setUser_id((Long) map.get("Admin_id"));
         return admin;
     }
 

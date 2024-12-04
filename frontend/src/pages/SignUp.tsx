@@ -5,8 +5,10 @@ import '../styles/components.css';
 import { Link } from 'react-router-dom';
 import { registerDriver, registerLotManager } from "../services/authService";
 import Modal from "../components/modal/Modal";
-
-const SignUp: React.FC = () => {
+interface signupProps{
+  onLogin: ()=> void
+}
+const SignUp: React.FC<signupProps> = ({onLogin}) => {
   const [username, setUsername] = useState<string>(""); 
   const [password, setPassword] = useState<string>("");
   const [role, setRole] = useState<"driver" | "lot-manager">("driver");
@@ -54,10 +56,9 @@ const SignUp: React.FC = () => {
         console.log("Registering lot manager...");
         response = await registerLotManager(username, password, role);
       }
-
-      if (response.token) {
-        navigate("/dashboard");
-      }
+      onLogin()
+      navigate("/");
+      
     } catch (error) {
       console.error("Sign up error:", error);
       setErrorMessage("Sign up failed. Please try again.");
