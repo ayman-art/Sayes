@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard"; 
 import { authorizeToken, clearData, saveData } from "./services/authService";
+import DriverHomePage from "./pages/DriverHome";
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -58,6 +59,7 @@ const App: React.FC = () => {
             <Route path="/signup" element={<SignUp onLogin={onLogin} />} />
           </>
         )}
+        <Route path="/test" element={<DriverHomePage/>}/>
       </Routes>
     </Router>
   );
