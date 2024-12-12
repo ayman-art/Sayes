@@ -12,7 +12,6 @@ public class SpotAdapter implements IAdapter<Spot> {
         spotMap.put("spot_id", spot.getSpot_id());
         spotMap.put("lot_id", spot.getLot_id());
         spotMap.put("state", spot.getState());
-        spotMap.put("type", spot.getType());
         return spotMap;
     }
 
@@ -21,9 +20,8 @@ public class SpotAdapter implements IAdapter<Spot> {
         long spot_id = (long) map.get("spot_id");
         long lot_id = (long) map.get("lot_id");
         String state = (String) map.get("state");
-        String type = (String) map.get("type");
 
-        Spot spot = new Spot(spot_id, lot_id, state, type);
+        Spot spot = new Spot(spot_id, lot_id, state);
         return spot;
     }
 
