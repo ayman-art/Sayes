@@ -8,7 +8,7 @@ import com.utopia.Sayes.Repo.SpotDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalTime;
+import java.sql.Time;
 
 @Service
 public class ReservationService {
@@ -18,7 +18,7 @@ public class ReservationService {
     SpotDAO spotDAO;
     @Autowired
     ReservationDAO reservationDAO;
-    public boolean reserveSpot(long lot_id , long spot_id, long driver_id) throws Exception{
+    public boolean reserveSpot(long lot_id , long spot_id, long driver_id, Time startTime , Time endTime) throws Exception{
         try {
             Spot spot = spotDAO.getSpotById(spot_id , lot_id);
             if (spot == null){
@@ -30,7 +30,7 @@ public class ReservationService {
             }
             lotDAO.decrementAvailableSpots(lot_id);
             spotDAO.updateSpotState(spot_id,lot_id,"Reserved");
-            reservationDAO.addReservation(spot_id,lot_id, String.valueOf(LocalTime.now()),
+            reservationDAO.addReservation(spot_id,lot_id,startTime , endTime,
                     "Reserved",driver_id);
             return true;
         }

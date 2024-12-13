@@ -15,10 +15,10 @@ public class SpotDAO {
 
     private SpotAdapter spotAdapter = new SpotAdapter();
 
-    public void addSpot(long spot_id , long lot_id, String state, String type){
+    public void addSpot(long spot_id , long lot_id, String state){
         String query = "INSERT INTO spots " +
-                " (spot_id, lot_id, state, spot_type) VALUES (?, ?, ?, ?)";
-        int rows =  jdbcTemplate.update(query,spot_id,lot_id,state,type);
+                " (spot_id, lot_id, state) VALUES (?, ?, ?)";
+        int rows =  jdbcTemplate.update(query,spot_id,lot_id,state);
         if(rows == 0){
             throw new RuntimeException("can't insert this spot");
         }

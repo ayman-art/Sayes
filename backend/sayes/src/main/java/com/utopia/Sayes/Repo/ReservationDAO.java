@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Time;
 import java.util.Map;
 
 @Repository
@@ -14,11 +15,11 @@ public class ReservationDAO {
     private JdbcTemplate jdbcTemplate;
 
     private ReservationAdapter reservationAdapter = new ReservationAdapter();
-    public void addReservation(long spot_id, long lot_id, String reservation_time, String state, long driver_id) {
+    public void addReservation(long spot_id, long lot_id, Time start_time , Time end_time, String state, long driver_id) {
         String query = "INSERT INTO reserved_spots"  +
-        "(spot_id, lot_id, reservation_time, state, driver_id) " +
-                "VALUES (?, ?, ?, ?, ?)";
-        int rows = jdbcTemplate.update(query, spot_id, lot_id, reservation_time, state, driver_id);
+        "(spot_id, lot_id, start_time, end_time , state, driver_id) " +
+                "VALUES (?, ?, ?, ?, ? ,?)";
+        int rows = jdbcTemplate.update(query, spot_id, lot_id, start_time , end_time, state, driver_id);
         if(rows == 0){
             throw new RuntimeException("can't add this reservation");
         }
