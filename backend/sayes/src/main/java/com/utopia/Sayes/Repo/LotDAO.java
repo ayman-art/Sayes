@@ -18,10 +18,10 @@ public class LotDAO {
 
     public void addLot(Lot lot){
         String query = "INSERT INTO Lots " +
-                " (manager, location, price, num_of_spots, details, lot_type, penalty, fee, time)" +
-                " VALUES (?, ?, ?, ?, ? , ? ,? ,? ,?)";
-        int rows = jdbcTemplate.update(query , lot.getManager_id(), lot.getLocation(), lot.getPrice(),
-                    lot.getNum_of_spots(), lot.getDetails(), lot.getLot_type() , lot.getPenalty(),
+                " (manager, longitude,latitude,revenue, price, num_of_spots, details, lot_type, penalty, fee, time)" +
+                " VALUES (?, ?, ?, ?, ? , ? ,? ,? ,?, ? , ?)";
+        int rows = jdbcTemplate.update(query , lot.getManager_id(), lot.getLongitude(),lot.getLatitude()
+                , lot.getRevenue(), lot.getPrice(), lot.getNum_of_spots(), lot.getDetails(), lot.getLot_type() , lot.getPenalty(),
         lot.getFee(), lot.getTime());
         if (rows == 0){
             throw new RuntimeException("Can't add this lot");
