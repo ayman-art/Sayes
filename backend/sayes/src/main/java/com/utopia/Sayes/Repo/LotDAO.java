@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -68,5 +69,9 @@ public class LotDAO {
     public long getLotTotalSpots(long lot_id){
         String query = "SELECT COUNT(*) FROM spots WHERE lot_id = ?";
         return jdbcTemplate.queryForObject(query, Long.class, lot_id);
+    }
+    public Time getTimeLimitById(long lotId) {
+        String query = "SELECT time FROM Lots WHERE id = ?";
+            return jdbcTemplate.queryForObject(query, Time.class, lotId);
     }
 }
