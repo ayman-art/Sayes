@@ -15,10 +15,10 @@ public class SpotDAO {
 
     private SpotAdapter spotAdapter = new SpotAdapter();
 
-    public void addSpot(long spot_id , long lot_id, String state){
+    public void addSpot(long lot_id, String state){
         String query = "INSERT INTO spots " +
-                " (spot_id, lot_id, state) VALUES (?, ?, ?)";
-        int rows =  jdbcTemplate.update(query,spot_id,lot_id,state);
+                " (lot_id, state) VALUES (?, ?)";
+        int rows =  jdbcTemplate.update(query,lot_id,state);
         if(rows == 0){
             throw new RuntimeException("can't insert this spot");
         }
@@ -34,6 +34,7 @@ public class SpotDAO {
         String query = "SELECT * FROM spots WHERE spot_id = ? AND lot_id = ?";
             Map<String, Object> resultMap = jdbcTemplate.queryForMap(query, spot_id, lot_id);
             if(resultMap.isEmpty()){
+                System.out.println("here");
                 throw new Exception("There is no spot with this id");
             }
             return spotAdapter.fromMap(resultMap);
@@ -45,5 +46,9 @@ public class SpotDAO {
             throw new NullPointerException("Spot Doesn't exist");
         }
         return state;
+    }
+    public Long getFirstAvailableSpotId(long lot_id, String state) {
+        String query = "SELECT spot_id FROM spots WHERE lot_id = ? AND state = ? LIMIT 1";
+       return jdbcTemplate.queryForObject(query, new Object[]{lot_id, state}, Long.class);
     }
 }

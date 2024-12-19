@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Time;
+import java.util.Date;
 import java.util.Map;
 
 @Repository
@@ -15,7 +15,7 @@ public class ReservationDAO {
     private JdbcTemplate jdbcTemplate;
 
     private ReservationAdapter reservationAdapter = new ReservationAdapter();
-    public void addReservation(long spot_id, long lot_id, Time start_time , Time end_time, String state, long driver_id) {
+    public void addReservation(long spot_id, long lot_id, Date start_time , Date end_time, String state, long driver_id) {
         String query = "INSERT INTO reserved_spots"  +
         "(spot_id, lot_id, start_time, end_time , state, driver_id) " +
                 "VALUES (?, ?, ?, ?, ? ,?)";
@@ -32,7 +32,7 @@ public class ReservationDAO {
         }
     }
     public Reservation getReservation(long spot_id, long lot_id,long driver_id) throws Exception {
-        String query = "SELECT FROM reserved_spots WHERE spot_id = ? AND lot_id = ? AND driver_id = ?";
+        String query = "SELECT * FROM reserved_spots WHERE spot_id = ? AND lot_id = ? AND driver_id = ?";
         Map<String, Object> resultMap = jdbcTemplate.queryForMap(query, spot_id, lot_id,driver_id);
         if(resultMap.isEmpty()){
             throw new Exception("There is no spot with this id");

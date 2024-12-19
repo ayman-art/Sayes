@@ -1,8 +1,9 @@
 package com.utopia.Sayes.Adapters;
 
-import com.utopia.Sayes.Models.Lot;
 import com.google.gson.Gson;
+import com.utopia.Sayes.Models.Lot;
 
+import java.sql.Time;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class LotAdapter implements IAdapter<Lot>{
     @Override
     public Lot fromMap(Map<String, Object> map) {
         long lot_id = (long) map.get("lot_id");
-        long manager_id = (long) map.get("manager_id");
+        long manager_id = (long) map.get("manager");
         double longitude = (double) map.get("longitude");
         double latitude = (double) map.get("latitude");
         long revenue = (long) map.get("revenue");
@@ -36,9 +37,10 @@ public class LotAdapter implements IAdapter<Lot>{
         long num_of_spots = (long) map.get("num_of_spots");
         String details = (String) map.get("details");
         String lot_type = (String) map.get("lot_type");
-        long penalty = (long) map.get("penalty");
-        long fee = (long) map.get("fee");
-        Duration time = (Duration) map.get("time");
+        double penalty = (double) map.get("penalty");
+        double fee = (double) map.get("fee");
+        long milliseconds = ((Time) map.get("time")).getTime();
+        Duration time = Duration.ofMillis(milliseconds);
         Lot lot = new Lot(manager_id, longitude, latitude , revenue, price, num_of_spots,lot_type,penalty,fee,time);
         lot.setLot_id(lot_id);
         lot.setDetails(details);

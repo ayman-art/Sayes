@@ -22,29 +22,26 @@ public class ReservationService {
     SpotDAO spotDAO;
     @Autowired
     ReservationDAO reservationDAO;
-    public boolean reserveSpot(long lot_id , long spot_id, long driver_id, Time startTime , Time endTime) throws Exception{
+    public long reserveSpot(long lot_id ,long driver_id,Time endTime) throws Exception{
         try {
-            Spot spot = spotDAO.getSpotById(spot_id , lot_id);
-            if (spot == null){
+            long spotId = spotDAO.getFirstAvailableSpotId(lot_id , "Available");
+            if (spotId == 0){
                 throw new Exception("spot doesn't exist");
             }
-            String spotStatus = spotDAO.getSpotState(spot_id , lot_id);
-            if(!spotStatus.equals("Available")){
-                throw new Exception("this spot is occupied or reserved");
-            }
             lotDAO.decrementAvailableSpots(lot_id);
-            spotDAO.updateSpotState(spot_id,lot_id,"Reserved");
-            reservationDAO.addReservation(spot_id,lot_id,startTime , endTime,
+            spotDAO.updateSpotState(spotId,lot_id,"Reserved");
+            java.sql.Timestamp startTimestamp = new java.sql.Timestamp(new Date().getTime());
+            java.sql.Timestamp endTimestamp = new java.sql.Timestamp(endTime.getTime());
+            reservationDAO.addReservation(spotId,lot_id, startTimestamp, endTimestamp,
                     "Reserved",driver_id);
-            setReservationTimeOut(lot_id , spot_id , driver_id);
-            return true;
+            setReservationTimeOut(lot_id , spotId , driver_id);
+            return spotId;
         }
         catch (Exception e){
-            System.out.println("Couldn't reserve this spot: " + e);
+           throw new Exception(e.getMessage());
         }
-        return false;
     }
-    public boolean useReservation(long spot_id ,long lot_id,long driver_id){
+    public void useReservation(long spot_id ,long lot_id,long driver_id){
         try {
             Spot spot = spotDAO.getSpotById(spot_id , lot_id);
             if (spot == null){
@@ -55,19 +52,18 @@ public class ReservationService {
                 throw new Exception("this spot is not reserved");
             }
             Reservation reservation = reservationDAO.getReservation(spot_id , lot_id , driver_id);
+            System.out.println(reservation.getState());
             if (reservation == null){
                 throw new Exception("There is no reservation for this spot");
             }
             spotDAO.updateSpotState(spot_id,lot_id,"Occupied");
             setOverOccupiedTime(lot_id , spot_id , driver_id);
-            return true;
         }
         catch (Exception e){
             System.out.println("Couldn't reserve this spot: " + e);
         }
-        return false;
     }
-    public boolean freeReservation(long spot_id ,long lot_id,long driver_id){
+    public void freeReservation(long spot_id ,long lot_id,long driver_id){
         try {
             Spot spot = spotDAO.getSpotById(spot_id , lot_id);
             if (spot == null){
@@ -84,12 +80,10 @@ public class ReservationService {
             spotDAO.updateSpotState(spot_id,lot_id,"Available");
             lotDAO.incrementAvailableSpots(lot_id);
             reservationDAO.deleteReservation(spot_id , lot_id);
-            return true;
         }
         catch (Exception e){
             System.out.println("Couldn't free this spot: " + e);
         }
-        return false;
     }
     private void setReservationTimeOut(long lot_id, long spot_id, long driver_id) {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();

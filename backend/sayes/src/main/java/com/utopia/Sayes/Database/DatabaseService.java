@@ -61,7 +61,7 @@ public class DatabaseService {
 
             //create spots table
             String createSpotsTable = "CREATE TABLE IF NOT EXISTS spots (" +
-                    "spot_id BIGINT NOT NULL, " +
+                    "spot_id BIGINT NOT NULL AUTO_INCREMENT, " +
                     "lot_id BIGINT NOT NULL, " +
                     "state VARCHAR(255) NOT NULL, " +
                     "PRIMARY KEY (spot_id, lot_id), " +

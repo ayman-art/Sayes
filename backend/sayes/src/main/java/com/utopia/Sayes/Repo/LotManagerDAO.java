@@ -14,4 +14,8 @@ public class LotManagerDAO {
         String query = "INSERT INTO lot_managers (manager_id, revenue) VALUES (?, ?)";
         jdbcTemplate.update(query, lotManager.getUser_id(), lotManager.getRevenue());
     }
+    public boolean doesManagerExist(long managerId) {
+        String query = "SELECT EXISTS(SELECT 1 FROM lot_managers WHERE manager_id = ?)";
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(query, Boolean.class, managerId));
+    }
 }
