@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,9 +19,11 @@ public class LotDAO {
 
     public void addLot(Lot lot){
         String query = "INSERT INTO Lots " +
-                " (manager, location, price, num_of_spots, details) VALUES (?, ?, ?, ?, ?)";
-        int rows = jdbcTemplate.update(query , lot.getManager_id(), lot.getLocation(), lot.getPrice(),
-                    lot.getNum_of_spots(), lot.getDetails());
+                " (manager, longitude,latitude,revenue, price, num_of_spots, details, lot_type, penalty, fee, time)" +
+                " VALUES (?, ?, ?, ?, ? , ? ,? ,? ,?, ? , ?)";
+        int rows = jdbcTemplate.update(query , lot.getManager_id(), lot.getLongitude(),lot.getLatitude()
+                , lot.getRevenue(), lot.getPrice(), lot.getNum_of_spots(), lot.getDetails(), lot.getLot_type() , lot.getPenalty(),
+        lot.getFee(), lot.getTime());
         if (rows == 0){
             throw new RuntimeException("Can't add this lot");
         }
@@ -66,5 +69,9 @@ public class LotDAO {
     public long getLotTotalSpots(long lot_id){
         String query = "SELECT COUNT(*) FROM spots WHERE lot_id = ?";
         return jdbcTemplate.queryForObject(query, Long.class, lot_id);
+    }
+    public Time getTimeLimitById(long lotId) {
+        String query = "SELECT time FROM Lots WHERE id = ?";
+            return jdbcTemplate.queryForObject(query, Time.class, lotId);
     }
 }

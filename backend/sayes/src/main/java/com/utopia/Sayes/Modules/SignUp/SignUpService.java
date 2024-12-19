@@ -4,11 +4,9 @@ import com.utopia.Sayes.Models.Driver;
 import com.utopia.Sayes.Models.LotManager;
 import com.utopia.Sayes.Models.User;
 import com.utopia.Sayes.Modules.Login.LoginValidation;
-import com.utopia.Sayes.Modules.SignUp.Handler.Exceptions.SignUpException;
 import com.utopia.Sayes.Repo.DriverDAO;
 import com.utopia.Sayes.Repo.LotManagerDAO;
 import com.utopia.Sayes.Repo.UserDAO;
-import org.apache.juli.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

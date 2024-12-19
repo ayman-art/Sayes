@@ -47,9 +47,15 @@ public class DatabaseService {
             String createLotsTable = "CREATE TABLE IF NOT EXISTS Lots (" +
                     "lot_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
                     "manager BIGINT NOT NULL, " +
-                    "location VARCHAR(255) NOT NULL, " +
-                    "price BIGINT NOT NULL, " +
+                    "longitude DOUBLE NOT NULL, " +
+                    "latitude DOUBLE NOT NULL, " +
+                    "revenue BIGINT NOT NULL, " +
+                    "price DOUBLE (15 , 2) NOT NULL, " +
+                    "lot_type VARCHAR(255) NOT NULL,"+
                     "num_of_spots BIGINT NOT NULL, " +
+                    "penalty DOUBLE (15 , 2) NOT NULL, " +
+                    "fee DOUBLE (15 , 2) NOT NULL, " +
+                    "time TIME NOT NULL, " +
                     "details VARCHAR(255), " +
                     "FOREIGN KEY (manager) REFERENCES lot_managers (manager_id) ON DELETE CASCADE ON UPDATE CASCADE)";
 
@@ -58,7 +64,6 @@ public class DatabaseService {
                     "spot_id BIGINT NOT NULL, " +
                     "lot_id BIGINT NOT NULL, " +
                     "state VARCHAR(255) NOT NULL, " +
-                    "spot_type VARCHAR(255) NOT NULL, " +
                     "PRIMARY KEY (spot_id, lot_id), " +
                     "FOREIGN KEY (lot_id) REFERENCES Lots (lot_id) ON DELETE CASCADE ON UPDATE CASCADE)";
 
@@ -66,7 +71,8 @@ public class DatabaseService {
             String createReservedSpotsTable = "CREATE TABLE IF NOT EXISTS reserved_spots (" +
                     "spot_id BIGINT NOT NULL, " +
                     "lot_id BIGINT NOT NULL, " +
-                    "reservation_time DATETIME NOT NULL, " +
+                    "start_time DATETIME NOT NULL, " +
+                    "end_time DATETIME NOT NULL, " +
                     "state VARCHAR(255), " +
                     "driver_id BIGINT NOT NULL, " +
                     "PRIMARY KEY (lot_id, spot_id), " +
