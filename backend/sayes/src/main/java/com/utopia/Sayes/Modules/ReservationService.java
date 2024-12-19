@@ -9,6 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Time;
+import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ReservationService {
@@ -32,6 +36,7 @@ public class ReservationService {
             spotDAO.updateSpotState(spot_id,lot_id,"Reserved");
             reservationDAO.addReservation(spot_id,lot_id,startTime , endTime,
                     "Reserved",driver_id);
+            setReservationTimeOut(lot_id , spot_id , driver_id);
             return true;
         }
         catch (Exception e){
@@ -54,6 +59,7 @@ public class ReservationService {
                 throw new Exception("There is no reservation for this spot");
             }
             spotDAO.updateSpotState(spot_id,lot_id,"Occupied");
+            setOverOccupiedTime(lot_id , spot_id , driver_id);
             return true;
         }
         catch (Exception e){
@@ -85,4 +91,47 @@ public class ReservationService {
         }
         return false;
     }
+    private void setReservationTimeOut(long lot_id, long spot_id, long driver_id) {
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+        Time timeLimit = lotDAO.getTimeLimitById(lot_id);
+        long timeoutMinutes = timeLimit.toLocalTime().toSecondOfDay() / 60;
+
+        scheduler.schedule(() -> {
+            try {
+                Reservation reservation = reservationDAO.getReservation(spot_id, lot_id, driver_id);
+                String reservationState = reservation.getState();
+                if ("Reserved".equals(reservationState)) {
+                    freeReservation(spot_id , lot_id , driver_id);
+                    System.out.println("Reservation expired and spot is now available again.");
+                    // send a penalty to the driver using his socket
+                }
+            } catch (Exception e) {
+                System.err.println("Error while checking reservation: " + e.getMessage());
+            }
+        }, timeoutMinutes, TimeUnit.MINUTES);
+    }
+
+
+    private void setOverOccupiedTime(long lot_id, long spot_id, long driver_id) throws Exception {
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+        Reservation reservation = reservationDAO.getReservation(spot_id, lot_id, driver_id);
+        String reservationState = reservation.getState();
+        Date endTime = reservation.getEnd_time();
+        Date currentTime = new Date();
+        long difference = endTime.getTime() - currentTime.getTime();
+        long minutesElapsed = difference / (60 * 1000);
+        scheduler.schedule(() -> {
+            try {
+                if ("Occupied".equals(reservationState)) {
+                    System.out.println("Reservation is over-occupied.");
+                    // send a fee to the driver using his socket
+                }
+            } catch (Exception e) {
+                System.err.println("Error while checking reservation: " + e.getMessage());
+            }
+        }, minutesElapsed, TimeUnit.MINUTES);
+    }
+
 }

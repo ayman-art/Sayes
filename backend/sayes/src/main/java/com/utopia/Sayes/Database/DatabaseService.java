@@ -47,7 +47,9 @@ public class DatabaseService {
             String createLotsTable = "CREATE TABLE IF NOT EXISTS Lots (" +
                     "lot_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
                     "manager BIGINT NOT NULL, " +
-                    "location VARCHAR(255) NOT NULL, " +
+                    "longitude DOUBLE NOT NULL, " +
+                    "latitude DOUBLE NOT NULL, " +
+                    "revenue BIGINT NOT NULL, " +
                     "price DOUBLE (15 , 2) NOT NULL, " +
                     "lot_type VARCHAR(255) NOT NULL,"+
                     "num_of_spots BIGINT NOT NULL, " +

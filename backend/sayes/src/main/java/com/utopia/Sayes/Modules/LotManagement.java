@@ -15,10 +15,11 @@ public class LotManagement {
     @Autowired
     SpotDAO spotDAO;
 
-    public void createLot(long manager_id , String location, long price, long num_of_available_spots, String lot_type
+    public void createLot(long manager_id , double longitude,double latitude,long revenue, long price, long num_of_available_spots, String lot_type
             , double penalty , double fee, Duration time) throws Exception{
         try {
-            Lot lot = new Lot(manager_id,location,price,num_of_available_spots , lot_type, penalty,fee, time);
+            Lot lot = new Lot(manager_id,longitude,latitude
+                    ,revenue,price,num_of_available_spots , lot_type, penalty,fee, time);
             lotDAO.addLot(lot);
         }
         catch (Exception e){

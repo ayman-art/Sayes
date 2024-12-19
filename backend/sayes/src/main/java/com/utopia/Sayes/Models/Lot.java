@@ -5,7 +5,10 @@ import java.time.Duration;
 public class Lot {
     private long lot_id;
     private long manager_id;
-    private String location;
+    private double longitude;
+
+    private double latitude;
+    private long revenue;
     private double price;
     private long num_of_spots;
 
@@ -16,12 +19,14 @@ public class Lot {
     private Duration time;
     private String details;
 
-    public Lot(long manager_id, String location, double price, long num_of_spots, String lot_type
+    public Lot(long manager_id, double longitude, double latitude,long revenue, double price, long num_of_spots, String lot_type
     , double penalty , double fee,Duration time) {
         this.manager_id = manager_id;
-        this.location = location;
         this.price = price;
         this.num_of_spots = num_of_spots;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.revenue = revenue;
         this.lot_type = lot_type;
         this.penalty = penalty;
         this.fee = fee;
@@ -76,12 +81,28 @@ public class Lot {
         this.manager_id = manager_id;
     }
 
-    public String getLocation() {
-        return location;
+    public double getLongitude() {
+        return longitude;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public long getRevenue() {
+        return revenue;
+    }
+
+    public void setRevenue(long revenue) {
+        this.revenue = revenue;
     }
 
     public double getPrice() {
