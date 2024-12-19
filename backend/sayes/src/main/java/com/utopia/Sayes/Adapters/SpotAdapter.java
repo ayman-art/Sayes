@@ -1,7 +1,6 @@
 package com.utopia.Sayes.Adapters;
 
 import com.utopia.Sayes.Models.Spot;
-import com.google.gson.Gson;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,9 +24,4 @@ public class SpotAdapter implements IAdapter<Spot> {
         return spot;
     }
 
-    @Override
-    public String toJson(Spot spot) {
-        Gson gson = new Gson();
-        return gson.toJson(spot);
-    }
 }
