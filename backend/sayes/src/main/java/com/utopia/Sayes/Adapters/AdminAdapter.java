@@ -1,6 +1,5 @@
 package com.utopia.Sayes.Adapters;
 
-import com.google.gson.Gson;
 import com.utopia.Sayes.Models.Admin;
 
 import java.util.HashMap;
@@ -22,11 +21,5 @@ public class AdminAdapter implements IAdapter<Admin> {
         Admin admin = new Admin(username , user_password);
         admin.setUser_id((Long) map.get("Admin_id"));
         return admin;
-    }
-
-    @Override
-    public String toJson(Admin admin) {
-        Gson gson = new Gson();
-        return gson.toJson(admin);
     }
 }

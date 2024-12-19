@@ -1,6 +1,5 @@
 package com.utopia.Sayes.Adapters;
 
-import com.google.gson.Gson;
 import com.utopia.Sayes.Models.Driver;
 
 import java.util.HashMap;
@@ -33,11 +32,5 @@ public class DriverAdapter implements IAdapter<Driver> {
         System.out.println("here2");
         driver.setPayment_method((String) map.get("payment_method"));
         return driver;
-    }
-
-    @Override
-    public String toJson(Driver driver) {
-        Gson gson = new Gson();
-        return gson.toJson(driver);
     }
 }
