@@ -1,6 +1,5 @@
 package com.utopia.Sayes.Adapters;
 
-import com.google.gson.Gson;
 import com.utopia.Sayes.Models.LotManager;
 
 import java.util.HashMap;
@@ -26,9 +25,5 @@ public class LotManagerAdapter implements IAdapter<LotManager> {
         return lotManager;
     }
 
-    @Override
-    public String toJson(LotManager lotManager) {
-        Gson gson = new Gson();
-        return gson.toJson(lotManager);
-    }
+
 }

@@ -3,6 +3,7 @@
   line-height: 1.5;
   font-weight: 400;
 
+  /* Theme colors */
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
@@ -11,23 +12,36 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Add CSS variables for easy customization */
+  --primary-color: #646cff;
+  --primary-hover-color: #535bf2;
+  --background-dark: #242424;
+  --background-light: #ffffff;
+  --text-dark: #213547;
+  --button-bg-dark: #1a1a1a;
+  --button-bg-light: #f9f9f9;
+  --focus-ring-color: -webkit-focus-ring-color;
 }
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--primary-color);
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--primary-hover-color);
 }
 
 body {
   margin: 0;
   display: flex;
-  place-items: center;
+  flex-direction: column; /* Allow stacking of content (e.g., navbar + main content) */
   min-width: 320px;
   min-height: 100vh;
+  background-color: var(--background-dark);
+  color: var(--text-dark);
+  transition: background-color 0.25s, color 0.25s; /* Smooth theme transitions */
 }
 
 h1 {
@@ -42,27 +56,76 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--button-bg-dark);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 0.25s, background-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: var(--primary-color);
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 4px auto var(--focus-ring-color);
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    color: var(--text-dark);
+    background-color: var(--background-light);
   }
   a:hover {
     color: #747bff;
   }
   button {
-    background-color: #f9f9f9;
+    background-color: var(--button-bg-light);
   }
+}
+
+/* Additional General Styling */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Page-Specific Adjustments */
+.map-page body {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  overflow: hidden; /* Prevent unwanted scrolling when the map overflows */
+}
+
+.map-page .map-container {
+  flex: 3;
+  height: 100vh; /* Full height for the map */
+}
+
+.map-page .sidebar {
+  flex: 1;
+  background-color: var(--background-light);
+  color: var(--text-dark);
+  padding: 1rem;
+  overflow-y: auto; /* Scrollable sidebar */
+}
+
+.navbar {
+  width: 100%;
+  background-color: var(--background-dark);
+  color: white;
+  padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar a {
+  margin: 0 1rem;
+  color: var(--primary-color);
+  text-decoration: none;
+}
+.navbar a:hover {
+  color: var(--primary-hover-color);
 }
