@@ -54,7 +54,7 @@ public class ReservationFacade {
             Long driverId = Long.parseLong(claims.getId());
             if (driverId == null)
                 throw new Exception("driver id is null");
-            reservationService.freeReservation((long) spotData.get("spotId") ,(long) spotData.get("lotId"), driverId);
+            reservationService.freeReservation(Long.valueOf((Integer) spotData.get("spotId")) ,Long.valueOf((Integer) spotData.get("lotId")), driverId);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());

@@ -41,7 +41,7 @@ public class ReservationController {
         try {
             token = token.replace("Bearer ", "");
             spotData.put("jwt", token);
-            reservationFacade.useSpot(spotData);
+            reservationFacade.freeSpot(spotData);
             return new ResponseEntity<>("spot freed successfully ", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

@@ -72,7 +72,7 @@ public class LotDAO {
         }
     }
     public void incrementAvailableSpots(long lotId) {
-        String query = "UPDATE Lots SET num_of_spots = num_of_spots + 1 WHERE id = ?";
+        String query = "UPDATE Lots SET num_of_spots = num_of_spots + 1 WHERE lot_id = ?";
         int rowsUpdated = jdbcTemplate.update(query, lotId);
         if (rowsUpdated == 0) {
             throw new IllegalStateException("Can't increment spots fro this manager: " + lotId);
