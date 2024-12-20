@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Time;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -44,6 +45,7 @@ public class ReservationService {
     public void useReservation(long spot_id ,long lot_id,long driver_id) throws Exception {
         try {
             Spot spot = spotDAO.getSpotById(spot_id , lot_id);
+            System.out.println(spot.getSpot_id());
             if (spot == null){
                 throw new Exception("spot doesn't exist");
             }
@@ -51,11 +53,11 @@ public class ReservationService {
             if(!spotStatus.equals("Reserved")){
                 throw new Exception("this spot is not reserved");
             }
-//            Reservation reservation = reservationDAO.getReservation(spot_id , lot_id , driver_id);
-//            System.out.println(reservation.getState());
-//            if (reservation == null){
-//                throw new Exception("There is no reservation for this spot");
-//            }
+            Reservation reservation = reservationDAO.getReservation(spot_id , lot_id , driver_id);
+            System.out.println(reservation.getState());
+            if (reservation == null){
+                throw new Exception("There is no reservation for this spot");
+            }
             spotDAO.updateSpotState(spot_id,lot_id,"Occupied");
             setOverOccupiedTime(lot_id , spot_id , driver_id);
         }
@@ -73,10 +75,10 @@ public class ReservationService {
             if(spotStatus.equals("Available")){
                 throw new Exception("this spot is Available");
             }
-//            Reservation reservation = reservationDAO.getReservation(spot_id , lot_id , driver_id);
-//            if (reservation == null){
-//                throw new Exception("There is no reservation for this spot");
-//            }
+            Reservation reservation = reservationDAO.getReservation(spot_id , lot_id , driver_id);
+            if (reservation == null){
+                throw new Exception("There is no reservation for this spot");
+            }
             spotDAO.updateSpotState(spot_id,lot_id,"Available");
             lotDAO.incrementAvailableSpots(lot_id);
             reservationDAO.deleteReservation(spot_id , lot_id);
@@ -112,9 +114,9 @@ public class ReservationService {
 
         Reservation reservation = reservationDAO.getReservation(spot_id, lot_id, driver_id);
         String reservationState = reservation.getState();
-        Date endTime = reservation.getEnd_time();
+        LocalDateTime endTime = reservation.getEnd_time();
         Date currentTime = new Date();
-        long difference = endTime.getTime() - currentTime.getTime();
+        long difference = endTime.getSecond() * 1000 - currentTime.getTime();
         long minutesElapsed = difference / (60 * 1000);
         scheduler.schedule(() -> {
             try {

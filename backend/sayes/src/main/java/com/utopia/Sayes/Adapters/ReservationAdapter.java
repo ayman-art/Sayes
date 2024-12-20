@@ -3,10 +3,7 @@ package com.utopia.Sayes.Adapters;
 import com.google.gson.Gson;
 import com.utopia.Sayes.Models.Reservation;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,12 +25,8 @@ public class ReservationAdapter implements IAdapter<Reservation> {
     public Reservation fromMap(Map<String, Object> map) {
         long spot_id = (long) map.get("spot_id");
         long lot_id = (long) map.get("lot_id");
-        Timestamp startTimestamp = (Timestamp) map.get("start_time");
-        LocalDateTime startTime = startTimestamp.toLocalDateTime();
-        Date start_time = Date.from(startTime.atZone(ZoneId.systemDefault()).toInstant());
-        Timestamp endTimestamp = (Timestamp) map.get("end_time");
-        LocalDateTime endTime = endTimestamp.toLocalDateTime();
-        Date end_time = Date.from(endTime.atZone(ZoneId.systemDefault()).toInstant());
+        LocalDateTime start_time = (LocalDateTime) map.get("start_time");
+        LocalDateTime end_time = (LocalDateTime) map.get("end_time");
         String state = (String) map.get("state");
         long driver_id = (long) map.get("driver_id");
 
