@@ -1,6 +1,4 @@
 package com.utopia.Sayes.Adapters;
-
-import com.google.gson.Gson;
 import com.utopia.Sayes.Models.Lot;
 
 import java.sql.Time;
@@ -47,9 +45,4 @@ public class LotAdapter implements IAdapter<Lot>{
         return lot;
     }
 
-    @Override
-    public String toJson(Lot lot) {
-        Gson gson = new Gson();
-        return gson.toJson(lot);
-    }
 }

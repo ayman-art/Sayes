@@ -1,88 +1,107 @@
 /* General styling */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f7fc;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  
-  h2 {
-    margin-bottom: 20px;
-    text-align: center;
-    color: #4A90E2;
-  }
-  
-  button {
-    padding: 10px 20px;
-    background-color: #4A90E2;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-    font-size: 16px;
-  }
-  
-  button:hover {
-    background-color: #357ABD;
-  }
-  
-  /* Form Containers */
-  input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    font-size: 14px;
-  }
-  
-  input:focus {
-    outline: none;
-    border-color: #4A90E2;
-  }
-  
-  .input-field {
-    margin-bottom: 20px;
-  }
-  
-  .submit-button {
-    background-color: #357ABD;
-  }
-  
-  /* Sign-In Specific */
-  .sign-in-container, .login-container {
-    width: 100%;
-    max-width: 400px;
-    padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .radio-group {
-    margin: 10px 0;
-  }
-  
-  .radio-container {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .radio-container label {
-    display: flex;
-    align-items: center;
-  }
-  
-  .radio-container input {
-    margin-right: 8px;
-  }
-  
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f7fc;
+  height: 100%; /* Ensure it takes full height for all pages */
+}
+
+h2 {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #4A90E2;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #4A90E2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #357ABD;
+}
+
+/* Form Containers */
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #4A90E2;
+}
+
+.input-field {
+  margin-bottom: 20px;
+}
+
+.submit-button {
+  background-color: #357ABD;
+}
+
+/* Sign-In Specific */
+.sign-in-container, .login-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: auto; /* Center only specific containers like forms */
+}
+
+.radio-group {
+  margin: 10px 0;
+}
+
+.radio-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.radio-container label {
+  display: flex;
+  align-items: center;
+}
+
+.radio-container input {
+  margin-right: 8px;
+}
+
+/* Specific Fixes for Map Layout */
+.map-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Full height for map page */
+}
+
+.map-content {
+  display: flex;
+  flex: 1;
+}
+
+.map-container {
+  flex: 2;
+}
+
+.sidebar {
+  flex: 1;
+  background-color: #f8f9fa;
+  padding: 1rem;
+}

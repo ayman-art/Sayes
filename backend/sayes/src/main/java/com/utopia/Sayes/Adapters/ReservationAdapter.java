@@ -1,6 +1,5 @@
 package com.utopia.Sayes.Adapters;
 
-import com.google.gson.Gson;
 import com.utopia.Sayes.Models.Reservation;
 
 import java.sql.Timestamp;
@@ -41,9 +40,5 @@ public class ReservationAdapter implements IAdapter<Reservation> {
         return reservation;
     }
 
-    @Override
-    public String toJson(Reservation reservation) {
-        Gson gson = new Gson();
-        return gson.toJson(reservation);
-    }
+
 }
