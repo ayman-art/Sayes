@@ -1,17 +1,17 @@
 package com.utopia.Sayes.Models;
 
-import java.sql.Time;
+import java.util.Date;
 
 public class Reservation {
     private long spot_id;
     private long lot_id;
-    private Time start_time;
+    private Date start_time;
 
-    private Time end_time;
+    private Date end_time;
     private String state;
     private long driver_id;
 
-    public Reservation(long spot_id, long lot_id, Time start_time,Time end_time, String state, long driver_id) {
+    public Reservation(long spot_id, long lot_id, Date start_time,Date end_time, String state, long driver_id) {
         this.spot_id = spot_id;
         this.lot_id = lot_id;
         this.start_time = start_time;
@@ -36,19 +36,19 @@ public class Reservation {
         this.lot_id = lot_id;
     }
 
-    public Time getStart_time() {
+    public Date getStart_time() {
         return start_time;
     }
 
-    public void setStart_time(Time start_time) {
+    public void setStart_time(Date start_time) {
         this.start_time = start_time;
     }
 
-    public Time getEnd_time() {
+    public Date getEnd_time() {
         return end_time;
     }
 
-    public void setEnd_time(Time end_time) {
+    public void setEnd_time(Date end_time) {
         this.end_time = end_time;
     }
 
