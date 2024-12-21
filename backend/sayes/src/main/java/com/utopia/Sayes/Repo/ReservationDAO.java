@@ -15,7 +15,7 @@ public class ReservationDAO {
     private JdbcTemplate jdbcTemplate;
 
     private ReservationAdapter reservationAdapter = new ReservationAdapter();
-    public void addReservation(long spot_id, long lot_id, Date start_time , Date end_time, String state, long driver_id) {
+    public void addReservation(long spot_id, long lot_id, Date start_time , Date end_time, String state, long driver_id, double price) {
         String query = "INSERT INTO reserved_spots"  +
         "(spot_id, lot_id, start_time, end_time , state, driver_id) " +
                 "VALUES (?, ?, ?, ?, ? ,?)";
@@ -38,6 +38,11 @@ public class ReservationDAO {
             throw new Exception("There is no spot with this id");
         }
         return reservationAdapter.fromMap(resultMap);
+    }
+
+    public double getReservationPrice(long spot_id, long lot_id) {
+        String query = "SELECT price FROM reserved_spots WHERE spot_id = ? AND lot_id = ?";
+        return jdbcTemplate.queryForObject(query, new Object[]{spot_id, lot_id}, Double.class);
     }
 
 }

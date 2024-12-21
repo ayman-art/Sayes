@@ -75,6 +75,7 @@ public class DatabaseService {
                     "end_time DATETIME NOT NULL, " +
                     "state VARCHAR(255), " +
                     "driver_id BIGINT NOT NULL, " +
+                    "price DOUBLE (15 , 2) NOT NULL, " +
                     "PRIMARY KEY (lot_id, spot_id), " +
                     "FOREIGN KEY (lot_id) REFERENCES Lots (lot_id), " +
                     "FOREIGN KEY (spot_id) REFERENCES spots (spot_id), " +
