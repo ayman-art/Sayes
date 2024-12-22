@@ -2,15 +2,17 @@ package com.utopia.Sayes.Modules.DynamicPricing;
 
 import com.utopia.Sayes.Models.Lot;
 import com.utopia.Sayes.Repo.LotDAO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.sql.Time;
-import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalTime;
-
+@Component
 public class DynamicPricing {
-    public static Double getPrice(long lotId, Time from, Time to) throws Exception {
-        LotDAO lotDAO = new LotDAO();
+    @Autowired
+    LotDAO lotDAO;
+    public Double getPrice(long lotId, Time from, Time to) throws Exception {
         Lot lot = lotDAO.getLotById(lotId);
 
         LocalTime fromTime = from.toLocalTime();
@@ -20,7 +22,7 @@ public class DynamicPricing {
         return lot.getPrice() * totalTime(fromTime, toTime) * ratio;
     }
 
-    private static double priceOnDemand(long AvailableSpots, long TotalSpots){
+    private double priceOnDemand(long AvailableSpots, long TotalSpots){
         double ratio = (double) AvailableSpots / TotalSpots;
         if(ratio < 0.2){
             return 0.5;
@@ -36,7 +38,7 @@ public class DynamicPricing {
         }
     }
 
-    private static double priceOnTime(LocalTime from) {
+    private double priceOnTime(LocalTime from) {
         int hour = from.getHour();
         if (hour >= 10 && hour <= 16) {
             return 0.35;
@@ -49,7 +51,7 @@ public class DynamicPricing {
         }
     }
 
-    private static double totalTime(LocalTime from, LocalTime to) {
+    private double totalTime(LocalTime from, LocalTime to) {
         return Duration.between(from, to).toMillis() / 3_600_000.0;
     }
 

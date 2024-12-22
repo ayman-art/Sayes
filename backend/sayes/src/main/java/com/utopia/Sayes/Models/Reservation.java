@@ -11,14 +11,25 @@ public class Reservation {
     private String state;
     private long driver_id;
 
-    public Reservation(long spot_id, long lot_id, LocalDateTime start_time,LocalDateTime end_time, String state, long driver_id) {
+    private double price;
+
+    public Reservation(long spot_id, long lot_id, LocalDateTime start_time, LocalDateTime end_time, String state, long driver_id, double price) {
         this.spot_id = spot_id;
         this.lot_id = lot_id;
         this.start_time = start_time;
         this.end_time = end_time;
         this.state = state;
         this.driver_id = driver_id;
+        this.price = price;
     }
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
 
     public long getSpot_id() {
         return spot_id;

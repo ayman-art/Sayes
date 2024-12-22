@@ -28,8 +28,9 @@ public class ReservationAdapter implements IAdapter<Reservation> {
         LocalDateTime end_time = (LocalDateTime) map.get("end_time");
         String state = (String) map.get("state");
         long driver_id = (long) map.get("driver_id");
+        double price = (double) map.get("price");
 
-        Reservation reservation = new Reservation(spot_id, lot_id, start_time , end_time, state, driver_id);
+        Reservation reservation = new Reservation(spot_id, lot_id, start_time , end_time, state, driver_id, price);
         return reservation;
     }
 
