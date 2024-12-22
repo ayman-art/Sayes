@@ -102,4 +102,11 @@ public class LotDAO {
         String query = "SELECT penalty FROM Lots WHERE lot_id = ?";
         return jdbcTemplate.queryForObject(query, Double.class, lot_id);
     }
+    public void updateLotRevenue(long price , long lotId) {
+        String query = "UPDATE Lots SET revenue = revenue + ? WHERE lot_id = ? ";
+        int rows  = jdbcTemplate.update(query, price, lotId);
+        if(rows == 0){
+            throw new RuntimeException("error updating revenue");
+        }
+    }
 }

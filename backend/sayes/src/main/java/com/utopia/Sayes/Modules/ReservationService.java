@@ -36,6 +36,9 @@ public class ReservationService {
     DynamicPricing dynamicPricing;
 
     @Autowired
+    PaymentService paymentService;
+
+    @Autowired
     private NotificationService notificationService;
 
     public long reserveSpot(long lot_id ,long driver_id,Time endTime) throws Exception{
@@ -67,23 +70,30 @@ public class ReservationService {
     }
     public void useReservation(long spot_id ,long lot_id,long driver_id) throws Exception {
         try {
-            Spot spot = spotDAO.getSpotById(spot_id , lot_id);
-            System.out.println(spot.getSpot_id());
-            if (spot == null){
-                throw new Exception("spot doesn't exist");
-            }
-            String spotStatus = spotDAO.getSpotState(spot_id , lot_id);
-            if(!spotStatus.equals(String.valueOf(SpotStatus.Reserved))){
-                throw new Exception("this spot is not reserved");
-            }
-            Reservation reservation = reservationDAO.getReservation(spot_id , lot_id , driver_id);
-            if (reservation == null){
-                throw new Exception("There is no reservation for this spot");
-            }
-            spotDAO.updateSpotState(spot_id,lot_id, String.valueOf(SpotStatus.Occupied));
-            setOverOccupiedTime(lot_id , spot_id , driver_id);
+            double price = reservationDAO.getReservationPrice(spot_id, lot_id);
+            if (paymentService.confirmReservation(price, driver_id, lot_id)) {
+                Spot spot = spotDAO.getSpotById(spot_id, lot_id);
+                System.out.println(spot.getSpot_id());
+                if (spot == null) {
+                    throw new Exception("spot doesn't exist");
+                }
+                String spotStatus = spotDAO.getSpotState(spot_id, lot_id);
+                if (!spotStatus.equals(String.valueOf(SpotStatus.Reserved))) {
+                    throw new Exception("this spot is not reserved");
+                }
+                Reservation reservation = reservationDAO.getReservation(spot_id, lot_id, driver_id);
+                if (reservation == null) {
+                    throw new Exception("There is no reservation for this spot");
+                }
+                spotDAO.updateSpotState(spot_id, lot_id, String.valueOf(SpotStatus.Occupied));
+                setOverOccupiedTime(lot_id, spot_id, driver_id);
 
-            notificationService.notifyLotManager(new UpdateLotManagerLotSpotsDTO(spot_id, lot_id, SpotStatus.Occupied));
+                notificationService.notifyLotManager(new UpdateLotManagerLotSpotsDTO(spot_id, lot_id, SpotStatus.Occupied));
+            }
+            else{
+                freeReservation(spot_id , lot_id , driver_id);
+                throw new Exception("driver doesn't have enough balance");
+            }
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
