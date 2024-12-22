@@ -97,4 +97,9 @@ public class LotDAO {
         String query = "SELECT time FROM Lots WHERE lot_id = ?";
             return jdbcTemplate.queryForObject(query, Time.class, lotId);
     }
+
+    public double getLotPenalty(long lot_id){
+        String query = "SELECT penalty FROM Lots WHERE lot_id = ?";
+        return jdbcTemplate.queryForObject(query, Double.class, lot_id);
+    }
 }
