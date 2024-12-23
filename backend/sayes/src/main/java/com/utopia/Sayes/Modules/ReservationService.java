@@ -41,14 +41,16 @@ public class ReservationService {
     @Autowired
     private NotificationService notificationService;
 
+
     public long reserveSpot(long lot_id ,long driver_id,Time endTime) throws Exception{
         try {
-            long spotId = spotDAO.getFirstAvailableSpotId(lot_id , String.valueOf(SpotStatus.Available));
+            long spotId = spotDAO.getAndUpdateFirstAvailableSpotId(lot_id , String.valueOf(SpotStatus.Available),
+            String.valueOf(SpotStatus.Reserved));
             if (spotId == 0){
                 throw new Exception("spot doesn't exist");
             }
             lotDAO.decrementAvailableSpots(lot_id);
-            spotDAO.updateSpotState(spotId,lot_id, String.valueOf(SpotStatus.Reserved));
+            //spotDAO.updateSpotState(spotId,lot_id, String.valueOf(SpotStatus.Reserved));
             java.sql.Timestamp startTimestamp = new java.sql.Timestamp(new Date().getTime());
             java.sql.Timestamp endTimestamp = new java.sql.Timestamp(endTime.getTime());
             double price = dynamicPricing.getPrice(lot_id,
