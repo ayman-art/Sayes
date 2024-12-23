@@ -1,5 +1,6 @@
 package com.utopia.Sayes.Facades;
 
+import com.utopia.Sayes.Models.Lot;
 import com.utopia.Sayes.Modules.Authentication;
 import com.utopia.Sayes.Modules.LotManagement;
 import io.jsonwebtoken.Claims;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 @Component
 public class LotManagementFacade {
@@ -42,6 +44,21 @@ public class LotManagementFacade {
             if (managerId == null)
                 throw new Exception("manager id is null");
             lotManagement.addSpots(Long.valueOf((Integer) spots.get("lotId")) ,(int) spots.get("count"));
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+    public Map<String , Object> getLots(String jwt) throws Exception {
+        try {
+            Claims claims = Authentication.parseToken(jwt);
+            Long managerId = Long.parseLong(claims.getId());
+            if (managerId == null)
+                throw new Exception("manager id is null");
+            List<Lot> lots = lotManagement.getLots();
+            Map<String , Object> data = new HashMap<>();
+            data.put("lots" , lots);
+            return data;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());

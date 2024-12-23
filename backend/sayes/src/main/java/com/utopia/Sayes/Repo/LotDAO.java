@@ -64,6 +64,19 @@ public class LotDAO {
         }
         return lots;
     }
+    public List<Lot> getLots() {
+        String query = "SELECT * FROM Lots";
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
+        if(rows.isEmpty()){
+            throw new IllegalStateException("there is no lots");
+        }
+        List<Lot> lots = new ArrayList<>();
+        for (Map<String, Object> row : rows) {
+            Lot lot = lotAdapter.fromMap(row);
+            lots.add(lot);
+        }
+        return lots;
+    }
     public void decrementAvailableSpots(long lotId) {
         String query = "UPDATE Lots SET num_of_spots = num_of_spots - 1 WHERE lot_id = ? AND num_of_spots > 0";
         int rowsUpdated = jdbcTemplate.update(query, lotId);

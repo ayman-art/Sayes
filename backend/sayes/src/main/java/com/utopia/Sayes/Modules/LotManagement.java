@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.List;
 
 @Service
 public class LotManagement {
@@ -45,6 +46,14 @@ public class LotManagement {
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
+        }
+    }
+    public List<Lot> getLots() throws Exception {
+        try {
+            return lotDAO.getLots();
+        }
+        catch (Exception e){
+            throw  new Exception(e.getMessage());
         }
     }
 }
