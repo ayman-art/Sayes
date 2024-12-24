@@ -18,10 +18,20 @@ public class UserProfileController {
     ProfileFacade profileFacade;
 
     @GetMapping("/get-manager")
-    public ResponseEntity<?> getLots(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> getManager(@RequestHeader("Authorization") String token) {
         try {
             token = token.replace("Bearer ", "");
             Map<String , Object> response = profileFacade.getManagerData(token);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/get-driver")
+    public ResponseEntity<?> getDriver(@RequestHeader("Authorization") String token) {
+        try {
+            token = token.replace("Bearer ", "");
+            Map<String , Object> response = profileFacade.getDriverData(token);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

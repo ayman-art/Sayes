@@ -1,5 +1,6 @@
 package com.utopia.Sayes.Facades;
 
+import com.utopia.Sayes.Adapters.DriverAdapter;
 import com.utopia.Sayes.Adapters.LotManagerAdapter;
 import com.utopia.Sayes.Models.Lot;
 import com.utopia.Sayes.Models.Spot;
@@ -20,6 +21,8 @@ public class ProfileFacade {
     ProfileService profileService;
 
     LotManagerAdapter lotManagerAdapter = new LotManagerAdapter();
+
+    DriverAdapter driverAdapter = new DriverAdapter();
 
     public Map<String, Object> getManagerData(String jwt) throws Exception {
         Map<String, Object> result = new HashMap<>();
@@ -47,6 +50,19 @@ public class ProfileFacade {
             throw new Exception(e.getMessage());
         }
         return result;
+    }
+    public Map<String, Object> getDriverData(String jwt) throws Exception {
+        try {
+            Claims claims = Authentication.parseToken(jwt);
+            Long driverId = Long.parseLong(claims.getId());
+
+            if (driverId == null) {
+                throw new Exception("Driver ID is null");
+            }
+            return driverAdapter.toMap(profileService.getDriver(driverId));
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
     }
 
 }
