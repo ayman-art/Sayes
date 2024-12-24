@@ -51,12 +51,9 @@ public class LotDAO {
         return keyHolder.getKey().longValue(); // Retrieve the generated key as a long.
     }
 
-    public List<Lot> getLotsByManager(int managerId) {
+    public List<Lot> getLotsByManager(long managerId) {
         String query = "SELECT * FROM Lots WHERE manager = ?";
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, managerId);
-        if(rows.isEmpty()){
-            throw new IllegalStateException("this manager has no lots");
-        }
         List<Lot> lots = new ArrayList<>();
         for (Map<String, Object> row : rows) {
             Lot lot = lotAdapter.fromMap(row);
