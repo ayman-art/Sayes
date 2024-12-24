@@ -1,3 +1,5 @@
+import { Spot } from "./Spot";
+
 export interface LotDetailed {
     lot_id: number;
     manager_id: number;
@@ -10,5 +12,6 @@ export interface LotDetailed {
     penalty: number;
     fee: number;
     time: string;
-    details: any;
+    details?: string;
+    spots: Spot[];
 }

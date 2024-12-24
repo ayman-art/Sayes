@@ -1,4 +1,4 @@
-export interface driverDataDTO {
+export interface DriverDataDTO {
     username: string;
     balance: number;
     plate_number: string;
