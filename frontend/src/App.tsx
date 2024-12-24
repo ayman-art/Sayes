@@ -52,12 +52,14 @@ const App: React.FC = () => {
             <Route path="/" element={<Dashboard onLogout={onLogout} />} />
             <Route path="/signup" element={<Navigate to="/" />}/>
             <Route path="/login" element={<Navigate to="/" />} />
+            {}
           </>
         ):(
           <>
             <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/login" element={<Login onLogin={onLogin} />} />
             <Route path="/signup" element={<SignUp onLogin={onLogin} />} />
+            <Route path="/profile" element={localStorage.getItem('role') === 'driver' ? <DriverProfile/> : <LotManagerProfile/>}/>
           </>
         )}
         <Route path="/test" element={<LotManagerHomePage/>}/>
