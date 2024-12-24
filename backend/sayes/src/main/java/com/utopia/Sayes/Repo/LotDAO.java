@@ -51,11 +51,21 @@ public class LotDAO {
         return keyHolder.getKey().longValue(); // Retrieve the generated key as a long.
     }
 
-    public List<Lot> getLotsByManager(int managerId) {
+    public List<Lot> getLotsByManager(long managerId) {
         String query = "SELECT * FROM Lots WHERE manager = ?";
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, managerId);
+        List<Lot> lots = new ArrayList<>();
+        for (Map<String, Object> row : rows) {
+            Lot lot = lotAdapter.fromMap(row);
+            lots.add(lot);
+        }
+        return lots;
+    }
+    public List<Lot> getLots() {
+        String query = "SELECT * FROM Lots";
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
         if(rows.isEmpty()){
-            throw new IllegalStateException("this manager has no lots");
+            throw new IllegalStateException("there is no lots");
         }
         List<Lot> lots = new ArrayList<>();
         for (Map<String, Object> row : rows) {
@@ -96,5 +106,17 @@ public class LotDAO {
     public Time getTimeLimitById(long lotId) {
         String query = "SELECT time FROM Lots WHERE lot_id = ?";
             return jdbcTemplate.queryForObject(query, Time.class, lotId);
+    }
+
+    public double getLotPenalty(long lot_id){
+        String query = "SELECT penalty FROM Lots WHERE lot_id = ?";
+        return jdbcTemplate.queryForObject(query, Double.class, lot_id);
+    }
+    public void updateLotRevenue(long price , long lotId) {
+        String query = "UPDATE Lots SET revenue = revenue + ? WHERE lot_id = ? ";
+        int rows  = jdbcTemplate.update(query, price, lotId);
+        if(rows == 0){
+            throw new RuntimeException("error updating revenue");
+        }
     }
 }

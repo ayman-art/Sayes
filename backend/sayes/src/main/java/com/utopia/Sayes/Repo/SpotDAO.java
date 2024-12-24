@@ -5,7 +5,10 @@ import com.utopia.Sayes.Models.Spot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -47,8 +50,24 @@ public class SpotDAO {
         }
         return state;
     }
-    public Long getFirstAvailableSpotId(long lot_id, String state) {
-        String query = "SELECT spot_id FROM spots WHERE lot_id = ? AND state = ? LIMIT 1";
-       return jdbcTemplate.queryForObject(query, new Object[]{lot_id, state}, Long.class);
+    @Transactional
+    public Long getAndUpdateFirstAvailableSpotId(long lot_id, String currentState, String newState) {
+        String selectQuery = "SELECT spot_id FROM spots WHERE lot_id = ? AND state = ? LIMIT 1 FOR UPDATE";
+        Long spotId = jdbcTemplate.queryForObject(selectQuery, new Object[]{lot_id, currentState}, Long.class);
+        if (spotId != null) {
+            String updateQuery = "UPDATE spots SET state = ? WHERE spot_id = ?";
+            jdbcTemplate.update(updateQuery, newState, spotId);
+        }
+        return spotId;
+    }
+    public List<Spot> getSpotsByLotId(long lotId) {
+        String query = "SELECT * FROM spots WHERE lot_id = ?";
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, lotId);
+        List<Spot> spots = new ArrayList<>();
+        for (Map<String, Object> row : rows) {
+            Spot spot = spotAdapter.fromMap(row);
+            spots.add(spot);
+        }
+        return spots;
     }
 }
