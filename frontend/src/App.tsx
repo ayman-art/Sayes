@@ -60,7 +60,7 @@ const App: React.FC = () => {
             <Route path="/signup" element={<SignUp onLogin={onLogin} />} />
           </>
         )}
-        <Route path="/test" element={<LotManagerHomePage/>}/>
+        <Route path="/test" element={<DriverHomePage/>}/>
       </Routes>
     </Router>
   );

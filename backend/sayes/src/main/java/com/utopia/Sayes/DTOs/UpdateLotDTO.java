@@ -12,5 +12,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UpdateLotDTO {
     private long lotId;
-    private SpotStatus status;
+    private long noOfSpots;
 }
