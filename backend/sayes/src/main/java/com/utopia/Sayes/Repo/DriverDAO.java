@@ -26,4 +26,19 @@ public class DriverDAO {
         String query = "SELECT EXISTS(SELECT 1 FROM Drivers WHERE license_number = ?)";
         return Boolean.TRUE.equals(jdbcTemplate.queryForObject(query, Boolean.class, licenseNumber));
     }
+    public Long getDriverBalance(long driverId) {
+        String query = "SELECT balance FROM Drivers WHERE Driver_id = ? ";
+        Long balance = jdbcTemplate.queryForObject(query, new Object[]{driverId}, Long.class);
+        if(balance == null){
+            throw new NullPointerException("balance Doesn't exist");
+        }
+        return balance;
+    }
+    public void updateDriverBalance(long price , long driverId) {
+        String query = "UPDATE Drivers SET balance = balance - ? WHERE Driver_id = ? ";
+        int rows  = jdbcTemplate.update(query, price, driverId);
+        if(rows == 0){
+            throw new RuntimeException("error updating balance");
+        }
+    }
 }
