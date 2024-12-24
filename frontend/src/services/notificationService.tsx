@@ -17,7 +17,7 @@ const NotificationListener: React.FC = () => {
 
       // Subscribe to lot updates
       webSocketService.subscribe('/topic/lots-update', (message) => {
-        console.log(message);
+        console.log(JSON.parse(message.body));
         setLotUpdates((prev) => [...prev, JSON.parse(message.body)]);
       });
 
