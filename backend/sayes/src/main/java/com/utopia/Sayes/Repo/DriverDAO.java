@@ -1,14 +1,19 @@
 package com.utopia.Sayes.Repo;
 
+import com.utopia.Sayes.Adapters.DriverAdapter;
 import com.utopia.Sayes.Models.Driver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.Map;
+
 @Repository
 public class DriverDAO {
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    DriverAdapter driverAdapter = new DriverAdapter();
 
     public void addDriver(Driver driver) {
         String query = "INSERT INTO Drivers " +
@@ -40,5 +45,17 @@ public class DriverDAO {
         if(rows == 0){
             throw new RuntimeException("error updating balance");
         }
+    }
+    public Driver getDriverById(long driverId) throws Exception {
+        String query = """
+                SELECT * FROM Users
+                LEFT JOIN Drivers ON Users.user_id = Drivers.Driver_id
+                WHERE user_id = ?
+                """;
+        Map<String, Object> resultMap = jdbcTemplate.queryForMap(query, driverId);
+        if(resultMap.isEmpty()){
+            throw new Exception("error");
+        }
+        return driverAdapter.fromMap(resultMap);
     }
 }

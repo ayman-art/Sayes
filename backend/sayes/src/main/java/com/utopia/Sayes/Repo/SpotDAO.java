@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -56,8 +58,16 @@ public class SpotDAO {
             String updateQuery = "UPDATE spots SET state = ? WHERE spot_id = ?";
             jdbcTemplate.update(updateQuery, newState, spotId);
         }
-
         return spotId;
     }
-
+    public List<Spot> getSpotsByLotId(long lotId) {
+        String query = "SELECT * FROM spots WHERE lot_id = ?";
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, lotId);
+        List<Spot> spots = new ArrayList<>();
+        for (Map<String, Object> row : rows) {
+            Spot spot = spotAdapter.fromMap(row);
+            spots.add(spot);
+        }
+        return spots;
+    }
 }
