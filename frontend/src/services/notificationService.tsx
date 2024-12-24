@@ -17,18 +17,18 @@ const NotificationListener: React.FC = () => {
 
       // Subscribe to lot updates
       webSocketService.subscribe('/topic/lots-update', (message) => {
-        setLotUpdates((prev) => [...prev, JSON.parse(message.body)]);
+        console.log(message);
       });
 
-      // Subscribe to lot manager updates
-      webSocketService.subscribe('/topic/lot-manager-update/123', (message) => {
-        setLotManagerUpdates((prev) => [...prev, JSON.parse(message.body)]);
-      });
+      // // Subscribe to lot manager updates
+      // webSocketService.subscribe('/topic/lot-manager-update/123', (message) => {
+      //   setLotManagerUpdates((prev) => [...prev, JSON.parse(message.body)]);
+      // });
 
-      // Subscribe to driver reservations
-      webSocketService.subscribe('/topic/driver-reservation-update/456', (message) => {
-        setDriverReservations((prev) => [...prev, JSON.parse(message.body)]);
-      });
+      // // Subscribe to driver reservations
+      // webSocketService.subscribe('/topic/driver-reservation-update/456', (message) => {
+      //   setDriverReservations((prev) => [...prev, JSON.parse(message.body)]);
+      // });
     };
 
     const onError = (error: string) => {
