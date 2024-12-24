@@ -17,9 +17,9 @@ public class ReservationDAO {
     private ReservationAdapter reservationAdapter = new ReservationAdapter();
     public void addReservation(long spot_id, long lot_id, Date start_time , Date end_time, String state, long driver_id, double price) {
         String query = "INSERT INTO reserved_spots"  +
-        "(spot_id, lot_id, start_time, end_time , state, driver_id) " +
-                "VALUES (?, ?, ?, ?, ? ,?)";
-        int rows = jdbcTemplate.update(query, spot_id, lot_id, start_time , end_time, state, driver_id);
+        "(spot_id, lot_id, start_time, end_time , state, driver_id , price) " +
+                "VALUES (?, ?, ?, ?, ? ,?, ?)";
+        int rows = jdbcTemplate.update(query, spot_id, lot_id, start_time , end_time, state, driver_id , price);
         if(rows == 0){
             throw new RuntimeException("can't add this reservation");
         }
@@ -43,6 +43,13 @@ public class ReservationDAO {
     public double getReservationPrice(long spot_id, long lot_id) {
         String query = "SELECT price FROM reserved_spots WHERE spot_id = ? AND lot_id = ?";
         return jdbcTemplate.queryForObject(query, new Object[]{spot_id, lot_id}, Double.class);
+    }
+    public void setReservationPrice(long spot_id, long lot_id, double price) {
+        String query = "UPDATE reserved_spots SET price = ? WHERE spot_id = ? AND lot_id = ?";
+        int rows = jdbcTemplate.update(query, price , spot_id, lot_id);
+        if(rows == 0){
+            throw new RuntimeException("reservation doesn't exist");
+        }
     }
 
 }
