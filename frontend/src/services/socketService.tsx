@@ -1,12 +1,11 @@
 import { Client, IMessage } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
 
 class WebSocketService {
   private client: Client;
 
   constructor(webSocketUrl: string) {
     this.client = new Client({
-      webSocketFactory: () => new SockJS(webSocketUrl),
+      webSocketFactory: () => new WebSocket(webSocketUrl), // Use native WebSocket
       debug: (str) => console.log(str),
       reconnectDelay: 5000, // Automatically reconnect after 5 seconds
     });
@@ -19,6 +18,7 @@ class WebSocketService {
       console.error('Additional details: ' + frame.body);
       onError(frame.body);
     };
+    console.log("connected")
     this.client.activate();
   }
 
