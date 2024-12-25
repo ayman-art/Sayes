@@ -27,6 +27,8 @@ public class UserProfileController {
     @GetMapping("/get-driver")
     public ResponseEntity<?> getDriver(@RequestHeader("Authorization") String token) {
         try {
+            System.out.println("111");
+            System.out.println(token);
             token = token.replace("Bearer ", "");
             Map<String , Object> response = profileFacade.getDriverData(token);
             return new ResponseEntity<>(response, HttpStatus.OK);

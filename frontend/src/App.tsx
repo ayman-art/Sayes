@@ -6,6 +6,8 @@ import Dashboard from "./pages/Dashboard";
 import { authorizeToken, clearData, saveData } from "./services/authService";
 import DriverHomePage from "./pages/DriverHome";
 import LotManagerHomePage from "./pages/LotManagerHome";
+import DriverProfile from "./pages/DriverProfile";
+import LotManagerProfile from "./pages/LotManagerProfile";
 import NotificationListener from "./services/notificationService";
 
 const App: React.FC = () => {
@@ -53,13 +55,15 @@ const App: React.FC = () => {
             <Route path="/" element={role== 'ADMIN'? <Dashboard onLogout={onLogout} />: (role=='DRIVER'? <DriverHomePage/>: <LotManagerHomePage/>)} />
             <Route path="/signup" element={<Navigate to="/" />}/>
             <Route path="/login" element={<Navigate to="/" />} />
+            <Route path="/profile" element={role === 'DRIVER' ? <DriverProfile /> : <LotManagerProfile />}/>
+            
           </>
         ):(
           <>
             <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/login" element={<Login onLogin={onLogin} />} />
             <Route path="/signup" element={<SignUp onLogin={onLogin} />} />
-          </>
+            </>
         )}
         <Route path="/test" element={<NotificationListener/>}/>
       </Routes>

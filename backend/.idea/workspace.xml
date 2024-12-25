@@ -5,15 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2cd1c8cf-957e-4955-91a5-860f1461e1e0" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Adapters/AdminAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Adapters/AdminAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Adapters/DriverAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Adapters/DriverAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Adapters/IAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Adapters/IAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Adapters/LotAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Adapters/LotAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Adapters/LotManagerAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Adapters/LotManagerAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Adapters/ReservationAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Adapters/ReservationAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Adapters/SpotAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Adapters/SpotAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sayes/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/sayes/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Controllers/UserProfileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Controllers/UserProfileController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/DriverProfile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/DriverProfile.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/LotManagerProfile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/LotManagerProfile.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,23 +20,23 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 1
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
   <component name="ProjectId" id="2qRvoBvBRFTlPls10caU1Z9wsuS" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Unnamed.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "SAYES-28-Driver-home-GUI",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/projects/Sayes/backend/Sayes"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Unnamed.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;SAYES-28-Driver-home-GUI&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/projects/Sayes/backend/Sayes&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="Unnamed" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.utopia.Sayes.SayesApplication" />
