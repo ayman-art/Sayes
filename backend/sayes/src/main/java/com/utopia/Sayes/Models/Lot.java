@@ -19,11 +19,10 @@ public class Lot {
     private Duration time;
     private String details;
 
-    public Lot(long manager_id, double longitude, double latitude,long revenue, double price, long num_of_spots, String lot_type
+    public Lot(long manager_id, double longitude, double latitude,long revenue, double price, String lot_type
     , double penalty , double fee,Duration time) {
         this.manager_id = manager_id;
         this.price = price;
-        this.num_of_spots = num_of_spots;
         this.longitude = longitude;
         this.latitude = latitude;
         this.revenue = revenue;

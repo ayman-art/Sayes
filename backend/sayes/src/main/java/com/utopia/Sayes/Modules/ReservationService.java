@@ -54,7 +54,6 @@ public class ReservationService {
             if (spotId == 0){
                 throw new Exception("spot doesn't exist");
             }
-            lotDAO.decrementAvailableSpots(lot_id);
             //spotDAO.updateSpotState(spotId,lot_id, String.valueOf(SpotStatus.Reserved));
             java.sql.Timestamp startTimestamp = new java.sql.Timestamp(new Date().getTime());
             java.sql.Timestamp endTimestamp = new java.sql.Timestamp(endTime.getTime());
@@ -121,7 +120,6 @@ public class ReservationService {
                 throw new Exception("There is no reservation for this spot");
             }
             spotDAO.updateSpotState(spot_id,lot_id, String.valueOf(SpotStatus.Available));
-            lotDAO.incrementAvailableSpots(lot_id);
             reservationDAO.deleteReservation(spot_id , lot_id);
             Date date = Date.from(reservation.getStart_time().atZone(ZoneId.systemDefault()).toInstant());
             java.sql.Timestamp endTimestamp = new java.sql.Timestamp(new Date().getTime());

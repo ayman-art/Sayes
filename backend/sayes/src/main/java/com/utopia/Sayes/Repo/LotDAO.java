@@ -21,10 +21,13 @@ public class LotDAO {
     private JdbcTemplate jdbcTemplate;
     private LotAdapter lotAdapter = new LotAdapter();
 
+    @Autowired
+    SpotDAO spotDAO;
+
     public long addLot(Lot lot) {
         String query = "INSERT INTO Lots " +
-                "(manager, longitude, latitude, revenue, price, num_of_spots, details, lot_type, penalty, fee, time)" +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "(manager, longitude, latitude, revenue, price, details, lot_type, penalty, fee, time)" +
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -35,12 +38,11 @@ public class LotDAO {
             ps.setDouble(3, lot.getLatitude());
             ps.setLong(4, lot.getRevenue());
             ps.setDouble(5, lot.getPrice());
-            ps.setLong(6, lot.getNum_of_spots());
-            ps.setString(7, lot.getDetails());
-            ps.setString(8, lot.getLot_type());
-            ps.setDouble(9, lot.getPenalty());
-            ps.setDouble(10, lot.getFee());
-            ps.setObject(11, lot.getTime());
+            ps.setString(6, lot.getDetails());
+            ps.setString(7, lot.getLot_type());
+            ps.setDouble(8, lot.getPenalty());
+            ps.setDouble(9, lot.getFee());
+            ps.setObject(10, lot.getTime());
             return ps;
         }, keyHolder);
 
@@ -56,6 +58,7 @@ public class LotDAO {
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, managerId);
         List<Lot> lots = new ArrayList<>();
         for (Map<String, Object> row : rows) {
+            row.put("num_of_spots" , spotDAO.getNumOfAvailableSpots((Long) row.get("lot_id")));
             Lot lot = lotAdapter.fromMap(row);
             lots.add(lot);
         }
@@ -69,24 +72,11 @@ public class LotDAO {
         }
         List<Lot> lots = new ArrayList<>();
         for (Map<String, Object> row : rows) {
+            row.put("num_of_spots" , spotDAO.getNumOfAvailableSpots((Long) row.get("lot_id")));
             Lot lot = lotAdapter.fromMap(row);
             lots.add(lot);
         }
         return lots;
-    }
-    public void decrementAvailableSpots(long lotId) {
-        String query = "UPDATE Lots SET num_of_spots = num_of_spots - 1 WHERE lot_id = ? AND num_of_spots > 0";
-        int rowsUpdated = jdbcTemplate.update(query, lotId);
-        if (rowsUpdated == 0) {
-            throw new IllegalStateException("No available spots: " + lotId);
-        }
-    }
-    public void incrementAvailableSpots(long lotId) {
-        String query = "UPDATE Lots SET num_of_spots = num_of_spots + 1 WHERE lot_id = ?";
-        int rowsUpdated = jdbcTemplate.update(query, lotId);
-        if (rowsUpdated == 0) {
-            throw new IllegalStateException("Can't increment spots fro this manager: " + lotId);
-        }
     }
 
     public Lot getLotById(long lot_id) throws Exception {
@@ -95,7 +85,7 @@ public class LotDAO {
             if (resultMap.isEmpty()){
                 throw new Exception("there is no lot with this id");
             }
-
+            resultMap.put("num_of_spots" , spotDAO.getNumOfAvailableSpots((Long) resultMap.get("lot_id")));
             return lotAdapter.fromMap(resultMap);
     }
 
@@ -119,4 +109,5 @@ public class LotDAO {
             throw new RuntimeException("error updating revenue");
         }
     }
+
 }

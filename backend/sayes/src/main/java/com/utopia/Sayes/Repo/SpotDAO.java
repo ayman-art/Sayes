@@ -78,4 +78,9 @@ public class SpotDAO {
         long total = jdbcTemplate.queryForObject(query1 , new Object[]{lot_id} , Long.class);
         return (double) occupied / total;
     }
+    public long getNumOfAvailableSpots(long lotId){
+        String query = "SELECT COUNT(*) FROM spots WHERE lot_id = ? AND state = ?";
+        return jdbcTemplate.queryForObject(query , new Object[]{lotId , String.valueOf(SpotStatus.Available)}
+                , Long.class);
+    }
 }

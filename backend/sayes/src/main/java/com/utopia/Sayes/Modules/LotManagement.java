@@ -20,13 +20,13 @@ public class LotManagement {
     @Autowired
     LotManagerDAO lotManagerDAO;
 
-    public long createLot(long manager_id , double longitude,double latitude,long revenue, long price, long num_of_available_spots, String lot_type
+    public long createLot(long manager_id , double longitude,double latitude,long revenue, long price, String lot_type
             , double penalty , double fee, Duration time) throws Exception{
         try {
             if (! lotManagerDAO.doesManagerExist(manager_id))
                 throw new Exception("lot manager is not exist");
             Lot lot = new Lot(manager_id,longitude,latitude
-                    ,revenue,price,num_of_available_spots , lot_type, penalty,fee, time);
+                    ,revenue,price,lot_type, penalty,fee, time);
             return lotDAO.addLot(lot);
         }
         catch (Exception e){
