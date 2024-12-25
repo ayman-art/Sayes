@@ -1,24 +1,35 @@
 package com.utopia.Sayes.Models;
 
-import java.sql.Time;
+import java.time.LocalDateTime;
 
 public class Reservation {
     private long spot_id;
     private long lot_id;
-    private Time start_time;
+    private LocalDateTime start_time;
 
-    private Time end_time;
+    private LocalDateTime end_time;
     private String state;
     private long driver_id;
 
-    public Reservation(long spot_id, long lot_id, Time start_time,Time end_time, String state, long driver_id) {
+    private double price;
+
+    public Reservation(long spot_id, long lot_id, LocalDateTime start_time, LocalDateTime end_time, String state, long driver_id, double price) {
         this.spot_id = spot_id;
         this.lot_id = lot_id;
         this.start_time = start_time;
         this.end_time = end_time;
         this.state = state;
         this.driver_id = driver_id;
+        this.price = price;
     }
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
 
     public long getSpot_id() {
         return spot_id;
@@ -36,19 +47,19 @@ public class Reservation {
         this.lot_id = lot_id;
     }
 
-    public Time getStart_time() {
+    public LocalDateTime getStart_time() {
         return start_time;
     }
 
-    public void setStart_time(Time start_time) {
+    public void setStart_time(LocalDateTime start_time) {
         this.start_time = start_time;
     }
 
-    public Time getEnd_time() {
+    public LocalDateTime getEnd_time() {
         return end_time;
     }
 
-    public void setEnd_time(Time end_time) {
+    public void setEnd_time(LocalDateTime end_time) {
         this.end_time = end_time;
     }
 

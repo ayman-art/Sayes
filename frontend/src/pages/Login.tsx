@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import '../styles/components.css';
-import { loginUser } from "../services/authService";
+import { loginUser, saveData } from "../services/authService";
 import { Link } from 'react-router-dom';
 interface loginProps{
   onLogin: ()=> void
@@ -14,7 +14,9 @@ const Login: React.FC<loginProps> = ({onLogin}) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await loginUser(username, password); 
+      await loginUser(username, password);
+      const token = localStorage.getItem('jwtToken')
+      saveData(token!) 
       onLogin()
       navigate("/");
     } catch (error) {

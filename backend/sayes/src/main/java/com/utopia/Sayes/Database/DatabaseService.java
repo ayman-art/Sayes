@@ -52,7 +52,6 @@ public class DatabaseService {
                     "revenue BIGINT NOT NULL, " +
                     "price DOUBLE (15 , 2) NOT NULL, " +
                     "lot_type VARCHAR(255) NOT NULL,"+
-                    "num_of_spots BIGINT NOT NULL, " +
                     "penalty DOUBLE (15 , 2) NOT NULL, " +
                     "fee DOUBLE (15 , 2) NOT NULL, " +
                     "time TIME NOT NULL, " +
@@ -61,7 +60,7 @@ public class DatabaseService {
 
             //create spots table
             String createSpotsTable = "CREATE TABLE IF NOT EXISTS spots (" +
-                    "spot_id BIGINT NOT NULL, " +
+                    "spot_id BIGINT NOT NULL AUTO_INCREMENT, " +
                     "lot_id BIGINT NOT NULL, " +
                     "state VARCHAR(255) NOT NULL, " +
                     "PRIMARY KEY (spot_id, lot_id), " +
@@ -75,6 +74,7 @@ public class DatabaseService {
                     "end_time DATETIME NOT NULL, " +
                     "state VARCHAR(255), " +
                     "driver_id BIGINT NOT NULL, " +
+                    "price DOUBLE (15 , 2) NOT NULL, " +
                     "PRIMARY KEY (lot_id, spot_id), " +
                     "FOREIGN KEY (lot_id) REFERENCES Lots (lot_id), " +
                     "FOREIGN KEY (spot_id) REFERENCES spots (spot_id), " +

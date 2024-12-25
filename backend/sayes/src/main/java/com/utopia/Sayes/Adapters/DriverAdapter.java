@@ -10,7 +10,6 @@ public class DriverAdapter implements IAdapter<Driver> {
     public Map<String, Object> toMap(Driver driver) {
         Map<String, Object> driverMap = new HashMap<>();
         driverMap.put("username", driver.getUsername());
-        driverMap.put("user_password",driver.getUser_password());
         driverMap.put("balance", driver.getBalance());
         driverMap.put("plate_number", driver.getPlate_number());
         driverMap.put("license_number", driver.getLicense_number());

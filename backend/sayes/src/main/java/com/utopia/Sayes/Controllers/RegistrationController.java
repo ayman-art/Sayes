@@ -73,7 +73,7 @@ public class RegistrationController {
             ), HttpStatusCode.valueOf(200));
         }catch (Exception e){
             return new ResponseEntity<>((Object) Map.of(
-                    "jwt", jwt
+                    "message", "Token not authorized"
             ), HttpStatusCode.valueOf(401));
         }
     }

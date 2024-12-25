@@ -2,7 +2,7 @@ package com.utopia.Sayes.Adapters;
 
 import com.utopia.Sayes.Models.Reservation;
 
-import java.sql.Time;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,12 +24,13 @@ public class ReservationAdapter implements IAdapter<Reservation> {
     public Reservation fromMap(Map<String, Object> map) {
         long spot_id = (long) map.get("spot_id");
         long lot_id = (long) map.get("lot_id");
-        Time start_time = (Time) map.get("start_time");
-        Time end_time = (Time) map.get("end_time");
+        LocalDateTime start_time = (LocalDateTime) map.get("start_time");
+        LocalDateTime end_time = (LocalDateTime) map.get("end_time");
         String state = (String) map.get("state");
         long driver_id = (long) map.get("driver_id");
+        double price = (double) map.get("price");
 
-        Reservation reservation = new Reservation(spot_id, lot_id, start_time , end_time, state, driver_id);
+        Reservation reservation = new Reservation(spot_id, lot_id, start_time , end_time, state, driver_id, price);
         return reservation;
     }
 

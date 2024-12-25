@@ -2,10 +2,14 @@ package com.utopia.Sayes.Repo;
 
 import com.utopia.Sayes.Adapters.SpotAdapter;
 import com.utopia.Sayes.Models.Spot;
+import com.utopia.Sayes.enums.SpotStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -15,10 +19,10 @@ public class SpotDAO {
 
     private SpotAdapter spotAdapter = new SpotAdapter();
 
-    public void addSpot(long spot_id , long lot_id, String state){
+    public void addSpot(long lot_id, String state){
         String query = "INSERT INTO spots " +
-                " (spot_id, lot_id, state) VALUES (?, ?, ?)";
-        int rows =  jdbcTemplate.update(query,spot_id,lot_id,state);
+                " (lot_id, state) VALUES (?, ?)";
+        int rows =  jdbcTemplate.update(query,lot_id,state);
         if(rows == 0){
             throw new RuntimeException("can't insert this spot");
         }
@@ -34,6 +38,7 @@ public class SpotDAO {
         String query = "SELECT * FROM spots WHERE spot_id = ? AND lot_id = ?";
             Map<String, Object> resultMap = jdbcTemplate.queryForMap(query, spot_id, lot_id);
             if(resultMap.isEmpty()){
+                System.out.println("here");
                 throw new Exception("There is no spot with this id");
             }
             return spotAdapter.fromMap(resultMap);
@@ -45,5 +50,37 @@ public class SpotDAO {
             throw new NullPointerException("Spot Doesn't exist");
         }
         return state;
+    }
+    @Transactional
+    public Long getAndUpdateFirstAvailableSpotId(long lot_id, String currentState, String newState) {
+        String selectQuery = "SELECT spot_id FROM spots WHERE lot_id = ? AND state = ? LIMIT 1 FOR UPDATE";
+        Long spotId = jdbcTemplate.queryForObject(selectQuery, new Object[]{lot_id, currentState}, Long.class);
+        if (spotId != null) {
+            String updateQuery = "UPDATE spots SET state = ? WHERE spot_id = ?";
+            jdbcTemplate.update(updateQuery, newState, spotId);
+        }
+        return spotId;
+    }
+    public List<Spot> getSpotsByLotId(long lotId) {
+        String query = "SELECT * FROM spots WHERE lot_id = ?";
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, lotId);
+        List<Spot> spots = new ArrayList<>();
+        for (Map<String, Object> row : rows) {
+            Spot spot = spotAdapter.fromMap(row);
+            spots.add(spot);
+        }
+        return spots;
+    }
+    public double getOccupancyRate (long lot_id){
+        String query = "SELECT COUNT(*) FROM spots WHERE lot_id = ? AND state = ?";
+        String query1 = "SELECT COUNT(*) FROM spots WHERE lot_id = ?";
+        long occupied = jdbcTemplate.queryForObject(query ,new Object[]{lot_id, String.valueOf(SpotStatus.Occupied)},Long.class);
+        long total = jdbcTemplate.queryForObject(query1 , new Object[]{lot_id} , Long.class);
+        return (double) occupied / total;
+    }
+    public long getNumOfAvailableSpots(long lotId){
+        String query = "SELECT COUNT(*) FROM spots WHERE lot_id = ? AND state = ?";
+        return jdbcTemplate.queryForObject(query , new Object[]{lotId , String.valueOf(SpotStatus.Available)}
+                , Long.class);
     }
 }

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import '../styles/components.css';
 import { Link } from 'react-router-dom';
-import { registerDriver, registerLotManager } from "../services/authService";
+import { registerDriver, registerLotManager, saveData } from "../services/authService";
 import Modal from "../components/modal/Modal";
 interface signupProps{
   onLogin: ()=> void
@@ -56,6 +56,8 @@ const SignUp: React.FC<signupProps> = ({onLogin}) => {
         console.log("Registering lot manager...");
         response = await registerLotManager(username, password, role);
       }
+      const token =localStorage.getItem('jwtToken')
+      saveData(token!)
       onLogin()
       navigate("/");
       
