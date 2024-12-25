@@ -27,7 +27,8 @@ public class LotManagementFacade {
             ,(double) lotData.get("latitude") , Long.valueOf((Integer) lotData.get("revenue")) ,
                     Long.valueOf((Integer)  lotData.get("price")),
                     (String) lotData.get("lot_type") , (double)lotData.get("penalty"),
-                    (double)lotData.get("fee") , Duration.parse((CharSequence) lotData.get("time")));
+                    (double)lotData.get("fee") , Duration.parse((CharSequence) lotData.get("time")),
+                    (int) lotData.get("num_of_spots"));
             Map<String , Object> data = new HashMap<>();
             data.put("lotId" , lotId);
             return data;

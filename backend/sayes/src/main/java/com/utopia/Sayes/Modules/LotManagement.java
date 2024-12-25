@@ -21,13 +21,15 @@ public class LotManagement {
     LotManagerDAO lotManagerDAO;
 
     public long createLot(long manager_id , double longitude,double latitude,long revenue, long price, String lot_type
-            , double penalty , double fee, Duration time) throws Exception{
+            , double penalty , double fee, Duration time , int numOfSpots) throws Exception{
         try {
             if (! lotManagerDAO.doesManagerExist(manager_id))
                 throw new Exception("lot manager is not exist");
             Lot lot = new Lot(manager_id,longitude,latitude
                     ,revenue,price,lot_type, penalty,fee, time);
-            return lotDAO.addLot(lot);
+            long lotId =  lotDAO.addLot(lot);
+            addSpots(lotId , numOfSpots);
+            return lotId;
         }
         catch (Exception e){
            throw new Exception(e.getMessage());
