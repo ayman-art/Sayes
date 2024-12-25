@@ -61,8 +61,9 @@ public class ReservationService {
             reservationDAO.addReservation(spotId,lot_id, startTimestamp, endTimestamp,
                     String.valueOf(SpotStatus.Reserved),driver_id,price);
             setReservationTimeOut(lot_id , spotId , driver_id);
-            long spots = lotDAO.getLotTotalSpots(lot_id);
-            notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, spots));
+            Lot lot = lotDAO.getLotById(lot_id);
+            notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, lot.getNum_of_spots(),
+                    lot.getLongitude(), lot.getLatitude(), lot.getPrice(), lot.getLot_type()));
             notificationService.notifyLotManager(new UpdateLotManagerLotSpotsDTO(spotId, lot_id, SpotStatus.Reserved));
 
             return spotId;
@@ -119,9 +120,9 @@ public class ReservationService {
             spotDAO.updateSpotState(spot_id,lot_id, String.valueOf(SpotStatus.Available));
             lotDAO.incrementAvailableSpots(lot_id);
             reservationDAO.deleteReservation(spot_id , lot_id);
-            long spots = lotDAO.getLotTotalSpots(lot_id);
-
-            notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, spots));
+            Lot lot = lotDAO.getLotById(lot_id);
+            notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, lot.getNum_of_spots(),
+                    lot.getLongitude(), lot.getLatitude(), lot.getPrice(), lot.getLot_type()));
             notificationService.notifyLotManager(new UpdateLotManagerLotSpotsDTO(
                     spot_id,
                     lot_id,

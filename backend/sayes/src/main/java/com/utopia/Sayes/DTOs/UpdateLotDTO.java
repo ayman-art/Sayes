@@ -13,4 +13,10 @@ import lombok.Setter;
 public class UpdateLotDTO {
     private long lotId;
     private long noOfSpots;
+    private double longitude;
+    private double latitude;
+    private double price;
+    private String lot_type;
+
+
 }
