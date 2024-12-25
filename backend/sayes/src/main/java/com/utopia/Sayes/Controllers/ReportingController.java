@@ -26,4 +26,14 @@ public class ReportingController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+    @GetMapping("/get-manager-lot-report")
+    public ResponseEntity<?> getLotsReportForManager(@RequestHeader("Authorization") String token) {
+        try {
+            token = token.replace("Bearer ", "");
+            Map<String , Object> response = reportingFacade.getLotsReportForManager(token);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }
