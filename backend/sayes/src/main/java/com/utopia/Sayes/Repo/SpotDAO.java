@@ -2,6 +2,7 @@ package com.utopia.Sayes.Repo;
 
 import com.utopia.Sayes.Adapters.SpotAdapter;
 import com.utopia.Sayes.Models.Spot;
+import com.utopia.Sayes.enums.SpotStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -69,5 +70,17 @@ public class SpotDAO {
             spots.add(spot);
         }
         return spots;
+    }
+    public double getOccupancyRate (long lot_id){
+        String query = "SELECT COUNT(*) FROM spots WHERE lot_id = ? AND state = ?";
+        String query1 = "SELECT COUNT(*) FROM spots WHERE lot_id = ?";
+        long occupied = jdbcTemplate.queryForObject(query ,new Object[]{lot_id, String.valueOf(SpotStatus.Occupied)},Long.class);
+        long total = jdbcTemplate.queryForObject(query1 , new Object[]{lot_id} , Long.class);
+        return (double) occupied / total;
+    }
+    public long getNumOfAvailableSpots(long lotId){
+        String query = "SELECT COUNT(*) FROM spots WHERE lot_id = ? AND state = ?";
+        return jdbcTemplate.queryForObject(query , new Object[]{lotId , String.valueOf(SpotStatus.Available)}
+                , Long.class);
     }
 }
