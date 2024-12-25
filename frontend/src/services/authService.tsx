@@ -69,8 +69,8 @@ export const loginUser = async (name: string, password: string) => {
     
     if (response.ok ) {
       // Save JWT to localStorage
-      const token = response.headers.get("Authorization") ?? "";
-      localStorage.setItem('jwtToken', token);
+      const token = await response.json()
+      localStorage.setItem('jwtToken', token['jwt']);
     } else {
       throw new Error('Registration failed');
     }
@@ -114,6 +114,7 @@ export const saveData = (token:string)=>{
 
     // Parse the payload into a JavaScript object
     const decodedObj = JSON.parse(decodedPayload);
+    localStorage.setItem("jwtToken", token);
     localStorage.setItem("role", decodedObj.role)
     localStorage.setItem("name", decodedObj.sub)
     localStorage.setItem("id", decodedObj.id)
