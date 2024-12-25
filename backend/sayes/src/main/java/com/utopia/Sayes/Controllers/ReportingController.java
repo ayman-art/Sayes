@@ -46,4 +46,14 @@ public class ReportingController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+    @GetMapping("/get-top-lots")
+    public ResponseEntity<?> getTopLots(@RequestHeader("Authorization") String token) {
+        try {
+            token = token.replace("Bearer ", "");
+            Map<String , Object> response = reportingFacade.getTopLots(token);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }

@@ -2,6 +2,7 @@ package com.utopia.Sayes.Modules;
 
 import com.utopia.Sayes.Models.Log;
 import com.utopia.Sayes.Repo.LogDAO;
+import com.utopia.Sayes.Repo.LotDAO;
 import com.utopia.Sayes.Repo.SpotDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,9 @@ public class ReportingService {
 
     @Autowired
     SpotDAO spotDAO;
+
+    @Autowired
+    LotDAO lotDAO;
 
     public List<Log> getLogs() throws Exception {
         try {
@@ -36,6 +40,14 @@ public class ReportingService {
     public List<Map<String , Object>> getTopUsers() throws Exception {
         try {
             return logDAO.getTopUsers();
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+    public List<Map<String , Object>> getTopLots() throws Exception {
+        try {
+            return lotDAO.getTopLots();
         }
         catch (Exception e){
             throw new Exception(e.getMessage());

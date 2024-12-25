@@ -109,5 +109,10 @@ public class LotDAO {
             throw new RuntimeException("error updating revenue");
         }
     }
+    public List<Map<String , Object>> getTopLots(){
+        String query = "SELECT lot_id , revenue From Lots ORDER BY revenue DESC LIMIT 20 ";
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
+        return rows;
+    }
 
 }

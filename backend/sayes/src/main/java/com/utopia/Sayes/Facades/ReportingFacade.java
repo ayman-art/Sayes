@@ -80,4 +80,20 @@ public class ReportingFacade {
            throw new Exception(e.getMessage());
        }
    }
+    public Map<String , Object> getTopLots(String jwt) throws Exception {
+        try {
+            Claims claims = Authentication.parseToken(jwt);
+            Long adminId = Long.parseLong(claims.getId());
+
+            if (adminId == null) {
+                throw new Exception("Admin ID is null");
+            }
+            List<Map<String , Object>> topUsers = reportingService.getTopLots();
+            Map<String , Object> topLotsMap = new HashMap<>();
+            topLotsMap.put("topLots" , topUsers);
+            return topLotsMap;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
 }
