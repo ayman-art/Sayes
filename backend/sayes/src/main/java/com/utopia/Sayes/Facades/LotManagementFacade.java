@@ -65,4 +65,23 @@ public class LotManagementFacade {
             throw new Exception(e.getMessage());
         }
     }
+    public Map<String , Object> getDynamicPrice(Map<String , Object> lotData) throws Exception {
+        try {
+            String jwt = (String) lotData.get("jwt");
+            Claims claims = Authentication.parseToken(jwt);
+            Long driverId = Long.parseLong(claims.getId());
+            if (driverId == null)
+                throw new Exception("driver id is null");
+            String timeString = (String) lotData.get("time");
+            java.sql.Time time = java.sql.Time.valueOf(timeString);
+            double price = lotManagement.getLotDynamicPrice(Long.valueOf((Integer) lotData.get("lotId")),
+                    time);
+            Map<String , Object> data = new HashMap<>();
+            data.put("price" , price);
+            return data;
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
 }
