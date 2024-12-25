@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchDriverData } from '../services/profileService';
+import '../styles/profile.css';
 
 const DriverProfile: React.FC = () => {
     const [driverName, setDriverName] = useState<string>("");
@@ -24,9 +25,9 @@ const DriverProfile: React.FC = () => {
     }, []);
 
     return (
-        <div>
-            <h2>Driver Profile</h2>
-            <div>
+        <div className="profile-container">
+            <h2 className="profile-title">Driver Profile</h2>
+            <div className="profile-info">
                 <p><strong>Name:</strong> {driverName}</p>
                 <p><strong>Balance:</strong> ${balance.toFixed(2)}</p>
                 <p><strong>Plate Number:</strong> {plateNumber}</p>
