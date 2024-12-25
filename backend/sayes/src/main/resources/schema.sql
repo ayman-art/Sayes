@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS `sayes`.`Lots` (
   `manager` BIGINT NOT NULL,
   `longitude` DOUBLE NOT NULL,
   `latitude` DOUBLE NOT NULL,
+  `revenue` BIGINT NOT NULL,
   `price` DOUBLE(15,2) NOT NULL,
   `lot_type` VARCHAR(255) NOT NULL,
   `penalty` DOUBLE(15,2) NOT NULL,
