@@ -114,6 +114,7 @@ export const saveData = (token:string)=>{
 
     // Parse the payload into a JavaScript object
     const decodedObj = JSON.parse(decodedPayload);
+    localStorage.setItem("jwtToken", token);
     localStorage.setItem("role", decodedObj.role)
     localStorage.setItem("name", decodedObj.sub)
     localStorage.setItem("id", decodedObj.id)
