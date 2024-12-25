@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ReportingService {
@@ -30,6 +31,14 @@ public class ReportingService {
         }
         catch (Exception e){
           throw new Exception(e.getMessage());
+        }
+    }
+    public List<Map<String , Object>> getTopUsers() throws Exception {
+        try {
+            return logDAO.getTopUsers();
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
         }
     }
 }
