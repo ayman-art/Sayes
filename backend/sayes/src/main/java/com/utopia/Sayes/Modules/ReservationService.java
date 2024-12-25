@@ -3,6 +3,7 @@ package com.utopia.Sayes.Modules;
 import com.utopia.Sayes.DTOs.UpdateDriverReservationDTO;
 import com.utopia.Sayes.DTOs.UpdateLotDTO;
 import com.utopia.Sayes.DTOs.UpdateLotManagerLotSpotsDTO;
+import com.utopia.Sayes.Models.Lot;
 import com.utopia.Sayes.Models.Reservation;
 import com.utopia.Sayes.Models.Spot;
 import com.utopia.Sayes.Modules.DynamicPricing.DynamicPricing;
@@ -64,8 +65,9 @@ public class ReservationService {
             reservationDAO.addReservation(spotId,lot_id, startTimestamp, endTimestamp,
                     String.valueOf(SpotStatus.Reserved),driver_id,price);
             setReservationTimeOut(lot_id , spotId , driver_id);
-
-            notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, SpotStatus.Reserved));
+            Lot lot = lotDAO.getLotById(lot_id);
+            notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, lot.getNum_of_spots(),
+                    lot.getLongitude(), lot.getLatitude(), lot.getPrice(), lot.getLot_type()));
             notificationService.notifyLotManager(new UpdateLotManagerLotSpotsDTO(spotId, lot_id, SpotStatus.Reserved));
 
             return spotId;
@@ -124,7 +126,9 @@ public class ReservationService {
             Date date = Date.from(reservation.getStart_time().atZone(ZoneId.systemDefault()).toInstant());
             java.sql.Timestamp endTimestamp = new java.sql.Timestamp(new Date().getTime());
             logDAO.addlog(spot_id , lot_id, date , endTimestamp,driver_id);
-            notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, SpotStatus.Available));
+            Lot lot = lotDAO.getLotById(lot_id);
+            notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, lot.getNum_of_spots(),
+                    lot.getLongitude(), lot.getLatitude(), lot.getPrice(), lot.getLot_type()));
             notificationService.notifyLotManager(new UpdateLotManagerLotSpotsDTO(
                     spot_id,
                     lot_id,
