@@ -13,5 +13,7 @@ import lombok.Setter;
 public class UpdateLotManagerLotSpotsDTO {
     private long spotId;
     private long lotId;
+    private long lotManagerId;
+    private long lotRevenue;
     private SpotStatus status;
 }

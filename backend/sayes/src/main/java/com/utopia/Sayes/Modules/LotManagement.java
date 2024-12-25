@@ -1,7 +1,9 @@
 package com.utopia.Sayes.Modules;
 
+import com.utopia.Sayes.DTOs.UpdateLotDTO;
 import com.utopia.Sayes.Models.Lot;
 import com.utopia.Sayes.Modules.DynamicPricing.DynamicPricing;
+import com.utopia.Sayes.Modules.WebSocket.NotificationService;
 import com.utopia.Sayes.Repo.LotDAO;
 import com.utopia.Sayes.Repo.LotManagerDAO;
 import com.utopia.Sayes.Repo.SpotDAO;
@@ -26,6 +28,9 @@ public class LotManagement {
     @Autowired
     DynamicPricing dynamicPricing;
 
+    @Autowired
+    NotificationService notificationService;
+
     public long createLot(long manager_id , double longitude,double latitude,long revenue, long price, String lot_type
             , double penalty , double fee, Duration time , int numOfSpots) throws Exception{
         try {
@@ -35,6 +40,14 @@ public class LotManagement {
                     ,revenue,price,lot_type, penalty,fee, time);
             long lotId =  lotDAO.addLot(lot);
             addSpots(lotId , numOfSpots);
+            notificationService.notifyLotUpdate(new UpdateLotDTO(
+                    lotId,
+                    numOfSpots,
+                    longitude,
+                    latitude,
+                    price,
+                    lot_type
+            ));
             return lotId;
         }
         catch (Exception e){
@@ -51,6 +64,14 @@ public class LotManagement {
             for(int i = 0;i < count;i++){
                 spotDAO.addSpot(lot_id,"Available");
             }
+            notificationService.notifyLotUpdate(new UpdateLotDTO(
+                    lot_id,
+                    lotDAO.getLotTotalSpots(lot_id),
+                    lot.getLongitude(),
+                    lot.getLatitude(),
+                    lot.getPrice(),
+                    lot.getLot_type()
+            ));
         }
         catch (Exception e){
             throw new Exception(e.getMessage());

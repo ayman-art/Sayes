@@ -115,4 +115,13 @@ public class LotDAO {
         return rows;
     }
 
+    public long getLotManagerIdByLotId(long lotId){
+        String query = "SELECT manager FROM Lots WHERE lot_id = ?";
+        return jdbcTemplate.queryForObject(query, Long.class, lotId);
+    }
+
+    public long getLotRevenue(long lotId){
+        String query = "SELECT revenue FROM Lots WHERE lot_id = ?";
+        return jdbcTemplate.queryForObject(query, Long.class, lotId);
+    }
 }

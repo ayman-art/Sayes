@@ -23,7 +23,7 @@ public class NotificationService {
 
     public void notifyLotManager(UpdateLotManagerLotSpotsDTO updateLotManagerLotSpotsDTO) {
         messagingTemplate.convertAndSend(
-                "/topic/lot-manager-update/" + updateLotManagerLotSpotsDTO.getLotId(),
+                "/topic/lot-manager-update/" + updateLotManagerLotSpotsDTO.getLotManagerId(),
                 updateLotManagerLotSpotsDTO);
     }
 
