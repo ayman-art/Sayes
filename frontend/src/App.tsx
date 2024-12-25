@@ -27,8 +27,8 @@ const App: React.FC = () => {
         try {
           const data = await authorizeToken(token);
           console.log(data)
-          const jwt = data['jwt'];
-          localStorage.setItem('jwtToken', jwt);
+          // const jwt = data['jwt'];
+          // localStorage.setItem('jwtToken', jwt);
           console.log("didntpass")
           saveData(token)
           console.log("passed")
@@ -55,7 +55,7 @@ const App: React.FC = () => {
             <Route path="/" element={<Dashboard onLogout={onLogout} />} />
             <Route path="/signup" element={<Navigate to="/" />}/>
             <Route path="/login" element={<Navigate to="/" />} />
-            <Route path="/profile" element={<DriverProfile/>}/>
+            <Route path="/profile" element={localStorage.getItem('role') === 'DRIVER' ? <DriverProfile /> : <LotManagerProfile />}/>
             
           </>
         ):(
