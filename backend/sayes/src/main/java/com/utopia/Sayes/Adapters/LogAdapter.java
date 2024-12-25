@@ -21,8 +21,8 @@ public class LogAdapter implements IAdapter<Log> {
     @Override
     public Log fromMap(Map<String, Object> map) {
         Long driverId = (Long) map.get("driver_id");
-        LocalDateTime reservationTime = (LocalDateTime) map.get("start_time");
-        LocalDateTime departureTime= (LocalDateTime) map.get("end_time");
+        LocalDateTime reservationTime = (LocalDateTime) map.get("reservation_time");
+        LocalDateTime departureTime= (LocalDateTime) map.get("departure_time");
         Long spotId = (Long) map.get("spot_id");
         Long lotId = (Long) map.get("lot_id");
 
