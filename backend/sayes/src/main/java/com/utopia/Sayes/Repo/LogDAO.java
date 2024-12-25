@@ -36,4 +36,14 @@ public class LogDAO {
         }
         return logs;
     }
+    public List<Map<String , Object>> getTopUsers(){
+        String query = "SELECT u.username COUNT(l.driver_id) AS total_reservations " +
+                "FROM logs l JOIN Users u " +
+                "ON u.user_id = l.driver_id " +
+                "GROUP BY l.driver_id , u.username " +
+                "ORDER BY total_reservations DESC " +
+                "LIMIT 20";
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
+        return rows;
+    }
 }
