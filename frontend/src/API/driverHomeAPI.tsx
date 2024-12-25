@@ -32,3 +32,18 @@ export const getSpotPrice = async(lot_id: number, endTime:any)=>{
 
     return response;
 }
+export const reserveSpot = async(lotId: number, endTime:string)=>{
+    const token = localStorage.getItem('jwtToken')
+    const response = await fetch(URLS.RESERVE,{
+        method:'PUT',
+        headers:{
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token!}`
+        },
+        body:JSON.stringify({
+            lotId: lotId,
+            endTime: endTime
+        })
+    })
+    return response;
+}
