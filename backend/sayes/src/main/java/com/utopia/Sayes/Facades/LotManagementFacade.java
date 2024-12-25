@@ -25,7 +25,7 @@ public class LotManagementFacade {
                 throw new Exception("manager id is null");
             long lotId = lotManagement.createLot(managerId ,(double) lotData.get("longitude")
             ,(double) lotData.get("latitude") , Long.valueOf((Integer) lotData.get("revenue")) ,
-                    Long.valueOf((Integer)  lotData.get("price")),Long.valueOf((Integer)  lotData.get("num_of_spots")),
+                    Long.valueOf((Integer)  lotData.get("price")),
                     (String) lotData.get("lot_type") , (double)lotData.get("penalty"),
                     (double)lotData.get("fee") , Duration.parse((CharSequence) lotData.get("time")));
             Map<String , Object> data = new HashMap<>();

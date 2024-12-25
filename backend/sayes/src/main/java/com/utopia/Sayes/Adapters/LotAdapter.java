@@ -39,7 +39,8 @@ public class LotAdapter implements IAdapter<Lot>{
         double fee = (double) map.get("fee");
         long milliseconds = ((Time) map.get("time")).getTime();
         Duration time = Duration.ofMillis(milliseconds);
-        Lot lot = new Lot(manager_id, longitude, latitude , revenue, price, num_of_spots,lot_type,penalty,fee,time);
+        Lot lot = new Lot(manager_id, longitude, latitude , revenue, price,lot_type,penalty,fee,time);
+        lot.setNum_of_spots(num_of_spots);
         lot.setLot_id(lot_id);
         lot.setDetails(details);
         return lot;

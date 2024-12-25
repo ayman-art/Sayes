@@ -52,7 +52,6 @@ public class DatabaseService {
                     "revenue BIGINT NOT NULL, " +
                     "price DOUBLE (15 , 2) NOT NULL, " +
                     "lot_type VARCHAR(255) NOT NULL,"+
-                    "num_of_spots BIGINT NOT NULL, " +
                     "penalty DOUBLE (15 , 2) NOT NULL, " +
                     "fee DOUBLE (15 , 2) NOT NULL, " +
                     "time TIME NOT NULL, " +

@@ -8,10 +8,13 @@ import DriverHomePage from "./pages/DriverHome";
 import LotManagerHomePage from "./pages/LotManagerHome";
 import DriverProfile from "./pages/DriverProfile";
 import LotManagerProfile from "./pages/LotManagerProfile";
+import NotificationListener from "./services/notificationService";
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [role, setRole] = useState<string | null>(null);
   const onLogin  = ()=>{
+    setRole(localStorage.getItem('role'));
     setIsAuthenticated(true)
   }
   const onLogout = ()=>{
@@ -25,13 +28,10 @@ const App: React.FC = () => {
       console.log(token)
       if (token) {
         try {
-          const data = await authorizeToken(token);
-          console.log(data)
-          // const jwt = data['jwt'];
-          // localStorage.setItem('jwtToken', jwt);
-          console.log("didntpass")
+          await authorizeToken(token);
           saveData(token)
-          console.log("passed")
+          setRole(localStorage.getItem('role'));
+
           setIsAuthenticated(true); // Set to true when token is valid
         } catch (err) {
           localStorage.removeItem('jwtToken');
@@ -52,7 +52,7 @@ const App: React.FC = () => {
       <Routes>
         {isAuthenticated ? (
           <>
-            <Route path="/" element={<Dashboard onLogout={onLogout} />} />
+            <Route path="/" element={role== 'ADMIN'? <Dashboard onLogout={onLogout} />: (role=='DRIVER'? <DriverHomePage/>: <LotManagerHomePage/>)} />
             <Route path="/signup" element={<Navigate to="/" />}/>
             <Route path="/login" element={<Navigate to="/" />} />
             <Route path="/profile" element={localStorage.getItem('role') === 'DRIVER' ? <DriverProfile /> : <LotManagerProfile />}/>
@@ -65,7 +65,7 @@ const App: React.FC = () => {
             <Route path="/signup" element={<SignUp onLogin={onLogin} />} />
             </>
         )}
-        <Route path="/test" element={<LotManagerHomePage/>}/>
+        <Route path="/test" element={<NotificationListener/>}/>
       </Routes>
     </Router>
   );

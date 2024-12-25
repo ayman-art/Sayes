@@ -3,10 +3,12 @@ package com.utopia.Sayes.Modules;
 import com.utopia.Sayes.DTOs.UpdateDriverReservationDTO;
 import com.utopia.Sayes.DTOs.UpdateLotDTO;
 import com.utopia.Sayes.DTOs.UpdateLotManagerLotSpotsDTO;
+import com.utopia.Sayes.Models.Lot;
 import com.utopia.Sayes.Models.Reservation;
 import com.utopia.Sayes.Models.Spot;
 import com.utopia.Sayes.Modules.DynamicPricing.DynamicPricing;
 import com.utopia.Sayes.Modules.WebSocket.NotificationService;
+import com.utopia.Sayes.Repo.LogDAO;
 import com.utopia.Sayes.Repo.LotDAO;
 import com.utopia.Sayes.Repo.ReservationDAO;
 import com.utopia.Sayes.Repo.SpotDAO;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -39,6 +42,9 @@ public class ReservationService {
     PaymentService paymentService;
 
     @Autowired
+    LogDAO logDAO;
+
+    @Autowired
     private NotificationService notificationService;
 
 
@@ -49,7 +55,6 @@ public class ReservationService {
             if (spotId == 0){
                 throw new Exception("spot doesn't exist");
             }
-            lotDAO.decrementAvailableSpots(lot_id);
             //spotDAO.updateSpotState(spotId,lot_id, String.valueOf(SpotStatus.Reserved));
             java.sql.Timestamp startTimestamp = new java.sql.Timestamp(new Date().getTime());
             java.sql.Timestamp endTimestamp = new java.sql.Timestamp(endTime.getTime());
@@ -60,8 +65,9 @@ public class ReservationService {
             reservationDAO.addReservation(spotId,lot_id, startTimestamp, endTimestamp,
                     String.valueOf(SpotStatus.Reserved),driver_id,price);
             setReservationTimeOut(lot_id , spotId , driver_id);
-
-            notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, SpotStatus.Reserved));
+            Lot lot = lotDAO.getLotById(lot_id);
+            notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, lot.getNum_of_spots(),
+                    lot.getLongitude(), lot.getLatitude(), lot.getPrice(), lot.getLot_type()));
             notificationService.notifyLotManager(new UpdateLotManagerLotSpotsDTO(spotId, lot_id, SpotStatus.Reserved));
 
             return spotId;
@@ -116,10 +122,13 @@ public class ReservationService {
                 throw new Exception("There is no reservation for this spot");
             }
             spotDAO.updateSpotState(spot_id,lot_id, String.valueOf(SpotStatus.Available));
-            lotDAO.incrementAvailableSpots(lot_id);
             reservationDAO.deleteReservation(spot_id , lot_id);
-
-            notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, SpotStatus.Available));
+            Date date = Date.from(reservation.getStart_time().atZone(ZoneId.systemDefault()).toInstant());
+            java.sql.Timestamp endTimestamp = new java.sql.Timestamp(new Date().getTime());
+            logDAO.addlog(spot_id , lot_id, date , endTimestamp,driver_id);
+            Lot lot = lotDAO.getLotById(lot_id);
+            notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, lot.getNum_of_spots(),
+                    lot.getLongitude(), lot.getLatitude(), lot.getPrice(), lot.getLot_type()));
             notificationService.notifyLotManager(new UpdateLotManagerLotSpotsDTO(
                     spot_id,
                     lot_id,
