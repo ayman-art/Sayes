@@ -9,6 +9,7 @@ import { jsonLotMapper, ParkingLot } from '../models/Lot';
 import { fetchLots } from '../API/driverHomeAPI';
 import WebSocketService from '../services/socketService';
 import { URLS } from '../API/urls';
+import { DTOLotMapper } from '../models/UpdateLotDTO';
 
 // Interfaces
 
@@ -37,6 +38,22 @@ const LocationMarker: React.FC = () => {
 // Driver Home Page
 const DriverHomePage: React.FC = () => {
   const [parkingSpots, setParkingSpots] = useState<ParkingLot[]>([]);
+  const lotUpdateHandler = (lotUpdate: any)=>{
+    setParkingSpots((prevSpots) => {
+      // Check if the lot already exists in the list
+      const index = prevSpots.findIndex((spot) => spot.id === lotUpdate.lotId);
+  
+      if (index !== -1) {
+        // If found, replace the existing lot with the updated one
+        const updatedSpots = [...prevSpots];
+        updatedSpots[index] = DTOLotMapper(lotUpdate);
+        return updatedSpots;
+      } else {
+        // If not found, add the new lot to the list
+        return [...prevSpots, DTOLotMapper(lotUpdate)];
+      }
+    });
+  }
   const webSocketService = new WebSocketService(URLS.SOCKET);
   useEffect(()=>{
     const onConnect = () => {
@@ -45,7 +62,8 @@ const DriverHomePage: React.FC = () => {
       // Subscribe to lot updates
       webSocketService.subscribe('/topic/lots-update', (message) => {
         console.log(JSON.parse(message.body));
-        //setLotUpdates((prev) => [...prev, JSON.parse(message.body)]);
+        const lotUpdate = JSON.parse(message.body)
+        lotUpdateHandler(lotUpdate)
       });
     }
     const onError = (error: string) => {
@@ -68,7 +86,7 @@ const DriverHomePage: React.FC = () => {
   //     id: 1,
   //     name: 'Lot 1',
   //     latitude: 31.2,
-  //     longitude: 29.9,
+  //     longitude: 29.9,                          
   //     availableSpots: 0,
   //     pricePerHour: 100,
   //     lotType: 'Normal',
