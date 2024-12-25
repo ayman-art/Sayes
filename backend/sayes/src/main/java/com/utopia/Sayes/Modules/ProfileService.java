@@ -1,13 +1,7 @@
 package com.utopia.Sayes.Modules;
 
-import com.utopia.Sayes.Models.Driver;
-import com.utopia.Sayes.Models.Lot;
-import com.utopia.Sayes.Models.LotManager;
-import com.utopia.Sayes.Models.Spot;
-import com.utopia.Sayes.Repo.DriverDAO;
-import com.utopia.Sayes.Repo.LotDAO;
-import com.utopia.Sayes.Repo.LotManagerDAO;
-import com.utopia.Sayes.Repo.SpotDAO;
+import com.utopia.Sayes.Models.*;
+import com.utopia.Sayes.Repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +18,9 @@ public class ProfileService {
     LotManagerDAO lotManagerDAO;
     @Autowired
     DriverDAO driverDAO;
+
+    @Autowired
+    AdminDAO adminDAO;
 
     public List<Lot> getManagerLots(long managerId) throws Exception {
         try {
@@ -51,6 +48,14 @@ public class ProfileService {
     public Driver getDriver(long driverId) throws Exception {
         try {
             return driverDAO.getDriverById(driverId);
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+    public Admin getAdmin(long adminId) throws Exception {
+        try {
+            return adminDAO.getAdminById(adminId);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());

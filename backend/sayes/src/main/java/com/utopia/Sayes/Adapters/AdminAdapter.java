@@ -10,7 +10,6 @@ public class AdminAdapter implements IAdapter<Admin> {
     public Map<String, Object> toMap(Admin admin) {
         Map<String, Object> AdminMap = new HashMap<>();
         AdminMap.put("username", admin.getUsername());
-        AdminMap.put("user_password",admin.getUser_password());
         return AdminMap;
     }
 

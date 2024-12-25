@@ -46,7 +46,7 @@ public class LotManagementController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping("/get-price")
+    @PostMapping("/get-price")
     public ResponseEntity<?> getPrice(@RequestBody Map<String, Object> lotData  ,@RequestHeader("Authorization") String token) {
         try {
             token = token.replace("Bearer ", "");

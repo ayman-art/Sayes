@@ -9,6 +9,7 @@ import LotManagerHomePage from "./pages/LotManagerHome";
 import DriverProfile from "./pages/DriverProfile";
 import LotManagerProfile from "./pages/LotManagerProfile";
 import NotificationListener from "./services/notificationService";
+import AdminProfile from "./pages/AdminProfile";
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -55,7 +56,12 @@ const App: React.FC = () => {
             <Route path="/" element={role== 'ADMIN'? <Dashboard onLogout={onLogout} />: (role=='DRIVER'? <DriverHomePage/>: <LotManagerHomePage/>)} />
             <Route path="/signup" element={<Navigate to="/" />}/>
             <Route path="/login" element={<Navigate to="/" />} />
-            <Route path="/profile" element={role === 'DRIVER' ? <DriverProfile /> : <LotManagerProfile />}/>
+            <Route path="/profile" element={role === 'DRIVER' ? (<DriverProfile />) : role === 'ADMIN' ? (<AdminProfile/>) : (
+                    <LotManagerProfile />
+                    )
+                  }
+                />
+
             
           </>
         ):(
