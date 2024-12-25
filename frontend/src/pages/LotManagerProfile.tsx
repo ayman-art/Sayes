@@ -51,10 +51,24 @@ const LotManagerProfile = () => {
                         
                         <div className="lot-body">
                             <div className="lot-info">
-                                <p><strong>Price:</strong> ${lot.price.toFixed(2)}</p>
-                                <p><strong>Revenue:</strong> ${lot.revenue.toFixed(2)}</p>
-                                <p><strong>Location:</strong> {lot.latitude.toFixed(6)}, {lot.longitude.toFixed(6)}</p>
-                                {lot.details && <p><strong>Details:</strong> {lot.details}</p>}
+                                <div className="info-grid">
+                                    <div className="info-item">
+                                        <p><strong>Price:</strong> ${lot.price.toFixed(2)}</p>
+                                        <p><strong>Revenue:</strong> ${lot.revenue.toFixed(2)}</p>
+                                    </div>
+                                    <div className="info-item">
+                                        <p><strong>Penalty:</strong> ${lot.penalty.toFixed(2)}</p>
+                                        <p><strong>Fee:</strong> ${lot.fee.toFixed(2)}</p>
+                                    </div>
+                                    <div className="info-item">
+                                        <p><strong>Location:</strong> {lot.latitude.toFixed(6)}, {lot.longitude.toFixed(6)}</p>
+                                    </div>
+                                </div>
+                                {lot.details && (
+                                    <div className="details-section">
+                                        <p><strong>Details:</strong> {lot.details}</p>
+                                    </div>
+                                )}
                             </div>
                             
                             <h5 className="text-lg font-semibold mb-2">Parking Spots ({lot.spots.length})</h5>
