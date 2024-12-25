@@ -140,8 +140,6 @@ const DriverHomePage: React.FC = () => {
   //   }
   // };
   const BookingHandler = async () => {
-    // const price = calculateTotalPrice();
-    // setTotalPrice(price);
     const response = await getSpotPrice(selectedSpot!.id, endTime);
     if(response.ok){
       const data = await response.json()
@@ -176,7 +174,14 @@ const DriverHomePage: React.FC = () => {
   };
 
   function toggleOccupancy(): void {
-    throw new Error('Function not implemented.');
+    let temp = reservedSpot;
+    temp!.occupied = ! temp?.occupied;
+    setReservedSpot(temp);
+    if (temp?.occupied){
+      
+    }else{
+      
+    }
   }
 
   return (
