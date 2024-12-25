@@ -76,10 +76,10 @@ public class ReservationService {
            throw new Exception(e.getMessage());
         }
     }
-    public void useReservation(long spot_id ,long lot_id,long driver_id) throws Exception {
+    public void useReservation(long spot_id ,long lot_id,long driver_id, String method) throws Exception {
         try {
             double price = reservationDAO.getReservationPrice(spot_id, lot_id);
-            if (paymentService.confirmReservation(price, driver_id, lot_id)) {
+            if (paymentService.confirmReservation(price, driver_id, lot_id , method)) {
                 Spot spot = spotDAO.getSpotById(spot_id, lot_id);
                 System.out.println(spot.getSpot_id());
                 if (spot == null) {
