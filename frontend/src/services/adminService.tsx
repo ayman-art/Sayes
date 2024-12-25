@@ -22,6 +22,18 @@ interface RawTopLotsResponse {
     topLots: RawTopLot[];
 }
 
+interface RawLog {
+    driverId: number;
+    reservationTime: string;
+    departureTime: string;
+    spotId: number;
+    lotId: number;
+}
+
+interface RawLogsResponse {
+    logs: RawLog[];
+}
+
 // Admin Data Fetch Function
 export const fetchAdminData = async (token: string): Promise<AdminDataDTO> => {
     const response = await fetch(`${URL}/profile/get-admin`, {
@@ -82,6 +94,25 @@ export const fetchTopLots = async (token: string): Promise<RawTopLotsResponse> =
 
     const rawData: RawTopLotsResponse = await response.json();
     console.log('Top Lots:', rawData);
+
+    return rawData;
+};
+// Logs Fetch Function
+export const fetchLogs = async (token: string): Promise<RawLogsResponse> => {
+    const response = await fetch(`${URL}/report/get-logs`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch logs');
+    }
+
+    const rawData: RawLogsResponse = await response.json();
+    console.log('Logs:', rawData);
 
     return rawData;
 };

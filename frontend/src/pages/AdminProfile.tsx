@@ -1,34 +1,63 @@
 import React, { useState, useEffect } from 'react';
-import { fetchAdminData, fetchTopUsers, fetchTopLots } from '../services/adminService';
+import { fetchAdminData, fetchTopUsers, fetchTopLots, fetchLogs } from '../services/adminService';
 import '../styles/AdminProfile.css';
 
 const AdminProfile = () => {
+    // States for admin data, top users, top lots, and logs
     const [adminName, setAdminName] = useState<string>('');
     const [topUsers, setTopUsers] = useState<any[]>([]);
     const [topLots, setTopLots] = useState<any[]>([]);
-    const [view, setView] = useState<'none' | 'topUsers' | 'topLots'>('none');
+    const [logs, setLogs] = useState<any[]>([]);
+    const [view, setView] = useState<'none' | 'topUsers' | 'topLots' | 'logs'>('none');
 
+    // Get the token from local storage
     const token = localStorage.getItem('jwtToken');
 
+    // Fetch admin data on component mount
     useEffect(() => {
         const fetchData = async () => {
-            const adminData = await fetchAdminData(token!);
-            setAdminName(adminData.username);
+            try {
+                const adminData = await fetchAdminData(token!);  // Ensure token is present
+                setAdminName(adminData.username);
+            } catch (error) {
+                console.error('Error fetching admin data:', error);
+            }
         };
 
         fetchData();
-    }, []);
+    }, [token]);
 
+    // Function to fetch top users
     const handleTopUsers = async () => {
-        const response = await fetchTopUsers(token!);
-        setTopUsers(response.topUsers);
-        setView('topUsers');
+        try {
+            const response = await fetchTopUsers(token!);
+            setTopUsers(response.topUsers);
+            setView('topUsers');
+        } catch (error) {
+            console.error('Error fetching top users:', error);
+        }
     };
 
+    // Function to fetch top lots
     const handleTopLots = async () => {
-        const response = await fetchTopLots(token!);
-        setTopLots(response.topLots);
-        setView('topLots');
+        try {
+            const response = await fetchTopLots(token!);
+            setTopLots(response.topLots);
+            setView('topLots');
+        } catch (error) {
+            console.error('Error fetching top lots:', error);
+        }
+    };
+
+    // Function to fetch logs
+    const handleLogs = async () => {
+        try {
+            const response = await fetchLogs(token!);
+            setLogs(response.logs);
+            setView('logs');
+        } catch (error) {
+            console.error('Error fetching logs:', error);
+        }
     };
 
     return (
@@ -47,6 +76,9 @@ const AdminProfile = () => {
                     </button>
                     <button className="btn-secondary" onClick={handleTopLots}>
                         View Top Lots
+                    </button>
+                    <button className="btn-tertiary" onClick={handleLogs}>
+                        View Logs
                     </button>
                 </div>
             </div>
@@ -79,9 +111,27 @@ const AdminProfile = () => {
                         </ul>
                     </div>
                 )}
+
+                {view === 'logs' && (
+                    <div className="logs">
+                        <h3 className="text-2xl font-bold">Logs</h3>
+                        <ul>
+                            {logs.map((log, index) => (
+                                <li key={index} className="log-item">
+                                    <p><strong>Driver ID:</strong> {log.driverId}</p>
+                                    <p><strong>Reservation Time:</strong> {new Date(log.reservationTime).toLocaleString()}</p>
+                                    <p><strong>Departure Time:</strong> {new Date(log.departureTime).toLocaleString()}</p>
+                                    <p><strong>Spot ID:</strong> {log.spotId}</p>
+                                    <p><strong>Lot ID:</strong> {log.lotId}</p>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
 
 export default AdminProfile;
+
