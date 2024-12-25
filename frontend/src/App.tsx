@@ -55,7 +55,7 @@ const App: React.FC = () => {
             <Route path="/" element={role== 'ADMIN'? <Dashboard onLogout={onLogout} />: (role=='DRIVER'? <DriverHomePage/>: <LotManagerHomePage/>)} />
             <Route path="/signup" element={<Navigate to="/" />}/>
             <Route path="/login" element={<Navigate to="/" />} />
-            <Route path="/profile" element={localStorage.getItem('role') === 'DRIVER' ? <DriverProfile /> : <LotManagerProfile />}/>
+            <Route path="/profile" element={role === 'DRIVER' ? <DriverProfile /> : <LotManagerProfile />}/>
             
           </>
         ):(

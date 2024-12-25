@@ -69,8 +69,8 @@ export const loginUser = async (name: string, password: string) => {
     
     if (response.ok ) {
       // Save JWT to localStorage
-      const token = response.headers.get("Authorization") ?? "";
-      localStorage.setItem('jwtToken', token);
+      const token = await response.json()
+      localStorage.setItem('jwtToken', token['jwt']);
     } else {
       throw new Error('Registration failed');
     }
