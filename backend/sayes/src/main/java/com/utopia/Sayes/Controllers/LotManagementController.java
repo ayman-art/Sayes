@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-
 @CrossOrigin()
 @RestController
 @RequestMapping("/lot-management")
@@ -42,6 +41,17 @@ public class LotManagementController {
         try {
             token = token.replace("Bearer ", "");
             Map<String , Object> response = lotManagementFacade.getLots(token);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/get-price")
+    public ResponseEntity<?> getPrice(@RequestBody Map<String, Object> lotData  ,@RequestHeader("Authorization") String token) {
+        try {
+            token = token.replace("Bearer ", "");
+            lotData.put("jwt", token);
+            Map<String , Object> response = lotManagementFacade.getDynamicPrice(lotData);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
