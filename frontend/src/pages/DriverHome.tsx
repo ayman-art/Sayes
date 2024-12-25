@@ -1,27 +1,32 @@
 import React, { useState, useEffect } from 'react';
-//import Modal from 'react-modal';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L, { LatLng, Icon } from 'leaflet';
-import redIconUrl from '../assets/red-parking-sign.png';
-import blueIconUrl from '../assets/blue-parking-sign.png';
+import redIconUrl from '../assets/red-parking-sign.png'; // For lots with 0 spots
+import blueIconUrl from '../assets/blue-parking-sign.png'; // For lots with available spots
 import '../styles/DriverHomePage.css';
 import { jsonLotMapper, ParkingLot } from '../models/Lot';
-import { fetchLots, getSpotPrice, bookSpot } from '../API/driverHomeAPI';
+import { fetchLots, getSpotPrice } from '../API/driverHomeAPI';
 import WebSocketService from '../services/socketService';
 import { URLS } from '../API/urls';
 import { DTOLotMapper } from '../models/UpdateLotDTO';
+import Modal from "react-modal";
+// Interfaces
 
+
+// Location Marker Component
 const LocationMarker: React.FC = () => {
   const [position, setPosition] = useState<LatLng | null>(null);
+
   const map = useMap();
 
   useEffect(() => {
-    map.locate().on('locationfound', (e) => {
+    map.locate().on('locationfound', function (e) {
       const userLocation = e.latlng;
       setPosition(userLocation);
       map.flyTo(userLocation, map.getZoom());
     });
+    
   }, [map]);
 
   return position === null ? null : (
@@ -31,16 +36,67 @@ const LocationMarker: React.FC = () => {
   );
 };
 
+// Driver Home Page
 const DriverHomePage: React.FC = () => {
   const [parkingSpots, setParkingSpots] = useState<ParkingLot[]>([]);
+  
+  const [endTime, setEndTime] = useState("");
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [totalPrice, setTotalPrice] = useState(0);
   const [selectedSpot, setSelectedSpot] = useState<ParkingLot | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [endTime, setEndTime] = useState<string>('');
-  const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null);
+  const webSocketService = new WebSocketService(URLS.SOCKET);
+  const defaultCenter: [number, number] = [30.033333, 31.233334]; // Cairo
 
-  const defaultCenter: [number, number] = [30.033333, 31.233334];
+  const lotUpdateHandler = (lotUpdate: any)=>{
+    setParkingSpots((prevSpots) => {
+      // Check if the lot already exists in the list
+      const index = prevSpots.findIndex((spot) => spot.id === lotUpdate.lotId);
+  
+      if (index !== -1) {
+        // If found, replace the existing lot with the updated one
+        const updatedSpots = [...prevSpots];
+        updatedSpots[index] = DTOLotMapper(lotUpdate);
+        return updatedSpots;
+      } else {
+        // If not found, add the new lot to the list
+        return [...prevSpots, DTOLotMapper(lotUpdate)];
+      }
+    });
+  }
+  
+  useEffect(()=>{
+    const onConnect = () => {
+      console.log('Connected to WebSocket');
 
+      // Subscribe to lot updates
+      webSocketService.subscribe('/topic/lots-update', (message) => {
+        console.log(JSON.parse(message.body));
+        const lotUpdate = JSON.parse(message.body)
+        lotUpdateHandler(lotUpdate)
+      });
+    }
+    const onError = (error: string) => {
+      console.error('WebSocket error:', error);
+    };
+    webSocketService.connect(onConnect, onError);
+    const makeRequests = async()=>{
+      const jwt= localStorage.getItem('jwtToken');
+
+      const lots = await fetchLots(jwt!);
+      const update: ParkingLot[] = lots.map(jsonLotMapper);
+      setParkingSpots(update)
+    }
+    makeRequests()
+    return () => {
+      webSocketService.disconnect();
+    };
+  }, [])
+  
+
+
+  // Create dynamic icons for parking spots
   const getIcon = (availableSpots: number) =>
     new Icon({
       iconUrl: availableSpots > 0 ? blueIconUrl : redIconUrl,
@@ -49,44 +105,53 @@ const DriverHomePage: React.FC = () => {
       popupAnchor: [0, -32],
     });
 
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEndTime('');
-    setCalculatedPrice(null);
-  };
-
-  const handleFetchPrice = async () => {
-    if (!endTime || !selectedSpot) return;
-    try {
-      //const response = await getSpotPrice(selectedSpot.id, endTime); // Update API to accept `endTime`
-      //const price = await response.json();
-      //setCalculatedPrice(price);
-    } catch (error) {
-      setMessage('Error fetching price.');
-    }
-  };
-
-  const handleConfirmBooking = async () => {
-    if (!selectedSpot || !endTime) return;
-    try {
-      const response = await bookSpot(selectedSpot.id, endTime); // Add booking API call
-      if (response.ok) {
-        setMessage('Spot booked successfully!');
-        setParkingSpots((prevSpots) =>
-          prevSpots.map((spot) =>
-            spot.id === selectedSpot.id
-              ? { ...spot, availableSpots: spot.availableSpots - 1 }
-              : spot
-          )
-        );
-      } else {
-        setMessage('Failed to book the spot. Try again later.');
+  // Handle booking a spot
+  const handleBooking = async () => {
+    if (selectedSpot && selectedSpot.availableSpots > 0) {
+      console.log(endTime)
+      try {
+        const response = await getSpotPrice(selectedSpot!.id!)
+        if (response.ok) {
+          setMessage('Spot booked successfully!');
+          // Simulate spot availability update
+          setParkingSpots((prevSpots) =>
+            prevSpots.map((spot) =>
+              spot.id === selectedSpot.id
+                ? { ...spot, availableSpots: spot.availableSpots - 1 }
+                : spot
+            )
+          );
+        } else {
+          setMessage('Failed to book the spot. Try again later.');
+        }
+      } catch (error) {
+        setMessage('Error booking the spot.');
       }
-      handleCloseModal();
-    } catch (error) {
-      setMessage('Error booking the spot.');
+    } else {
+      setMessage('No available spots.');
     }
+  };
+  const BookingHandler = async () => {
+    // const price = calculateTotalPrice();
+    // setTotalPrice(price);
+    const response = await getSpotPrice(selectedSpot!.id, endTime);
+    if(response.ok){
+      const data = await response.json()
+      const price = data['price']
+      setTotalPrice(price); 
+      setIsModalOpen(true); // Show the confirmation modal
+    }
+  };
+
+  const confirmBooking = () => {
+    console.log(`Booking confirmed for ${selectedSpot.name} until ${endTime}`);
+    console.log(`Total price: $${totalPrice}`);
+    setIsModalOpen(false);
+    setMessage("Booking confirmed!"); // Set a success message
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -105,7 +170,7 @@ const DriverHomePage: React.FC = () => {
       <div className="content">
         {/* Map Section */}
         <div className="map-container">
-          <MapContainer center={defaultCenter} zoom={13} style={{ height: '100%', width: '100%' }}>
+          <MapContainer center={defaultCenter} zoom={13} style={{ height: "100%", width: "100%" }}>
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution="&copy; OpenStreetMap contributors"
@@ -119,7 +184,7 @@ const DriverHomePage: React.FC = () => {
                 eventHandlers={{
                   click: () => {
                     setSelectedSpot(spot);
-                    setMessage(null);
+                    setMessage(null); // Clear any previous message
                   },
                 }}
               >
@@ -151,9 +216,29 @@ const DriverHomePage: React.FC = () => {
               <p>
                 <strong>Price:</strong> ${selectedSpot.pricePerHour}/hour
               </p>
-              <button onClick={handleOpenModal} disabled={selectedSpot.availableSpots === 0}>
+
+              {/* End Time Selection */}
+              <div className="reservation-time">
+                <label htmlFor="endTime">
+                  <strong>End Time:</strong>
+                </label>
+                <input
+                  type="time"
+                  step="1"
+                  id="endTime"
+                  name="endTime"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                />
+              </div>
+
+              <button 
+                onClick={BookingHandler} 
+                disabled={selectedSpot.availableSpots === 0 || !endTime}
+              >
                 Book Spot
               </button>
+
               {message && <p className="message">{message}</p>}
             </div>
           ) : (
@@ -162,30 +247,19 @@ const DriverHomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal */}
-      <Modal isOpen={isModalOpen} onRequestClose={handleCloseModal} className="modal" overlayClassName="overlay">
-        <h2>Book Spot</h2>
-        <p>Select an end time for your reservation:</p>
-        <input
-          type="datetime-local"
-          value={endTime}
-          onChange={(e) => setEndTime(e.target.value)}
-        />
-        <button onClick={handleFetchPrice} disabled={!endTime}>
-          Fetch Price
-        </button>
-        {calculatedPrice !== null && (
-          <p>
-            <strong>Total Price:</strong> ${calculatedPrice}
-          </p>
-        )}
-        <button onClick={handleConfirmBooking} disabled={calculatedPrice === null}>
-          Confirm Booking
-        </button>
-        <button onClick={handleCloseModal}>Cancel</button>
+      {/* Booking Confirmation Modal */}
+      <Modal isOpen={isModalOpen} onRequestClose={closeModal} className="modal" overlayClassName="overlay">
+        <h2>Booking Confirmation</h2>
+        <p>Parking Spot: <strong>{selectedSpot?.name}</strong></p>
+        <p>End Time: <strong>{endTime}</strong></p>
+        <p>Total Price: <strong>${totalPrice}</strong></p>
+        <button onClick={confirmBooking}>Confirm</button>
+        <button onClick={closeModal}>Cancel</button>
       </Modal>
     </div>
   );
 };
 
 export default DriverHomePage;
+
+
