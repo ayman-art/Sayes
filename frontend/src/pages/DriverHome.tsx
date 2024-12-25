@@ -5,7 +5,10 @@ import L, { LatLng, Icon } from 'leaflet';
 import redIconUrl from '../assets/red-parking-sign.png'; // For lots with 0 spots
 import blueIconUrl from '../assets/blue-parking-sign.png'; // For lots with available spots
 import '../styles/DriverHomePage.css';
-import { ParkingLot } from '../models/Lot';
+import { jsonLotMapper, ParkingLot } from '../models/Lot';
+import { fetchLots } from '../API/driverHomeAPI';
+import WebSocketService from '../services/socketService';
+import { URLS } from '../API/urls';
 
 // Interfaces
 
@@ -21,6 +24,7 @@ const LocationMarker: React.FC = () => {
       setPosition(userLocation);
       map.flyTo(userLocation, map.getZoom());
     });
+    
   }, [map]);
 
   return position === null ? null : (
@@ -32,26 +36,53 @@ const LocationMarker: React.FC = () => {
 
 // Driver Home Page
 const DriverHomePage: React.FC = () => {
-  const [parkingSpots, setParkingSpots] = useState<ParkingLot[]>([
-    {
-      id: 1,
-      name: 'Lot 1',
-      latitude: 31.2,
-      longitude: 29.9,
-      availableSpots: 0,
-      pricePerHour: 100,
-      lotType: 'Normal',
-    },
-    {
-      id: 2,
-      name: 'Lot 2',
-      latitude: 31.3,
-      longitude: 29.8,
-      availableSpots: 5,
-      pricePerHour: 80,
-      lotType: 'VIP',
-    },
-  ]);
+  const [parkingSpots, setParkingSpots] = useState<ParkingLot[]>([]);
+  const webSocketService = new WebSocketService(URLS.SOCKET);
+  useEffect(()=>{
+    const onConnect = () => {
+      console.log('Connected to WebSocket');
+
+      // Subscribe to lot updates
+      webSocketService.subscribe('/topic/lots-update', (message) => {
+        console.log(JSON.parse(message.body));
+        //setLotUpdates((prev) => [...prev, JSON.parse(message.body)]);
+      });
+    }
+    const onError = (error: string) => {
+      console.error('WebSocket error:', error);
+    };
+    webSocketService.connect(onConnect, onError);
+    const makeRequests = async()=>{
+      const jwt= localStorage.getItem('jwtToken');
+
+      const lots = await fetchLots(jwt!);
+      const update: ParkingLot[] = lots.map(jsonLotMapper);
+      setParkingSpots(update)
+    }
+    makeRequests()
+    return () => {
+      webSocketService.disconnect();
+    };
+  }, [])
+  //   {
+  //     id: 1,
+  //     name: 'Lot 1',
+  //     latitude: 31.2,
+  //     longitude: 29.9,
+  //     availableSpots: 0,
+  //     pricePerHour: 100,
+  //     lotType: 'Normal',
+  //   },
+  //   {
+  //     id: 2,
+  //     name: 'Lot 2',
+  //     latitude: 31.3,
+  //     longitude: 29.8,
+  //     availableSpots: 5,
+  //     pricePerHour: 80,
+  //     lotType: 'VIP',
+  //   },
+  // ]);
   const [selectedSpot, setSelectedSpot] = useState<ParkingLot | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
