@@ -117,7 +117,7 @@ export const saveData = (token:string)=>{
     localStorage.setItem("jwtToken", token);
     localStorage.setItem("role", decodedObj.role)
     localStorage.setItem("name", decodedObj.sub)
-    localStorage.setItem("id", decodedObj.id)
+    localStorage.setItem("id", decodedObj.jti)
 }
 
 function base64urlDecode(base64url: string) {
