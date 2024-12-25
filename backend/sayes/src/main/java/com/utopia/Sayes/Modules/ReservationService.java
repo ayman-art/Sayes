@@ -189,7 +189,7 @@ public class ReservationService {
                             lot_id,
                             spot_id,
                             SpotStatus.OverOccupied,
-                            lotDAO.getLotPenalty(lot_id),
+                            lotDAO.getLotFee(lot_id),
                             reservationDAO.getReservationPrice(spot_id, lot_id),
                             0L,
                             0L)
