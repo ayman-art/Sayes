@@ -6,6 +6,8 @@ import Dashboard from "./pages/Dashboard";
 import { authorizeToken, clearData, saveData } from "./services/authService";
 import DriverHomePage from "./pages/DriverHome";
 import LotManagerHomePage from "./pages/LotManagerHome";
+import DriverProfile from "./pages/DriverProfile";
+import LotManagerProfile from "./pages/LotManagerProfile";
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -24,6 +26,7 @@ const App: React.FC = () => {
       if (token) {
         try {
           const data = await authorizeToken(token);
+          console.log(data)
           const jwt = data['jwt'];
           localStorage.setItem('jwtToken', jwt);
           console.log("didntpass")
@@ -52,15 +55,15 @@ const App: React.FC = () => {
             <Route path="/" element={<Dashboard onLogout={onLogout} />} />
             <Route path="/signup" element={<Navigate to="/" />}/>
             <Route path="/login" element={<Navigate to="/" />} />
-            {}
+            <Route path="/profile" element={<DriverProfile/>}/>
+            
           </>
         ):(
           <>
             <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/login" element={<Login onLogin={onLogin} />} />
             <Route path="/signup" element={<SignUp onLogin={onLogin} />} />
-            <Route path="/profile" element={localStorage.getItem('role') === 'driver' ? <DriverProfile/> : <LotManagerProfile/>}/>
-          </>
+            </>
         )}
         <Route path="/test" element={<LotManagerHomePage/>}/>
       </Routes>
