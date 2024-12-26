@@ -30,7 +30,11 @@ public class LotDAO {
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
+        long hours = lot.getTime().toHours();
+        long minutes = lot.getTime().toMinutesPart(); // Java 9+ feature
+        long seconds = lot.getTime().toSecondsPart(); // Java 9+ feature
 
+        String formatted =  String.format("%02d:%02d:%02d", hours, minutes, seconds);
         int rows = jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             ps.setLong(1, lot.getManager_id());
@@ -42,7 +46,7 @@ public class LotDAO {
             ps.setString(7, lot.getLot_type());
             ps.setDouble(8, lot.getPenalty());
             ps.setDouble(9, lot.getFee());
-            ps.setObject(10, lot.getTime());
+            ps.setString(10, formatted);
             return ps;
         }, keyHolder);
 

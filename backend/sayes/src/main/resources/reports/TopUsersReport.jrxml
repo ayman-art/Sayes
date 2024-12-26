@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+                                  http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="TopUsersReport" pageWidth="595" pageHeight="842" columnWidth="515">
+
+    <!-- Field Definitions -->
+    <field name="username" class="java.lang.String"/>
+    <field name="total_reservations" class="java.lang.Integer"/>
+
+    <!-- Title Section -->
+    <title>
+        <band height="50">
+            <staticText>
+                <textElement textAlignment="Center">
+                    <font size="18" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Top Users Report]]></text>
+            </staticText>
+        </band>
+    </title>
+
+    <!-- Detail Section for Data -->
+    <detail>
+        <band height="20">
+            <textField>
+                <textFieldExpression><![CDATA[$F{username}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <textFieldExpression><![CDATA[$F{total_reservations}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+</jasperReport>
