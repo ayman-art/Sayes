@@ -6,16 +6,22 @@ import redIconUrl from '../assets/red-parking-sign.png'; // For lots with 0 spot
 import blueIconUrl from '../assets/blue-parking-sign.png'; // For lots with available spots
 import '../styles/DriverHomePage.css';
 import { jsonLotMapper, ParkingLot } from '../models/Lot';
-import { fetchLots } from '../API/driverHomeAPI';
+import { fetchLots, freeSpot, getSpotPrice, reserveSpot, useSpot } from '../API/driverHomeAPI';
 import WebSocketService from '../services/socketService';
 import { URLS } from '../API/urls';
-
+import { DTOLotMapper } from '../models/UpdateLotDTO';
+import Modal from "react-modal";
 // Interfaces
-
+interface ReservedSpot{
+  lot_id: number;
+  spot_id: number;
+  endTime: string;
+}
 
 // Location Marker Component
 const LocationMarker: React.FC = () => {
   const [position, setPosition] = useState<LatLng | null>(null);
+
   const map = useMap();
 
   useEffect(() => {
@@ -37,7 +43,43 @@ const LocationMarker: React.FC = () => {
 // Driver Home Page
 const DriverHomePage: React.FC = () => {
   const [parkingSpots, setParkingSpots] = useState<ParkingLot[]>([]);
+  
+  const [endTime, setEndTime] = useState("");
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [selectedSpot, setSelectedSpot] = useState<ParkingLot | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [reservedSpot, setReservedSpot] = useState<ReservedSpot|null>(null);
+  const [hasReserved, setHasReserved] = useState<boolean> (false);
+  const [paymentMethod, setPaymentMethod] = useState("cash"); // Default to "cash"
+  const [occupied, setOccupied] = useState<boolean>(false)
+
+
   const webSocketService = new WebSocketService(URLS.SOCKET);
+  const defaultCenter: [number, number] = [30.033333, 31.233334]; // Cairo
+
+  const lotUpdateHandler = (lotUpdate: any)=>{
+    setParkingSpots((prevSpots) => {
+      // Check if the lot already exists in the list
+      const index = prevSpots.findIndex((spot) => spot.id === lotUpdate.lotId);
+  
+      if (index !== -1) {
+        // If found, replace the existing lot with the updated one
+        const updatedSpots = [...prevSpots];
+        updatedSpots[index] = DTOLotMapper(lotUpdate);
+        if(updatedSpots[index].id===selectedSpot?.id){
+          const temp = selectedSpot;
+          temp.availableSpots = updatedSpots[index].availableSpots;
+        }
+        return updatedSpots;
+      } else {
+        // If not found, add the new lot to the list
+        return [...prevSpots, DTOLotMapper(lotUpdate)];
+      }
+    });
+  }
+  
   useEffect(()=>{
     const onConnect = () => {
       console.log('Connected to WebSocket');
@@ -45,7 +87,8 @@ const DriverHomePage: React.FC = () => {
       // Subscribe to lot updates
       webSocketService.subscribe('/topic/lots-update', (message) => {
         console.log(JSON.parse(message.body));
-        //setLotUpdates((prev) => [...prev, JSON.parse(message.body)]);
+        const lotUpdate = JSON.parse(message.body)
+        lotUpdateHandler(lotUpdate)
       });
     }
     const onError = (error: string) => {
@@ -64,29 +107,8 @@ const DriverHomePage: React.FC = () => {
       webSocketService.disconnect();
     };
   }, [])
-  //   {
-  //     id: 1,
-  //     name: 'Lot 1',
-  //     latitude: 31.2,
-  //     longitude: 29.9,
-  //     availableSpots: 0,
-  //     pricePerHour: 100,
-  //     lotType: 'Normal',
-  //   },
-  //   {
-  //     id: 2,
-  //     name: 'Lot 2',
-  //     latitude: 31.3,
-  //     longitude: 29.8,
-  //     availableSpots: 5,
-  //     pricePerHour: 80,
-  //     lotType: 'VIP',
-  //   },
-  // ]);
-  const [selectedSpot, setSelectedSpot] = useState<ParkingLot | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
+  
 
-  const defaultCenter: [number, number] = [30.033333, 31.233334]; // Cairo
 
   // Create dynamic icons for parking spots
   const getIcon = (availableSpots: number) =>
@@ -98,34 +120,81 @@ const DriverHomePage: React.FC = () => {
     });
 
   // Handle booking a spot
-  const handleBooking = async () => {
-    if (selectedSpot && selectedSpot.availableSpots > 0) {
-      try {
-        const response = await fetch('/api/book-spot', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ spotId: selectedSpot.id }),
-        });
-        if (response.ok) {
-          setMessage('Spot booked successfully!');
-          // Simulate spot availability update
-          setParkingSpots((prevSpots) =>
-            prevSpots.map((spot) =>
-              spot.id === selectedSpot.id
-                ? { ...spot, availableSpots: spot.availableSpots - 1 }
-                : spot
-            )
-          );
-        } else {
-          setMessage('Failed to book the spot. Try again later.');
-        }
-      } catch (error) {
-        setMessage('Error booking the spot.');
-      }
-    } else {
-      setMessage('No available spots.');
+  // const handleBooking = async () => {
+  //   if (selectedSpot && selectedSpot.availableSpots > 0) {
+  //     console.log(endTime)
+  //     try {
+  //       const response = await getSpotPrice(selectedSpot!.id!)
+  //       if (response.ok) {
+  //         setMessage('Spot booked successfully!');
+  //         // Simulate spot availability update
+  //         setParkingSpots((prevSpots) =>
+  //           prevSpots.map((spot) =>
+  //             spot.id === selectedSpot.id
+  //               ? { ...spot, availableSpots: spot.availableSpots - 1 }
+  //               : spot
+  //           )
+  //         );
+  //       } else {
+  //         setMessage('Failed to book the spot. Try again later.');
+  //       }
+  //     } catch (error) {
+  //       setMessage('Error booking the spot.');
+  //     }
+  //   } else {
+  //     setMessage('No available spots.');
+  //   }
+  // };
+  const BookingHandler = async () => {
+    const response = await getSpotPrice(selectedSpot!.id, endTime);
+    if(response.ok){
+      const data = await response.json()
+      const price = data['price']
+      setTotalPrice(price); 
+      setIsModalOpen(true); // Show the confirmation modal
     }
   };
+
+  const confirmBooking = async() => {
+    console.log(`Booking confirmed for ${selectedSpot!.name} until ${endTime}`);
+    console.log(`Total price: $${totalPrice}`);
+    const response = await reserveSpot(selectedSpot?.id!, endTime);
+    const data = await response.json();
+    const spot = data['spotId']
+    if(response.ok){
+      setReservedSpot({
+        lot_id: selectedSpot?.id!,
+        spot_id: spot,
+        endTime: endTime,
+      })
+      setOccupied(false)
+      setHasReserved(true)
+      setIsModalOpen(false);
+      setMessage("Booking confirmed!"); // Set a success message
+    }
+    
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const toggleOccupancy= async()=>{
+    if (!occupied){
+      const response = await useSpot(reservedSpot!.lot_id, reservedSpot!.spot_id, paymentMethod);
+      if (response.ok){
+        setOccupied(true)
+        
+      }
+    }else{
+      const response = await freeSpot(reservedSpot!.lot_id, reservedSpot!.spot_id);
+      if(response.ok){
+        setHasReserved(false)
+        setOccupied(false)
+        setReservedSpot(null)
+      }
+    }
+  }
 
   return (
     <div className="app-container">
@@ -133,7 +202,7 @@ const DriverHomePage: React.FC = () => {
       <nav className="navbar">
         <div className="navbar-title">Sayes</div>
         <div className="navbar-links">
-          <a href="#">Home</a>
+          <a href="/">Home</a>
           <a href="#">Reservations</a>
           <a href="#">Account</a>
         </div>
@@ -143,7 +212,7 @@ const DriverHomePage: React.FC = () => {
       <div className="content">
         {/* Map Section */}
         <div className="map-container">
-          <MapContainer center={defaultCenter} zoom={13} style={{ height: '100%', width: '100%' }}>
+          <MapContainer center={defaultCenter} zoom={13} style={{ height: "100%", width: "100%" }}>
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution="&copy; OpenStreetMap contributors"
@@ -178,7 +247,8 @@ const DriverHomePage: React.FC = () => {
         {/* Sidebar */}
         <div className="sidebar">
           {selectedSpot ? (
-            <div className="sidebar-content">
+            <div className="sidebar-content">+
+              {!hasReserved && (<div>
               <h2>{selectedSpot.name}</h2>
               <p>
                 <strong>Lot Type:</strong> {selectedSpot.lotType}
@@ -189,18 +259,88 @@ const DriverHomePage: React.FC = () => {
               <p>
                 <strong>Price:</strong> ${selectedSpot.pricePerHour}/hour
               </p>
-              <button onClick={handleBooking} disabled={selectedSpot.availableSpots === 0}>
+
+              {/* End Time Selection */}
+              <div className="reservation-time">
+                <label htmlFor="endTime">
+                  <strong>End Time:</strong>
+                </label>
+                <input
+                  type="time"
+                  step="1"
+                  id="endTime"
+                  name="endTime"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                />
+              </div>
+
+              <button
+                onClick={BookingHandler}
+                disabled={selectedSpot.availableSpots === 0 || !endTime}
+              >
                 Book Spot
               </button>
+
               {message && <p className="message">{message}</p>}
+              </div>)}
+              {/* Currently Reserved Spot Section */}
+              {reservedSpot && (
+                <div className="reserved-spot">
+                <h3>Currently Reserved Spot</h3>
+                <p>
+                  <strong>Parking Lot:</strong> {reservedSpot.lot_id}
+                </p>
+                <p>
+                  <strong>Parking Spot:</strong> {reservedSpot.spot_id}
+                </p>
+                <p>
+                  <strong>End Time:</strong> {reservedSpot.endTime}
+                </p>
+                <p>
+                  <strong>Status:</strong> {occupied ? "Occupied" : "Unoccupied"}
+                </p>
+                {/* Payment Method Dropdown */}
+                <div className="payment-method">
+                  <label htmlFor="paymentMethod">
+                    <strong>Payment Method:</strong>
+                  </label>
+                  <select
+                    id="paymentMethod"
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                  >
+                    <option value="cash">Cash</option>
+                    <option value="card">Card</option>
+                  </select>
+                </div>
+                <button onClick={toggleOccupancy}>
+                  {occupied ? "Unoccupy Spot" : "Occupy Spot"}
+                </button>
+              
+                
+              </div>
+              )}
             </div>
           ) : (
             <div className="sidebar-empty">Select a parking spot on the map</div>
           )}
         </div>
       </div>
+
+      {/* Booking Confirmation Modal */}
+      <Modal isOpen={isModalOpen} onRequestClose={closeModal} className="modal" overlayClassName="overlay">
+        <h2>Booking Confirmation</h2>
+        <p>Parking Spot: <strong>{selectedSpot?.name}</strong></p>
+        <p>End Time: <strong>{endTime}</strong></p>
+        <p>Total Price: <strong>${totalPrice}</strong></p>
+        <button onClick={confirmBooking}>Confirm</button>
+        <button onClick={closeModal}>Cancel</button>
+      </Modal>
     </div>
   );
 };
 
 export default DriverHomePage;
+
+

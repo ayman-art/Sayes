@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-
 @CrossOrigin()
 @RestController
 @RequestMapping("/profile")
@@ -32,6 +31,16 @@ public class UserProfileController {
             System.out.println(token);
             token = token.replace("Bearer ", "");
             Map<String , Object> response = profileFacade.getDriverData(token);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/get-admin")
+    public ResponseEntity<?> getAdmin(@RequestHeader("Authorization") String token) {
+        try {
+            token = token.replace("Bearer ", "");
+            Map<String , Object> response = profileFacade.getAdminData(token);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

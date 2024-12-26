@@ -46,4 +46,15 @@ public class LotManagementController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+    @PostMapping("/get-price")
+    public ResponseEntity<?> getPrice(@RequestBody Map<String, Object> lotData  ,@RequestHeader("Authorization") String token) {
+        try {
+            token = token.replace("Bearer ", "");
+            lotData.put("jwt", token);
+            Map<String , Object> response = lotManagementFacade.getDynamicPrice(lotData);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }
