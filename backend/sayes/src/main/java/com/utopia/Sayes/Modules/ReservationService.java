@@ -42,6 +42,9 @@ public class ReservationService {
     PaymentService paymentService;
 
     @Autowired
+    ViolationService violationService;
+
+    @Autowired
     LogDAO logDAO;
 
     @Autowired
@@ -60,7 +63,8 @@ public class ReservationService {
             java.sql.Timestamp endTimestamp = new java.sql.Timestamp(endTime.getTime());
             double price = dynamicPricing.getPrice(lot_id,
                     new Time(startTimestamp.getTime()),
-                    new Time(endTimestamp.getTime()));
+                    new Time(endTimestamp.getTime())
+                            ,driver_id);
             System.out.println(lot_id);
             reservationDAO.addReservation(spotId,lot_id, startTimestamp, endTimestamp,
                     String.valueOf(SpotStatus.Reserved),driver_id,price);
@@ -163,13 +167,16 @@ public class ReservationService {
                 if (String.valueOf(SpotStatus.Reserved).equals(reservationState)) {
                     freeReservation(spot_id , lot_id , driver_id);
                     System.out.println("Reservation expired and spot is now available again.");
+                    double penalty = lotDAO.getLotPenalty(lot_id);
+                    if (!violationService.takePenaltyAmount(driver_id , lot_id , penalty))
+                        violationService.addPenalty(driver_id , lot_id , penalty);
                     // send a penalty to the driver using his socket
                     notificationService.notifyDriverReservation(new UpdateDriverReservationDTO(
                             driver_id,
                             lot_id,
                             spot_id,
                             SpotStatus.ReservationTimeOut,
-                            lotDAO.getLotPenalty(lot_id),
+                            penalty,
                             -1,
                             0L,
                             null)
