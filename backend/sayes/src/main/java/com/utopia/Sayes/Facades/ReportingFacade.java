@@ -53,8 +53,13 @@ public class ReportingFacade {
            for (Lot lot : lots) {
                List<Spot> spots = profileService.getSpotsByLotId(lot.getLot_id());
                Map<String, Object> lotData = new HashMap<>();
-               lotData.put("lot_id", lot.getRevenue());
+               lotData.put("lot_id", lot.getLot_id());
                lotData.put("revenue", lot.getRevenue());
+               lotData.put("longitude" , lot.getLongitude());
+               lotData.put("latitude" , lot.getLatitude());
+               lotData.put("lot_type" , lot.getLot_type());
+               lotData.put("price" , lot.getPrice());
+               lotData.put("num_of_spots" , lot.getNum_of_spots());
                lotData.put("occupancy_rate" , reportingService.getOccupancyRate(lot.getLot_id()));
                lotsMap.add(lotData);
            }
