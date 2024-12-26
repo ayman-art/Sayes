@@ -72,15 +72,15 @@ public class ReservationService {
                 throw new Exception("Spot doesn't exist or is unavailable.");
             }
 
-            reservationDAO.addReservation(spotId, lot_id, startTimestamp, endTimestamp,
-                    String.valueOf(SpotStatus.Reserved), driver_id, price, connection);
-            //spotDAO.updateSpotState(spotId,lot_id, String.valueOf(SpotStatus.Reserved));
             java.sql.Timestamp startTimestamp = new java.sql.Timestamp(new Date().getTime());
             java.sql.Timestamp endTimestamp = new java.sql.Timestamp(endTime.getTime());
             double price = dynamicPricing.getPrice(lot_id,
                     new Time(startTimestamp.getTime()),
                     new Time(endTimestamp.getTime())
-                            ,driver_id);
+                    ,driver_id);
+            reservationDAO.addReservation(spotId, lot_id, startTimestamp, endTimestamp,
+                    String.valueOf(SpotStatus.Reserved), driver_id, price, connection);
+            //spotDAO.updateSpotState(spotId,lot_id, String.valueOf(SpotStatus.Reserved));
             System.out.println(lot_id);
             setReservationTimeOut(lot_id , spotId , driver_id);
            connection.commit();
