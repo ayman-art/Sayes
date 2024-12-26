@@ -166,6 +166,25 @@ CREATE TABLE IF NOT EXISTS `sayes`.`logs` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
+CREATE TABLE IF NOT EXISTS `sayes`.`penalties` (
+  `driver_id` BIGINT NOT NULL,
+  `lot_id` BIGINT NOT NULL,
+  `penalty_amount` DOUBLE(10, 2) NOT NULL,
+  INDEX `fk_penalties_Lots1_idx` (`lot_id` ASC) VISIBLE,
+  INDEX `fk_penalties_Drivers1_idx` (`driver_id` ASC) VISIBLE,
+  CONSTRAINT `fk_penalties_Lots1`
+    FOREIGN KEY (`lot_id`)
+    REFERENCES `sayes`.`Lots` (`lot_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_penalties_Drivers1`
+    FOREIGN KEY (`driver_id`)
+    REFERENCES `sayes`.`Drivers` (`driver_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE = InnoDB;
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
