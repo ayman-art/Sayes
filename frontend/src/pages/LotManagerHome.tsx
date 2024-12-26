@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Tooltip, useMapEvents, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Tooltip, Popup, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L, { Icon } from 'leaflet';
+import L, { Icon, LatLng } from 'leaflet';
 import redIconUrl from '../assets/red-parking-sign.png'; // Icon for lots with 0 spots
 import blueIconUrl from '../assets/blue-parking-sign.png'; // Icon for lots with available spots
 import { fetchManagerLots, createNewLot, mapRawLot } from '../services/ManagerHomeService';
+import WebSocketService from '../services/socketService';
+import { URLS } from '../API/urls';
 
 // Interfaces
 export interface RawLot {
@@ -31,9 +33,26 @@ export interface LotHomeLot {
   price: number;
 }
 
-interface GetLotsResponse {
-  lots: RawLot[];
-}
+const LocationMarker: React.FC = () => {
+  const [position, setPosition] = useState<LatLng | null>(null);
+
+  const map = useMap();
+
+  useEffect(() => {
+    map.locate().on('locationfound', function (e) {
+      const userLocation = e.latlng;
+      setPosition(userLocation);
+      map.flyTo(userLocation, map.getZoom());
+    });
+    
+  }, [map]);
+
+  return position === null ? null : (
+    <Marker position={position}>
+      <Popup>You are here</Popup>
+    </Marker>
+  );
+};
 
 const LotManagerHomePage: React.FC = () => {
   const [parkingSpots, setParkingSpots] = useState<LotHomeLot[]>([]); // Correctly typed as RawLot[]
@@ -53,20 +72,69 @@ const LotManagerHomePage: React.FC = () => {
   const [selectedPosition, setSelectedPosition] = useState<[number, number] | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [currentPosition, setCurrentPosition] = useState<[number, number] | null>(null);
+  const webSocketService = new WebSocketService(URLS.SOCKET);
+  const [notification, setNotification] = useState(null); // Notification message state
 
   const token = localStorage.getItem('jwtToken'); // Replace with actual token handling
-
+  
   useEffect(() => {
+    const onConnect = ()=>{
+      const manager_id = localStorage.getItem('id');
+      webSocketService.subscribe(`/topic/lot-manager-update/${manager_id}`, (message) => {
+      handleSocket(JSON.parse(message.body));
+    });
+    }
+    const onError = (error: string) => {
+      console.error('WebSocket error:', error);
+    };
+    webSocketService.connect(onConnect, onError);
     if (token) {
       fetchLots();
     } else {
       setMessage('Please log in to view parking lots.');
     }
   }, [token]);
+  const handleSocket = (data:any)=>{
+    const status = data['status'];
+    if (status == "ReservationTimeOut"){
+      const msg = `Lot: ${data['lotId']}, Spot: ${data['spotId']} has had a reservation timout!`;
+      showNotification(msg);
+    }
+    if (status == "OverOccupied"){
+      const msg = `Lot: ${data['lotId']}, Spot: ${data['spotId']} has had a customer over-occupy!`;
+      showNotification(msg);
+
+    }
+    if (status == "Faulty"){
+      const msg = `Lot: ${data['lotId']}, Spot: ${data['spotId']} is faulty!`;
+      showNotification(msg);
+
+    }
+    if (status == "Occupied"){
+      const msg = `Lot: ${data['lotId']}, Spot: ${data['spotId']} is occupied!`;
+      showNotification(msg);
+
+    }
+    if (status == "Available"){
+      const msg = `Lot: ${data['lotId']}, Spot: ${data['spotId']} is Available!`;
+      showNotification(msg);
+
+    }
+    if (status == "Reserved"){
+      const msg = `Lot: ${data['lotId']}, Spot: ${data['spotId']} is Reserved!`;
+      showNotification(msg);
+
+    }
+  }
+  const showNotification = (message: any) => {
+    setNotification(message);
+    setTimeout(() => {
+      setNotification(null);
+    }, 5000);
+  };
 
   const fetchLots = async () => {
     try {
-      // Explicitly type the response as GetLotsResponse
       const unmappedLots: Object[]= await fetchManagerLots(token!); // Now TypeScript knows this is a GetLotsResponse
       console.log('Fetched lots raw data:', unmappedLots); // Log the raw response to check the format
       const mappedLots: LotHomeLot[] = unmappedLots.map(mapRawLot);
@@ -125,6 +193,7 @@ const LotManagerHomePage: React.FC = () => {
       click: (e) => {
         const latLng: [number, number] = [e.latlng.lat, e.latlng.lng];
         setSelectedPosition(latLng);
+        setCurrentPosition(latLng)
         setNewLot((prevLot) => ({
           ...prevLot,
           latitude: e.latlng.lat,
@@ -135,15 +204,6 @@ const LotManagerHomePage: React.FC = () => {
     return null;
   };
 
-  const NavigateToCurrentLocation: React.FC = () => {
-    const map = useMap();
-    useEffect(() => {
-      if (currentPosition) {
-        map.setView(currentPosition, 13);
-      }
-    }, [currentPosition, map]);
-    return null;
-  };
 
   const getIcon = (num_of_spots: number) =>
     new Icon({
@@ -163,8 +223,9 @@ const LotManagerHomePage: React.FC = () => {
         <div style={styles.mapContainer}>
           <MapContainer center={currentPosition || [30.033333, 31.233334]} zoom={13} style={styles.mapStyle} key={parkingSpots.length}>
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap contributors" />
+            <LocationMarker />
             <LocationSelector />
-            <NavigateToCurrentLocation />
+            {/* <NavigateToCurrentLocation /> */}
             {parkingSpots.map((spot) => (
               <Marker
                 key={spot.lot_id} // Use lot_id here
@@ -184,7 +245,12 @@ const LotManagerHomePage: React.FC = () => {
             ))}
           </MapContainer>
         </div>
-
+        {/* Notification Component */}
+        {notification && (
+          <div style={styles.notification}>
+            {notification}
+          </div>
+        )}
         <div style={styles.sidebar}>
           <h2>Add New Parking Lot</h2>
           <div style={styles.formGroup}>
@@ -224,9 +290,9 @@ const LotManagerHomePage: React.FC = () => {
               style={styles.input}
             >
               <option value="">Select Type</option>
-              <option value="Normal">Normal</option>
+              <option value="Regular">Regular</option>
               <option value="Disabled">Disabled</option>
-              <option value="Public">Public</option>
+              <option value="EV charging">EV charging</option>
             </select>
           </div>
           <div style={styles.formGroup}>
@@ -267,6 +333,17 @@ const LotManagerHomePage: React.FC = () => {
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
+  notification: {
+    position: 'fixed',
+    top: '20px',
+    right: '20px',
+    padding: '10px 20px',
+    backgroundColor: '#28a745',
+    color: '#fff',
+    borderRadius: '5px',
+    boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+    zIndex: 1000,
+  },
   appContainer: { display: 'flex', flexDirection: 'column', height: '100vh' },
   navbar: { backgroundColor: '#333', color: 'white', padding: '10px', textAlign: 'center' },
   navbarTitle: { fontSize: '20px', fontWeight: 'bold' },
