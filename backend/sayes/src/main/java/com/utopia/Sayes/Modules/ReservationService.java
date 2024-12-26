@@ -47,6 +47,9 @@ public class ReservationService {
     PaymentService paymentService;
 
     @Autowired
+    ViolationService violationService;
+
+    @Autowired
     LogDAO logDAO;
 
     @Autowired
@@ -69,19 +72,18 @@ public class ReservationService {
                 throw new Exception("Spot doesn't exist or is unavailable.");
             }
 
-            Timestamp startTimestamp = new Timestamp(new Date().getTime());
-            Timestamp endTimestamp = new Timestamp(endTime.getTime());
-
-            double price = dynamicPricing.getPrice(lot_id, new java.sql.Time(startTimestamp.getTime()),
-                    new java.sql.Time(endTimestamp.getTime()));
-
             reservationDAO.addReservation(spotId, lot_id, startTimestamp, endTimestamp,
                     String.valueOf(SpotStatus.Reserved), driver_id, price, connection);
-
-            setReservationTimeOut(lot_id, spotId, driver_id);
-
-            connection.commit();
-
+            //spotDAO.updateSpotState(spotId,lot_id, String.valueOf(SpotStatus.Reserved));
+            java.sql.Timestamp startTimestamp = new java.sql.Timestamp(new Date().getTime());
+            java.sql.Timestamp endTimestamp = new java.sql.Timestamp(endTime.getTime());
+            double price = dynamicPricing.getPrice(lot_id,
+                    new Time(startTimestamp.getTime()),
+                    new Time(endTimestamp.getTime())
+                            ,driver_id);
+            System.out.println(lot_id);
+            setReservationTimeOut(lot_id , spotId , driver_id);
+           connection.commit();
             Lot lot = lotDAO.getLotById(lot_id);
             notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, lot.getNum_of_spots(),
                     lot.getLongitude(), lot.getLatitude(), lot.getPrice(), lot.getLot_type()));
@@ -111,10 +113,10 @@ public class ReservationService {
             }
         }
     }
-    public void useReservation(long spot_id ,long lot_id,long driver_id) throws Exception {
+    public void useReservation(long spot_id ,long lot_id,long driver_id, String method) throws Exception {
         try {
             double price = reservationDAO.getReservationPrice(spot_id, lot_id);
-            if (paymentService.confirmReservation(price, driver_id, lot_id)) {
+            if (paymentService.confirmReservation(price, driver_id, lot_id , method)) {
                 Spot spot = spotDAO.getSpotById(spot_id, lot_id);
                 System.out.println(spot.getSpot_id());
                 if (spot == null) {
@@ -193,13 +195,16 @@ public class ReservationService {
                 if (String.valueOf(SpotStatus.Reserved).equals(reservationState)) {
                     freeReservation(spot_id , lot_id , driver_id);
                     System.out.println("Reservation expired and spot is now available again.");
+                    double penalty = lotDAO.getLotPenalty(lot_id);
+                    if (!violationService.takePenaltyAmount(driver_id , lot_id , penalty))
+                        violationService.addPenalty(driver_id , lot_id , penalty);
                     // send a penalty to the driver using his socket
                     notificationService.notifyDriverReservation(new UpdateDriverReservationDTO(
                             driver_id,
                             lot_id,
                             spot_id,
                             SpotStatus.ReservationTimeOut,
-                            lotDAO.getLotPenalty(lot_id),
+                            penalty,
                             -1,
                             0L,
                             null)

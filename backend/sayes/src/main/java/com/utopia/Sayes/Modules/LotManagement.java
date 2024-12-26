@@ -88,7 +88,7 @@ public class LotManagement {
     public double getLotDynamicPrice(long lotId , Time duration) throws Exception {
         try {
             java.sql.Timestamp startTimestamp = new java.sql.Timestamp(new Date().getTime());
-            return dynamicPricing.getPrice(lotId, new Time(startTimestamp.getTime()), duration);
+            return dynamicPricing.getPrice(lotId, new Time(startTimestamp.getTime()), duration , 0);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());

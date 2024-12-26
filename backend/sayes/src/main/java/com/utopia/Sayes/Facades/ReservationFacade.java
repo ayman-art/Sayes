@@ -80,7 +80,8 @@ public class ReservationFacade {
             Long driverId = Long.parseLong(claims.getId());
             if (driverId == null)
                 throw new Exception("driver id is null");
-            reservationService.useReservation(Long.valueOf((Integer)  spotData.get("spotId")) ,Long.valueOf((Integer)  spotData.get("lotId")), driverId);
+            reservationService.useReservation(Long.valueOf((Integer)  spotData.get("spotId")) ,Long.valueOf((Integer)  spotData.get("lotId")),
+                    driverId , (String) spotData.get("payment_method"));
         }
         catch (Exception e){
             throw new Exception(e.getMessage());

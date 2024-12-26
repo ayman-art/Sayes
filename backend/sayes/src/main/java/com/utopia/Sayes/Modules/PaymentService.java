@@ -17,9 +17,16 @@ public class PaymentService {
         long balane = driverDAO.getDriverBalance(driverId);
         return balane >= (long) price;
     }
-    public boolean confirmReservation(double price, long driverId, long lotId){
-        if (checkBalance(price , driverId)){
-            driverDAO.updateDriverBalance((long) price, driverId);
+    public boolean confirmReservation(double price, long driverId, long lotId, String method){
+        if(method.equals("card")) {
+            if (checkBalance(price, driverId)) {
+                driverDAO.updateDriverBalance((long) price, driverId);
+                lotDAO.updateLotRevenue((long) price, lotId);
+                return true;
+            }
+            return false;
+        }
+        else if (method.equals("cash")){
             lotDAO.updateLotRevenue((long) price, lotId);
             return true;
         }

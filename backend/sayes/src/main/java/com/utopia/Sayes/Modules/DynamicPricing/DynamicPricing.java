@@ -2,6 +2,7 @@ package com.utopia.Sayes.Modules.DynamicPricing;
 
 import com.utopia.Sayes.Models.Lot;
 import com.utopia.Sayes.Repo.LotDAO;
+import com.utopia.Sayes.Repo.PenaltyDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,14 +15,19 @@ import java.time.LocalTime;
 public class DynamicPricing {
     @Autowired
     LotDAO lotDAO;
-    public Double getPrice(long lotId, Time from, Time to) throws Exception {
+    @Autowired
+    PenaltyDAO penaltyDAO;
+    public Double getPrice(long lotId, Time from, Time to , long driverId) throws Exception {
         Lot lot = lotDAO.getLotById(lotId);
 
         LocalTime fromTime = from.toLocalTime();
         LocalTime toTime = to.toLocalTime();
-
+        double penalty = 0;
+        if (penaltyDAO.existsPenalty(driverId , lotId)) {
+             penalty = penaltyDAO.getPenalty(driverId, lotId);
+        }
         double ratio = priceOnDemand(lot.getNum_of_spots(), lotDAO.getLotTotalSpots(lotId)) + priceOnTime(fromTime);
-        return lot.getPrice() * totalTime(fromTime, toTime) * ratio;
+        return lot.getPrice() * totalTime(fromTime, toTime) * ratio + penalty;
     }
 
     private double priceOnDemand(long AvailableSpots, long TotalSpots){

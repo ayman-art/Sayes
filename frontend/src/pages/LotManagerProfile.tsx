@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { fetchManagerData } from '../services/profileService';
 import { LotDetailed } from '../models/LotDetailed';
+import WebSocketService from '../services/socketService';
+import { URLS } from '../API/urls';
 import '../styles/profile.css';
+import { UpdateLotManagerLotSpotsDTO } from '../models/UpdateLotManagerLotSpotsDTO';
+import { resolvePath } from 'react-router-dom';
 
 const LotManagerProfile = () => {
     const [managerName, setManagerName] = useState<string>("");
     const [revenue, setRevenue] = useState<number>(0);
     const [lots, setLots] = useState<LotDetailed[]>([]);
+    const [managerId, setManagerId] = useState<string>("");
 
     const token = localStorage.getItem('jwtToken');
+    const webSocketService = new WebSocketService(URLS.SOCKET);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -16,10 +22,60 @@ const LotManagerProfile = () => {
             setManagerName(managerData.username);
             setRevenue(managerData.revenue);
             setLots(managerData.lotsWithSpots);
+            setManagerId(localStorage.getItem('id')!);
+        };
+
+        // WebSocket connection and subscription setup
+        const onConnect = () => {
+            console.log('Connected to WebSocket in LotManagerProfile');
+
+            // Subscribe to manager-specific updates
+            console.log('Subscribing to:', `/topic/lot-manager-update/${managerId}`);
+            console.log(localStorage.getItem('role'))
+            webSocketService.subscribe(`/topic/lot-manager-update/${localStorage.getItem('id')}`, handleManagerUpdate);
+        };
+
+        const onError = (error: string) => {
+            console.error('WebSocket error:', error);
         };
 
         fetchData();
-    }, []);
+        webSocketService.connect(onConnect, onError);
+
+        return () => {
+            webSocketService.disconnect();
+        };
+    }, [managerId]); // Re-run when managerId changes
+
+
+    const handleManagerUpdate = (message: any) => {
+        const update = JSON.parse(message.body);
+        const updateLotManagerLotSpotsDTO: UpdateLotManagerLotSpotsDTO = update;
+        const spotId = updateLotManagerLotSpotsDTO.spotId;
+        const lotId = updateLotManagerLotSpotsDTO.lotId;
+        const newState = updateLotManagerLotSpotsDTO.status;
+        console.log("updating spot", spotId, "in lot", lotId, "to", newState);
+        setLots((currentLots) =>
+            currentLots.map((lot) => {
+                if (lot.lot_id === lotId) {
+                    return {
+                        ...lot,
+                        spots: lot.spots.map((spot) =>
+                            spot.spot_id === spotId ? { ...spot, state: newState } : spot
+                        )
+                    };
+                }
+                return lot;
+            })
+        );
+        
+    };
+
+
+    const updateRevenue = (newRevenue: number) => {
+        setRevenue(newRevenue);
+    };
+
 
     return (
         <div className="profile-container">

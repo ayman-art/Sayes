@@ -1,0 +1,159 @@
+/* Main Profile Container */
+.profile-container {
+    max-width: 1200px; /* Increased width for broader layout */
+    margin: 40px auto;
+    padding: 30px;
+    background: linear-gradient(145deg, #3b82f6, #2563eb); /* Smooth gradient */
+    border-radius: 16px;
+    color: white;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Profile Header */
+.profile-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.profile-header h2 {
+    font-size: 2.8rem; /* Slightly larger title */
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.profile-header p {
+    font-size: 1.3rem; /* Larger subtitle */
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+/* Action Buttons */
+.profile-actions {
+    display: flex;
+    justify-content: center;
+    gap: 30px; /* Increased gap between buttons */
+    margin-bottom: 30px;
+}
+
+.profile-actions button {
+    background: #2563eb; /* Button Background */
+    color: white;
+    font-size: 1.1rem; /* Slightly larger button text */
+    font-weight: bold;
+    padding: 15px 25px; /* Increased padding for a more prominent button */
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.3s, background 0.3s;
+    box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.profile-actions button:hover {
+    transform: translateY(-3px);
+    background: #1d4ed8;
+}
+
+/* Content Section */
+.profile-content {
+    margin-top: 40px;
+    background: #ffffff;
+    color: #2c3e50;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Section Headings */
+.profile-content h3 {
+    font-size: 2rem; /* Larger section heading */
+    font-weight: bold;
+    color: #1d4ed8;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #2563eb;
+    padding-bottom: 8px;
+}
+
+/* Item Lists */
+.lot-item, .user-item {
+    padding: 20px 25px; /* Larger padding for spacious design */
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lot-item:last-child, .user-item:last-child {
+    border-bottom: none;
+}
+
+.item-title {
+    font-size: 1.2rem; /* Slightly larger item title */
+    font-weight: 600;
+    color: #374151;
+}
+
+.item-revenue {
+    font-size: 1.1rem; /* Larger revenue text */
+    font-weight: bold;
+    color: #2563eb;
+}
+
+/* Logs Section */
+.logs {
+    margin-top: 20px;
+}
+
+.log-item {
+    padding: 20px 25px; /* Larger padding for logs */
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.log-item:last-child {
+    border-bottom: none;
+}
+
+.log-item p {
+    font-size: 1.1rem; /* Slightly larger font size */
+    margin: 0;
+}
+
+.log-title {
+    font-weight: bold;
+    color: #374151;
+}
+
+.log-time {
+    font-weight: 600;
+    color: #2563eb;
+}
+
+.log-item > p {
+    margin-right: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .profile-container {
+        padding: 20px;
+    }
+
+    .profile-actions {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .profile-header h2 {
+        font-size: 2.2rem;
+    }
+
+    .profile-content h3 {
+        font-size: 1.6rem;
+    }
+}
+
+

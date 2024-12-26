@@ -6,13 +6,17 @@ import redIconUrl from '../assets/red-parking-sign.png'; // For lots with 0 spot
 import blueIconUrl from '../assets/blue-parking-sign.png'; // For lots with available spots
 import '../styles/DriverHomePage.css';
 import { jsonLotMapper, ParkingLot } from '../models/Lot';
-import { fetchLots, getSpotPrice } from '../API/driverHomeAPI';
+import { fetchLots, freeSpot, getSpotPrice, reserveSpot, useSpot } from '../API/driverHomeAPI';
 import WebSocketService from '../services/socketService';
 import { URLS } from '../API/urls';
 import { DTOLotMapper } from '../models/UpdateLotDTO';
 import Modal from "react-modal";
 // Interfaces
-
+interface ReservedSpot{
+  lot_id: number;
+  spot_id: number;
+  endTime: string;
+}
 
 // Location Marker Component
 const LocationMarker: React.FC = () => {
@@ -46,6 +50,12 @@ const DriverHomePage: React.FC = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [selectedSpot, setSelectedSpot] = useState<ParkingLot | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [reservedSpot, setReservedSpot] = useState<ReservedSpot|null>(null);
+  const [hasReserved, setHasReserved] = useState<boolean> (false);
+  const [paymentMethod, setPaymentMethod] = useState("cash"); // Default to "cash"
+  const [occupied, setOccupied] = useState<boolean>(false)
+
+
   const webSocketService = new WebSocketService(URLS.SOCKET);
   const defaultCenter: [number, number] = [30.033333, 31.233334]; // Cairo
 
@@ -58,6 +68,10 @@ const DriverHomePage: React.FC = () => {
         // If found, replace the existing lot with the updated one
         const updatedSpots = [...prevSpots];
         updatedSpots[index] = DTOLotMapper(lotUpdate);
+        if(updatedSpots[index].id===selectedSpot?.id){
+          const temp = selectedSpot;
+          temp.availableSpots = updatedSpots[index].availableSpots;
+        }
         return updatedSpots;
       } else {
         // If not found, add the new lot to the list
@@ -106,34 +120,32 @@ const DriverHomePage: React.FC = () => {
     });
 
   // Handle booking a spot
-  const handleBooking = async () => {
-    if (selectedSpot && selectedSpot.availableSpots > 0) {
-      console.log(endTime)
-      try {
-        const response = await getSpotPrice(selectedSpot!.id!)
-        if (response.ok) {
-          setMessage('Spot booked successfully!');
-          // Simulate spot availability update
-          setParkingSpots((prevSpots) =>
-            prevSpots.map((spot) =>
-              spot.id === selectedSpot.id
-                ? { ...spot, availableSpots: spot.availableSpots - 1 }
-                : spot
-            )
-          );
-        } else {
-          setMessage('Failed to book the spot. Try again later.');
-        }
-      } catch (error) {
-        setMessage('Error booking the spot.');
-      }
-    } else {
-      setMessage('No available spots.');
-    }
-  };
+  // const handleBooking = async () => {
+  //   if (selectedSpot && selectedSpot.availableSpots > 0) {
+  //     console.log(endTime)
+  //     try {
+  //       const response = await getSpotPrice(selectedSpot!.id!)
+  //       if (response.ok) {
+  //         setMessage('Spot booked successfully!');
+  //         // Simulate spot availability update
+  //         setParkingSpots((prevSpots) =>
+  //           prevSpots.map((spot) =>
+  //             spot.id === selectedSpot.id
+  //               ? { ...spot, availableSpots: spot.availableSpots - 1 }
+  //               : spot
+  //           )
+  //         );
+  //       } else {
+  //         setMessage('Failed to book the spot. Try again later.');
+  //       }
+  //     } catch (error) {
+  //       setMessage('Error booking the spot.');
+  //     }
+  //   } else {
+  //     setMessage('No available spots.');
+  //   }
+  // };
   const BookingHandler = async () => {
-    // const price = calculateTotalPrice();
-    // setTotalPrice(price);
     const response = await getSpotPrice(selectedSpot!.id, endTime);
     if(response.ok){
       const data = await response.json()
@@ -143,16 +155,46 @@ const DriverHomePage: React.FC = () => {
     }
   };
 
-  const confirmBooking = () => {
-    console.log(`Booking confirmed for ${selectedSpot.name} until ${endTime}`);
+  const confirmBooking = async() => {
+    console.log(`Booking confirmed for ${selectedSpot!.name} until ${endTime}`);
     console.log(`Total price: $${totalPrice}`);
-    setIsModalOpen(false);
-    setMessage("Booking confirmed!"); // Set a success message
+    const response = await reserveSpot(selectedSpot?.id!, endTime);
+    const data = await response.json();
+    const spot = data['spotId']
+    if(response.ok){
+      setReservedSpot({
+        lot_id: selectedSpot?.id!,
+        spot_id: spot,
+        endTime: endTime,
+      })
+      setOccupied(false)
+      setHasReserved(true)
+      setIsModalOpen(false);
+      setMessage("Booking confirmed!"); // Set a success message
+    }
+    
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+  const toggleOccupancy= async()=>{
+    if (!occupied){
+      const response = await useSpot(reservedSpot!.lot_id, reservedSpot!.spot_id, paymentMethod);
+      if (response.ok){
+        setOccupied(true)
+        
+      }
+    }else{
+      const response = await freeSpot(reservedSpot!.lot_id, reservedSpot!.spot_id);
+      if(response.ok){
+        setHasReserved(false)
+        setOccupied(false)
+        setReservedSpot(null)
+      }
+    }
+  }
 
   return (
     <div className="app-container">
@@ -205,7 +247,8 @@ const DriverHomePage: React.FC = () => {
         {/* Sidebar */}
         <div className="sidebar">
           {selectedSpot ? (
-            <div className="sidebar-content">
+            <div className="sidebar-content">+
+              {!hasReserved && (<div>
               <h2>{selectedSpot.name}</h2>
               <p>
                 <strong>Lot Type:</strong> {selectedSpot.lotType}
@@ -232,14 +275,52 @@ const DriverHomePage: React.FC = () => {
                 />
               </div>
 
-              <button 
-                onClick={BookingHandler} 
+              <button
+                onClick={BookingHandler}
                 disabled={selectedSpot.availableSpots === 0 || !endTime}
               >
                 Book Spot
               </button>
 
               {message && <p className="message">{message}</p>}
+              </div>)}
+              {/* Currently Reserved Spot Section */}
+              {reservedSpot && (
+                <div className="reserved-spot">
+                <h3>Currently Reserved Spot</h3>
+                <p>
+                  <strong>Parking Lot:</strong> {reservedSpot.lot_id}
+                </p>
+                <p>
+                  <strong>Parking Spot:</strong> {reservedSpot.spot_id}
+                </p>
+                <p>
+                  <strong>End Time:</strong> {reservedSpot.endTime}
+                </p>
+                <p>
+                  <strong>Status:</strong> {occupied ? "Occupied" : "Unoccupied"}
+                </p>
+                {/* Payment Method Dropdown */}
+                <div className="payment-method">
+                  <label htmlFor="paymentMethod">
+                    <strong>Payment Method:</strong>
+                  </label>
+                  <select
+                    id="paymentMethod"
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                  >
+                    <option value="cash">Cash</option>
+                    <option value="card">Card</option>
+                  </select>
+                </div>
+                <button onClick={toggleOccupancy}>
+                  {occupied ? "Unoccupy Spot" : "Occupy Spot"}
+                </button>
+              
+                
+              </div>
+              )}
             </div>
           ) : (
             <div className="sidebar-empty">Select a parking spot on the map</div>
