@@ -76,19 +76,6 @@ const AdminProfile = () => {
         }
       };
 
-    // Function to handle printing the content
-    const handlePrint = (section: string) => {
-        const printContent = document.getElementById(section);
-        if (printContent) {
-            const printWindow = window.open('', '', 'height=600,width=800');
-            printWindow!.document.write('<html><head><title>Print Report</title></head><body>');
-            printWindow!.document.write(printContent.innerHTML);
-            printWindow!.document.write('</body></html>');
-            printWindow!.document.close();
-            printWindow!.print();
-        }
-    };
-
     return (
         <div className="profile-container">
             <div className="profile-header">
@@ -157,7 +144,6 @@ const AdminProfile = () => {
                                 </li>
                             ))}
                         </ul>
-                        <button className="btn-primary" onClick={() => handlePrint('logs')}>Print Logs</button>
                     </div>
                 )}
             </div>
