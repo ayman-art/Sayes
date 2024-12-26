@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchAdminData, fetchTopUsers, fetchTopLots, fetchLogs } from '../services/adminService';
+import { fetchAdminData, fetchTopUsers, fetchTopLots, fetchLogs, downloadTopUsersReport , downloadTopLotsReport} from '../services/adminService';
 import '../styles/AdminProfile.css';
 
 const AdminProfile = () => {
@@ -60,6 +60,22 @@ const AdminProfile = () => {
         }
     };
 
+    const handleDownloadTopUsersReport = async () => {
+        if (token) {
+          await downloadTopUsersReport(token);  // Trigger report download
+        } else {
+          console.error('No token found');
+        }
+      };
+
+      const handleDownloadTopLotsReport = async () => {
+        if (token) {
+          await downloadTopLotsReport(token);  // Trigger report download
+        } else {
+          console.error('No token found');
+        }
+      };
+
     return (
         <div className="profile-container">
             <div className="profile-header">
@@ -85,7 +101,7 @@ const AdminProfile = () => {
 
             <div className="profile-content">
                 {view === 'topUsers' && (
-                    <div className="top-users">
+                    <div className="top-users" id="topUsers">
                         <h3 className="text-2xl font-bold">Top Users</h3>
                         <ul>
                             {topUsers.map((user, index) => (
@@ -95,11 +111,12 @@ const AdminProfile = () => {
                                 </li>
                             ))}
                         </ul>
+                        <button className="btn-primary" onClick={handleDownloadTopUsersReport}>Print Top Users</button>
                     </div>
                 )}
 
                 {view === 'topLots' && (
-                    <div className="top-lots">
+                    <div className="top-lots" id="topLots">
                         <h3 className="text-2xl font-bold">Top Lots</h3>
                         <ul>
                             {topLots.map((lot, index) => (
@@ -109,11 +126,12 @@ const AdminProfile = () => {
                                 </li>
                             ))}
                         </ul>
+                        <button className="btn-primary" onClick={handleDownloadTopLotsReport}>Print Top Lots</button>
                     </div>
                 )}
 
                 {view === 'logs' && (
-                    <div className="logs">
+                    <div className="logs" id="logs">
                         <h3 className="text-2xl font-bold">Logs</h3>
                         <ul>
                             {logs.map((log, index) => (
@@ -134,4 +152,5 @@ const AdminProfile = () => {
 };
 
 export default AdminProfile;
+
 

@@ -10,6 +10,7 @@ import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -97,6 +98,34 @@ public class ReportingFacade {
             Map<String , Object> topLotsMap = new HashMap<>();
             topLotsMap.put("topLots" , topUsers);
             return topLotsMap;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+    public byte[] getTopUsersReport(String jwt) throws Exception {
+        try {
+            Claims claims = Authentication.parseToken(jwt);
+            Long adminId = Long.parseLong(claims.getId());
+
+            if (adminId == null) {
+                throw new Exception("Admin ID is null");
+            }
+            ByteArrayOutputStream reportStream = reportingService.generateTopUsersReport();
+            return reportStream.toByteArray();
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+    public byte[] getTopLotsReport(String jwt) throws Exception {
+        try {
+            Claims claims = Authentication.parseToken(jwt);
+            Long adminId = Long.parseLong(claims.getId());
+
+            if (adminId == null) {
+                throw new Exception("Admin ID is null");
+            }
+            ByteArrayOutputStream reportStream = reportingService.generateTopLotsReport();
+            return reportStream.toByteArray();
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }

@@ -163,6 +163,7 @@ public class ReservationService {
             if (reservation == null){
                 throw new Exception("There is no reservation for this spot");
             }
+            violationService.takeFeeAmount(driver_id , lot_id);
             spotDAO.updateSpotState(spot_id,lot_id, String.valueOf(SpotStatus.Available));
             reservationDAO.deleteReservation(spot_id , lot_id);
             Date date = Date.from(reservation.getStart_time().atZone(ZoneId.systemDefault()).toInstant());
@@ -235,7 +236,13 @@ public class ReservationService {
         long minutesElapsed = difference / (60 * 1000);
         scheduler.schedule(() -> {
             try {
-                if (String.valueOf(SpotStatus.Occupied).equals(reservationState)) {
+                if (String.valueOf(SpotStatus.Occupied).equals(reservationState) ||
+                String.valueOf(SpotStatus.OverOccupied).equals(reservationState)) {
+                    if (String.valueOf(SpotStatus.Occupied).equals(reservationState)){
+                        spotDAO.updateSpotState(spot_id , lot_id , String.valueOf(SpotStatus.OverOccupied));
+                        reservationDAO.updateSpotState(spot_id , lot_id,String.valueOf(SpotStatus.OverOccupied));
+                    }
+                    violationService.updateFee(driver_id , lot_id);
                     System.out.println("Reservation is over-occupied.");
                     // send a fee to the driver using his socket
                     notificationService.notifyDriverReservation(new UpdateDriverReservationDTO(
