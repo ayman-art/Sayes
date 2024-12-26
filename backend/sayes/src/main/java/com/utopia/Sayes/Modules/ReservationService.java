@@ -14,12 +14,17 @@ import com.utopia.Sayes.Repo.ReservationDAO;
 import com.utopia.Sayes.Repo.SpotDAO;
 import com.utopia.Sayes.enums.SpotStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -47,38 +52,63 @@ public class ReservationService {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-    public long reserveSpot(long lot_id ,long driver_id,Time endTime) throws Exception{
+
+    public long reserveSpot(long lot_id, long driver_id, Timestamp endTime) throws Exception {
+        Connection connection = null;
         try {
-            long spotId = spotDAO.getAndUpdateFirstAvailableSpotId(lot_id , String.valueOf(SpotStatus.Available),
-            String.valueOf(SpotStatus.Reserved));
-            if (spotId == 0){
-                throw new Exception("spot doesn't exist");
+            connection = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection();
+            connection.setAutoCommit(false);
+
+            long spotId = spotDAO.getAndUpdateFirstAvailableSpotId(connection, lot_id,
+                    String.valueOf(SpotStatus.Available), String.valueOf(SpotStatus.Reserved));
+
+            if (spotId == 0) {
+                throw new Exception("Spot doesn't exist or is unavailable.");
             }
-            //spotDAO.updateSpotState(spotId,lot_id, String.valueOf(SpotStatus.Reserved));
-            java.sql.Timestamp startTimestamp = new java.sql.Timestamp(new Date().getTime());
-            java.sql.Timestamp endTimestamp = new java.sql.Timestamp(endTime.getTime());
-            double price = dynamicPricing.getPrice(lot_id,
-                    new Time(startTimestamp.getTime()),
-                    new Time(endTimestamp.getTime()));
-            System.out.println(lot_id);
-            reservationDAO.addReservation(spotId,lot_id, startTimestamp, endTimestamp,
-                    String.valueOf(SpotStatus.Reserved),driver_id,price);
-            setReservationTimeOut(lot_id , spotId , driver_id);
+
+            Timestamp startTimestamp = new Timestamp(new Date().getTime());
+            Timestamp endTimestamp = new Timestamp(endTime.getTime());
+
+            double price = dynamicPricing.getPrice(lot_id, new java.sql.Time(startTimestamp.getTime()),
+                    new java.sql.Time(endTimestamp.getTime()));
+
+            reservationDAO.addReservation(spotId, lot_id, startTimestamp, endTimestamp,
+                    String.valueOf(SpotStatus.Reserved), driver_id, price, connection);
+
+            setReservationTimeOut(lot_id, spotId, driver_id);
+
+            connection.commit();
+
             Lot lot = lotDAO.getLotById(lot_id);
             notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, lot.getNum_of_spots(),
                     lot.getLongitude(), lot.getLatitude(), lot.getPrice(), lot.getLot_type()));
             notificationService.notifyLotManager(new UpdateLotManagerLotSpotsDTO(
-                    spotId,
-                    lot_id,
-                    lotDAO.getLotManagerIdByLotId(lot_id),
-                    lotDAO.getLotRevenue(lot_id),
-                    SpotStatus.Reserved));
+                    spotId, lot_id, lotDAO.getLotManagerIdByLotId(lot_id),
+                    lotDAO.getLotRevenue(lot_id), SpotStatus.Reserved));
 
             return spotId;
-        }
-        catch (Exception e){
-           throw new Exception(e.getMessage());
+
+        } catch (Exception e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException rollbackEx) {
+                    throw new Exception("Error rolling back the transaction: " + rollbackEx.getMessage(), rollbackEx);
+                }
+            }
+            throw new Exception("Error while reserving spot: " + e.getMessage(), e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);
+                    connection.close();
+                } catch (SQLException closeEx) {
+                    System.err.println("Error closing the connection: " + closeEx.getMessage());
+                }
+            }
         }
     }
     public void useReservation(long spot_id ,long lot_id,long driver_id) throws Exception {

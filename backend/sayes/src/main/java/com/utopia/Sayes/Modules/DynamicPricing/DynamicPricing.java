@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Time;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 @Component
 public class DynamicPricing {
@@ -52,9 +54,16 @@ public class DynamicPricing {
     }
 
     private double totalTime(LocalTime from, LocalTime to) {
-        if (to.isBefore(from)) {
-            to = to.plusHours(24);
+        LocalDateTime fromDateTime = LocalDateTime.of(LocalDate.now(), from);
+        LocalDateTime toDateTime = LocalDateTime.of(LocalDate.now(), to);
+
+        if (toDateTime.isBefore(fromDateTime)) {
+            toDateTime = toDateTime.plusDays(1);
         }
-        return Duration.between(from, to).toMillis() / 3_600_000.0;
+
+        long durationMillis = Duration.between(fromDateTime, toDateTime).toMillis();
+
+        return durationMillis / 3_600_000.0;
     }
+
 }
