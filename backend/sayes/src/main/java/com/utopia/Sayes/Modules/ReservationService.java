@@ -209,6 +209,13 @@ public class ReservationService {
                             0L,
                             null)
                     );
+
+                    notificationService.notifyLotManager(new UpdateLotManagerLotSpotsDTO(
+                            spot_id,
+                            lot_id,
+                            lotDAO.getLotManagerIdByLotId(lot_id),
+                            lotDAO.getLotRevenue(lot_id),
+                            SpotStatus.Available));
                 }
             } catch (Exception e) {
                 System.err.println("Error while checking reservation: " + e.getMessage());
@@ -241,6 +248,13 @@ public class ReservationService {
                             0L,
                             0L)
                     );
+
+                    notificationService.notifyLotManager(new UpdateLotManagerLotSpotsDTO(
+                            spot_id,
+                            lot_id,
+                            lotDAO.getLotManagerIdByLotId(lot_id),
+                            lotDAO.getLotRevenue(lot_id),
+                            SpotStatus.Occupied));
                 }
             } catch (Exception e) {
                 System.err.println("Error while checking reservation: " + e.getMessage());
