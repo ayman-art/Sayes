@@ -8,6 +8,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,14 +55,31 @@ public class SpotDAO {
         }
         return state;
     }
-    @Transactional
-    public Long getAndUpdateFirstAvailableSpotId(long lot_id, String currentState, String newState) {
+
+    public Long getAndUpdateFirstAvailableSpotId(Connection connection, long lot_id, String currentState, String newState) throws SQLException {
         String selectQuery = "SELECT spot_id FROM spots WHERE lot_id = ? AND state = ? LIMIT 1 FOR UPDATE";
-        Long spotId = jdbcTemplate.queryForObject(selectQuery, new Object[]{lot_id, currentState}, Long.class);
+        Long spotId = null;
+
+        try (PreparedStatement stmt = connection.prepareStatement(selectQuery)) {
+            stmt.setLong(1, lot_id);
+            stmt.setString(2, currentState);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    spotId = rs.getLong("spot_id");
+                }
+            }
+        }
+
         if (spotId != null) {
             String updateQuery = "UPDATE spots SET state = ? WHERE spot_id = ?";
-            jdbcTemplate.update(updateQuery, newState, spotId);
+            try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
+                stmt.setString(1, newState);
+                stmt.setLong(2, spotId);
+                stmt.executeUpdate();
+            }
         }
+
         return spotId;
     }
     public List<Spot> getSpotsByLotId(long lotId) {
