@@ -163,25 +163,27 @@ public class ReservationService {
 
         scheduler.schedule(() -> {
             try {
-                Reservation reservation = reservationDAO.getReservation(spot_id, lot_id, driver_id);
-                String reservationState = reservation.getState();
-                if (String.valueOf(SpotStatus.Reserved).equals(reservationState)) {
-                    freeReservation(spot_id , lot_id , driver_id);
-                    System.out.println("Reservation expired and spot is now available again.");
-                    double penalty = lotDAO.getLotPenalty(lot_id);
-                    if (!violationService.takePenaltyAmount(driver_id , lot_id , penalty))
-                        violationService.addPenalty(driver_id , lot_id , penalty);
-                    // send a penalty to the driver using his socket
-                    notificationService.notifyDriverReservation(new UpdateDriverReservationDTO(
-                            driver_id,
-                            lot_id,
-                            spot_id,
-                            SpotStatus.ReservationTimeOut,
-                            penalty,
-                            -1,
-                            0L,
-                            null)
-                    );
+                if (reservationDAO.existsReservation(driver_id , lot_id , spot_id)){
+                    Reservation reservation = reservationDAO.getReservation(spot_id, lot_id, driver_id);
+                    String reservationState = reservation.getState();
+                    if (String.valueOf(SpotStatus.Reserved).equals(reservationState)) {
+                        freeReservation(spot_id, lot_id, driver_id);
+                        System.out.println("Reservation expired and spot is now available again.");
+                        double penalty = lotDAO.getLotPenalty(lot_id);
+                        if (!violationService.takePenaltyAmount(driver_id, lot_id, penalty))
+                            violationService.addPenalty(driver_id, lot_id, penalty);
+                        // send a penalty to the driver using his socket
+                        notificationService.notifyDriverReservation(new UpdateDriverReservationDTO(
+                                driver_id,
+                                lot_id,
+                                spot_id,
+                                SpotStatus.ReservationTimeOut,
+                                penalty,
+                                -1,
+                                0L,
+                                null)
+                        );
+                    }
                 }
             } catch (Exception e) {
                 System.err.println("Error while checking reservation: " + e.getMessage());
