@@ -1,4 +1,5 @@
 import { LotDetailed } from "../models/LotDetailed";
+import { LotHomeLot } from "../pages/LotManagerHome";
 
 const URL = 'http://localhost:8080';
 
@@ -39,7 +40,7 @@ interface CreateLotResponse {
 }
 
 // Fetch lots for the manager
-export const fetchManagerLots = async (token: string): Promise<GetLotsResponse> => {
+export const fetchManagerLots = async (token: string)=> {
     try {
       const response = await fetch(`${URL}/report/get-manager-lot-report`, {
         method: 'GET',
@@ -61,7 +62,7 @@ export const fetchManagerLots = async (token: string): Promise<GetLotsResponse> 
       }
   
       // Explicitly return GetLotsResponse
-      return { lots: rawData.lots };
+      return rawData['lots']
     } catch (error) {
       console.error('Error fetching lots:', error);
       throw error;
@@ -70,7 +71,7 @@ export const fetchManagerLots = async (token: string): Promise<GetLotsResponse> 
   
 
 // Create a new lot
-export const createNewLot = async (token: string, lotData: CreateLotRequest): Promise<CreateLotResponse> => {
+export const createNewLot = async (token: string, lotData: CreateLotRequest) => {
   try {
     const response = await fetch(`${URL}/lot-management/create-lot`, {
       method: 'POST',
@@ -85,17 +86,26 @@ export const createNewLot = async (token: string, lotData: CreateLotRequest): Pr
       throw new Error('Failed to create a new lot: ' + response.statusText);
     }
 
-    const result: CreateLotResponse = await response.json();
-    console.log('Lot creation response:', result);
 
-    return result;
+    return response;
   } catch (error) {
     console.error('Error creating lot:', error);
     throw error; // Re-throw the error to be handled elsewhere
   }
 };
 
-
+export const mapRawLot= (json: any): LotHomeLot =>{
+  return {
+  lot_id: json.lot_id,
+  occupancy_rate: json.occupancy_rate,
+  price: json.price,
+  latitude: json.latitude,
+  num_of_spots: json.num_of_spots,
+  lot_type: json.lot_type,
+  longitude: json.longitude,
+  revenue: json.revenue
+}
+}
 
 
 

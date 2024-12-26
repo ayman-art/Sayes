@@ -4,10 +4,10 @@ import 'leaflet/dist/leaflet.css';
 import L, { Icon } from 'leaflet';
 import redIconUrl from '../assets/red-parking-sign.png'; // Icon for lots with 0 spots
 import blueIconUrl from '../assets/blue-parking-sign.png'; // Icon for lots with available spots
-import { fetchManagerLots, createNewLot } from '../services/ManagerHomeService';
+import { fetchManagerLots, createNewLot, mapRawLot } from '../services/ManagerHomeService';
 
 // Interfaces
-interface RawLot {
+export interface RawLot {
   lot_id: number;
   occupancy_rate: number | string;
   revenue: number;
@@ -20,13 +20,23 @@ interface RawLot {
   fee: number;
   time: string; // ISO 8601 duration format
 }
+export interface LotHomeLot {
+  lot_id: number;
+  occupancy_rate: number | string;
+  revenue: number;
+  lot_type: string;
+  latitude: number;
+  longitude: number;
+  num_of_spots: number;
+  price: number;
+}
 
 interface GetLotsResponse {
   lots: RawLot[];
 }
 
 const LotManagerHomePage: React.FC = () => {
-  const [parkingSpots, setParkingSpots] = useState<RawLot[]>([]); // Correctly typed as RawLot[]
+  const [parkingSpots, setParkingSpots] = useState<LotHomeLot[]>([]); // Correctly typed as RawLot[]
   const [newLot, setNewLot] = useState<RawLot>({
     lot_id: 0,
     occupancy_rate: 0,
@@ -57,9 +67,11 @@ const LotManagerHomePage: React.FC = () => {
   const fetchLots = async () => {
     try {
       // Explicitly type the response as GetLotsResponse
-      const response = await fetchManagerLots(token!); // Now TypeScript knows this is a GetLotsResponse
-      console.log('Fetched lots raw data:', response); // Log the raw response to check the format
-      setParkingSpots(response.lots); // Access 'lots' directly
+      const unmappedLots: Object[]= await fetchManagerLots(token!); // Now TypeScript knows this is a GetLotsResponse
+      console.log('Fetched lots raw data:', unmappedLots); // Log the raw response to check the format
+      const mappedLots: LotHomeLot[] = unmappedLots.map(mapRawLot);
+
+      setParkingSpots(mappedLots); // Access 'lots' directly
     } catch (error) {
       console.error('Error fetching lots:', error);
       setMessage('Failed to fetch parking lots.');
@@ -91,25 +103,13 @@ const LotManagerHomePage: React.FC = () => {
         const response = await createNewLot(token!, lotData);
         console.log('Received response:', response); // Log the response
 
-        if (response.success) {
+        if (response.ok) {
           setMessage('New lot added successfully!');
-          setNewLot({
-            lot_id: 0,
-            occupancy_rate: 0,
-            revenue: 0,
-            price: 0,
-            num_of_spots: 0,
-            lot_type: '',
-            latitude: 0,
-            longitude: 0,
-            penalty: 10.5,
-            fee: 5.5,
-            time: 'PT2H', // Reset time to default ISO format
-          }); // Reset the form after success
+          
           setSelectedPosition(null); // Clear selected position
           fetchLots(); // Re-fetch the updated list of lots
         } else {
-          setMessage(response.message || 'Failed to add lot.');
+          setMessage(response.statusText || 'Failed to add lot.');
         }
       } catch (error) {
         console.error('Error creating lot:', error);
