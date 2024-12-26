@@ -54,6 +54,9 @@ const DriverHomePage: React.FC = () => {
   const [hasReserved, setHasReserved] = useState<boolean> (false);
   const [paymentMethod, setPaymentMethod] = useState("cash"); // Default to "cash"
   const [occupied, setOccupied] = useState<boolean>(false)
+  const [notificationVisible, setNotificationVisible] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState(''); // State for the notification message
+
 
 
   const webSocketService = new WebSocketService(URLS.SOCKET);
@@ -95,6 +98,7 @@ const DriverHomePage: React.FC = () => {
       console.log(localStorage.getItem('jwtToken'))
       webSocketService.subscribe(`/topic/driver-reservation-update/${driver_id}`, (message)=>{
         console.log(JSON.parse(message.body))
+        driverNotificationHandler(JSON.parse(message.body));
       })
     }
     const onError = (error: string) => {
@@ -114,9 +118,41 @@ const DriverHomePage: React.FC = () => {
     };
   }, [])
   
+  const driverNotificationHandler = (data: any)=>{
+    const status = data.status;
+    switch(status){
+      case "ReservationTimeOut":
+        handleTimeoutMessage(data)
+        break;
+      case "OverOccupied":
+        handleOverOccupied(data)
+        break;
+      case "NearExpiry":
+        handleNearExpiry(data)
+    }
+  }
+  const handleNearExpiry = (data:any)=>{
+    let s = "ALERT:\n"
+    s+= `Your reservation at Lot: ${data['lotId']}, Spot: ${data['spotId']} is near expiry\n`
+    s+= `Remaining time ~ ${data['remainingReservationTime']}`
+    showNotification(s);
+  }
 
+  const handleOverOccupied = (data:any)=>{
+    let s = "ALERT:\n"
+    s+= `You have over-occupied your spot at Lot: ${data['lotId']}, Spot: ${data['spotId']}\n`
+    s+= `Over-Occupy fee = ${data['penalty']}`
+    showNotification(s); 
+  }
 
-  // Create dynamic icons for parking spots
+  const handleTimeoutMessage = (data: any)=>{
+    let s = "ALERT:\n"
+    s+= `Your reservation at Lot: ${data['lotId']}, Spot: ${data['spotId']} has expired\n`
+    showNotification(s); 
+    setReservedSpot(null);
+    setHasReserved(false);
+  }
+ 
   const getIcon = (availableSpots: number) =>
     new Icon({
       iconUrl: availableSpots > 0 ? blueIconUrl : redIconUrl,
@@ -131,7 +167,7 @@ const DriverHomePage: React.FC = () => {
       const data = await response.json()
       const price = data['price']
       setTotalPrice(price); 
-      setIsModalOpen(true); // Show the confirmation modal
+      setIsModalOpen(true);  
     }
   };
 
@@ -150,7 +186,7 @@ const DriverHomePage: React.FC = () => {
       setOccupied(false)
       setHasReserved(true)
       setIsModalOpen(false);
-      setMessage("Booking confirmed!"); // Set a success message
+      setMessage("Booking confirmed!");  
     }
     
   };
@@ -176,8 +212,19 @@ const DriverHomePage: React.FC = () => {
     }
   }
 
+  const showNotification = (message: string) => {
+    setNotificationMessage(message);
+    setNotificationVisible(true);
+  };
+
+  const hideNotification = () => {
+    setNotificationMessage('');
+    setNotificationVisible(false);
+  };
+
   return (
     <div className="app-container">
+      
       {/* Navbar */}
       <nav className="navbar">
         <div className="navbar-title">Sayes</div>
@@ -223,7 +270,15 @@ const DriverHomePage: React.FC = () => {
             ))}
           </MapContainer>
         </div>
-
+        {/* Notification Popup */}
+        {notificationVisible && (
+          <div className="notification-popup">
+            <div className="notification-content">
+              <p>{notificationMessage}</p>
+              <button onClick={hideNotification}>OK</button>
+            </div>
+          </div>
+        )}
         {/* Sidebar */}
         <div className="sidebar">
           {selectedSpot ? (
