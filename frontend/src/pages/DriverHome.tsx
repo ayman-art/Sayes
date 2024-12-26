@@ -90,6 +90,12 @@ const DriverHomePage: React.FC = () => {
         const lotUpdate = JSON.parse(message.body)
         lotUpdateHandler(lotUpdate)
       });
+      const driver_id = localStorage.getItem('id');
+      console.log(localStorage.getItem('id'));
+      console.log(localStorage.getItem('jwtToken'))
+      webSocketService.subscribe(`/topic/driver-reservation-update/${driver_id}`, (message)=>{
+        console.log(JSON.parse(message.body))
+      })
     }
     const onError = (error: string) => {
       console.error('WebSocket error:', error);
@@ -119,32 +125,6 @@ const DriverHomePage: React.FC = () => {
       popupAnchor: [0, -32],
     });
 
-  // Handle booking a spot
-  // const handleBooking = async () => {
-  //   if (selectedSpot && selectedSpot.availableSpots > 0) {
-  //     console.log(endTime)
-  //     try {
-  //       const response = await getSpotPrice(selectedSpot!.id!)
-  //       if (response.ok) {
-  //         setMessage('Spot booked successfully!');
-  //         // Simulate spot availability update
-  //         setParkingSpots((prevSpots) =>
-  //           prevSpots.map((spot) =>
-  //             spot.id === selectedSpot.id
-  //               ? { ...spot, availableSpots: spot.availableSpots - 1 }
-  //               : spot
-  //           )
-  //         );
-  //       } else {
-  //         setMessage('Failed to book the spot. Try again later.');
-  //       }
-  //     } catch (error) {
-  //       setMessage('Error booking the spot.');
-  //     }
-  //   } else {
-  //     setMessage('No available spots.');
-  //   }
-  // };
   const BookingHandler = async () => {
     const response = await getSpotPrice(selectedSpot!.id, endTime);
     if(response.ok){
