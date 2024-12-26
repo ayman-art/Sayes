@@ -51,5 +51,12 @@ public class ReservationDAO {
             throw new RuntimeException("reservation doesn't exist");
         }
     }
+    public void updateSpotState(long spot_id,long lot_id, String newState) {
+        String query = "UPDATE reserved_spots SET state = ? WHERE spot_id = ? AND lot_id = ?";
+        int rowsUpdated = jdbcTemplate.update(query, newState, spot_id, lot_id);
+        if(rowsUpdated == 0){
+            throw new RuntimeException("Can't update spot state");
+        }
+    }
 
 }

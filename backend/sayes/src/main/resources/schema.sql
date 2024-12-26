@@ -188,14 +188,14 @@ CREATE TABLE IF NOT EXISTS `sayes`.`fees` (
   `driver_id` BIGINT NOT NULL,
   `lot_id` BIGINT NOT NULL,
   `fee` DOUBLE(10, 2) NOT NULL,
-  INDEX `fk_penalties_Lots1_idx` (`lot_id` ASC) VISIBLE,
-  INDEX `fk_penalties_Drivers1_idx` (`driver_id` ASC) VISIBLE,
-  CONSTRAINT `fk_penalties_Lots1`
+  INDEX `fk_fees_Lots1_idx` (`lot_id` ASC) VISIBLE,
+  INDEX `fk_fees_Drivers1_idx` (`driver_id` ASC) VISIBLE,
+  CONSTRAINT `fk_fees_Lots1`
     FOREIGN KEY (`lot_id`)
     REFERENCES `sayes`.`Lots` (`lot_id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  CONSTRAINT `fk_penalties_Drivers1`
+  CONSTRAINT `fk_fees_Drivers1`
     FOREIGN KEY (`driver_id`)
     REFERENCES `sayes`.`Drivers` (`driver_id`)
     ON DELETE CASCADE
