@@ -52,7 +52,9 @@ public class DynamicPricing {
     }
 
     private double totalTime(LocalTime from, LocalTime to) {
+        if (to.isBefore(from)) {
+            to = to.plusHours(24);
+        }
         return Duration.between(from, to).toMillis() / 3_600_000.0;
     }
-
 }

@@ -17,6 +17,4 @@ public class UpdateLotDTO {
     private double latitude;
     private double price;
     private String lot_type;
-
-
 }
