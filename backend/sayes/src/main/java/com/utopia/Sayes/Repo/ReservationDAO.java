@@ -6,6 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Map;
 
@@ -15,13 +19,18 @@ public class ReservationDAO {
     private JdbcTemplate jdbcTemplate;
 
     private ReservationAdapter reservationAdapter = new ReservationAdapter();
-    public void addReservation(long spot_id, long lot_id, Date start_time , Date end_time, String state, long driver_id, double price) {
-        String query = "INSERT INTO reserved_spots"  +
-        "(spot_id, lot_id, start_time, end_time , state, driver_id , price) " +
-                "VALUES (?, ?, ?, ?, ? ,?, ?)";
-        int rows = jdbcTemplate.update(query, spot_id, lot_id, start_time , end_time, state, driver_id , price);
-        if(rows == 0){
-            throw new RuntimeException("can't add this reservation");
+    public void addReservation(long spot_id, long lot_id, Timestamp start_time, Timestamp end_time, String state, long driver_id, double price, Connection connection) throws SQLException {
+        String query = "INSERT INTO reserved_spots (spot_id, lot_id, start_time, end_time, state, driver_id, price) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setLong(1, spot_id);
+            stmt.setLong(2, lot_id);
+            stmt.setTimestamp(3, start_time);
+            stmt.setTimestamp(4, end_time);
+            stmt.setString(5, state);
+            stmt.setLong(6, driver_id);
+            stmt.setDouble(7, price);
+            stmt.executeUpdate();
         }
     }
     public void deleteReservation(long spot_id, long lot_id) {
