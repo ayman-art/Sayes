@@ -8,10 +8,7 @@ import com.utopia.Sayes.Models.Reservation;
 import com.utopia.Sayes.Models.Spot;
 import com.utopia.Sayes.Modules.DynamicPricing.DynamicPricing;
 import com.utopia.Sayes.Modules.WebSocket.NotificationService;
-import com.utopia.Sayes.Repo.LogDAO;
-import com.utopia.Sayes.Repo.LotDAO;
-import com.utopia.Sayes.Repo.ReservationDAO;
-import com.utopia.Sayes.Repo.SpotDAO;
+import com.utopia.Sayes.Repo.*;
 import com.utopia.Sayes.enums.SpotStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,6 +43,9 @@ public class ReservationService {
 
     @Autowired
     LogDAO logDAO;
+
+    @Autowired
+    FeeDAO feeDAO;
 
     @Autowired
     private NotificationService notificationService;
@@ -194,39 +194,48 @@ public class ReservationService {
 
     private void setOverOccupiedTime(long lot_id, long spot_id, long driver_id) throws Exception {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-
         Reservation reservation = reservationDAO.getReservation(spot_id, lot_id, driver_id);
-        String reservationState = reservation.getState();
         LocalDateTime endTime = reservation.getEnd_time();
         Date currentTime = new Date();
         long difference = endTime.getSecond() * 1000 - currentTime.getTime();
-        long minutesElapsed = difference / (60 * 1000);
-        scheduler.schedule(() -> {
+        System.out.println(currentTime.getTime());
+        System.out.println(endTime);
+        System.out.println(endTime.getSecond() * 1000);
+        long initialDelay = difference / (60 * 1000);
+        System.out.println(initialDelay);
+        long interval = 1;
+
+        scheduler.scheduleAtFixedRate(() -> {
             try {
-                if (String.valueOf(SpotStatus.Occupied).equals(reservationState) ||
-                String.valueOf(SpotStatus.OverOccupied).equals(reservationState)) {
-                    if (String.valueOf(SpotStatus.Occupied).equals(reservationState)){
-                        spotDAO.updateSpotState(spot_id , lot_id , String.valueOf(SpotStatus.OverOccupied));
-                        reservationDAO.updateSpotState(spot_id , lot_id,String.valueOf(SpotStatus.OverOccupied));
+                if (reservationDAO.existsReservation(driver_id , lot_id , spot_id)){
+                String spotState = spotDAO.getSpotState(spot_id , lot_id);
+                if (String.valueOf(SpotStatus.Occupied).equals(spotState) ||
+                        String.valueOf(SpotStatus.OverOccupied).equals(spotState)) {
+
+                    if (String.valueOf(SpotStatus.Occupied).equals(spotState)) {
+                        spotDAO.updateSpotState(spot_id, lot_id, String.valueOf(SpotStatus.OverOccupied));
+                        reservationDAO.updateSpotState(spot_id, lot_id, String.valueOf(SpotStatus.OverOccupied));
                     }
-                    violationService.updateFee(driver_id , lot_id);
+
+                    violationService.updateFee(driver_id, lot_id);
                     System.out.println("Reservation is over-occupied.");
-                    // send a fee to the driver using his socket
+
                     notificationService.notifyDriverReservation(new UpdateDriverReservationDTO(
                             driver_id,
                             lot_id,
                             spot_id,
                             SpotStatus.OverOccupied,
-                            lotDAO.getLotPenalty(lot_id),
+                            feeDAO.getFee(driver_id, lot_id),
                             reservationDAO.getReservationPrice(spot_id, lot_id),
                             0L,
                             0L)
                     );
                 }
+                }
             } catch (Exception e) {
                 System.err.println("Error while checking reservation: " + e.getMessage());
             }
-        }, minutesElapsed, TimeUnit.MINUTES);
+        }, initialDelay, interval, TimeUnit.MINUTES);
     }
 
 }
