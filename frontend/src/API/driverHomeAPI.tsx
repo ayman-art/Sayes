@@ -47,3 +47,34 @@ export const reserveSpot = async(lotId: number, endTime:string)=>{
     })
     return response;
 }
+export const useSpot = async(lotId:number, spotId:number, payment_method: string)=>{
+    const token = localStorage.getItem('jwtToken')
+    const response = await fetch(URLS.USE_SPOT,{
+        method:'PUT',
+        headers:{
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token!}`
+        },
+        body:JSON.stringify({
+            lotId: lotId,
+            spotId: spotId,
+            payment_method: payment_method
+        })
+    })
+    return response;
+}
+export const freeSpot = async(lotId:number, spotId:number)=>{
+    const token = localStorage.getItem('jwtToken')
+    const response = await fetch(URLS.FREE_SPOT,{
+        method:'PUT',
+        headers:{
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token!}`
+        },
+        body:JSON.stringify({
+            lotId: lotId,
+            spotId: spotId,
+        })
+    })
+    return response;
+}

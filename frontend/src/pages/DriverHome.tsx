@@ -6,7 +6,7 @@ import redIconUrl from '../assets/red-parking-sign.png'; // For lots with 0 spot
 import blueIconUrl from '../assets/blue-parking-sign.png'; // For lots with available spots
 import '../styles/DriverHomePage.css';
 import { jsonLotMapper, ParkingLot } from '../models/Lot';
-import { fetchLots, getSpotPrice, reserveSpot } from '../API/driverHomeAPI';
+import { fetchLots, freeSpot, getSpotPrice, reserveSpot, useSpot } from '../API/driverHomeAPI';
 import WebSocketService from '../services/socketService';
 import { URLS } from '../API/urls';
 import { DTOLotMapper } from '../models/UpdateLotDTO';
@@ -16,7 +16,6 @@ interface ReservedSpot{
   lot_id: number;
   spot_id: number;
   endTime: string;
-  occupied: boolean;
 }
 
 // Location Marker Component
@@ -53,6 +52,9 @@ const DriverHomePage: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [reservedSpot, setReservedSpot] = useState<ReservedSpot|null>(null);
   const [hasReserved, setHasReserved] = useState<boolean> (false);
+  const [paymentMethod, setPaymentMethod] = useState("cash"); // Default to "cash"
+  const [occupied, setOccupied] = useState<boolean>(false)
+
 
   const webSocketService = new WebSocketService(URLS.SOCKET);
   const defaultCenter: [number, number] = [30.033333, 31.233334]; // Cairo
@@ -66,6 +68,10 @@ const DriverHomePage: React.FC = () => {
         // If found, replace the existing lot with the updated one
         const updatedSpots = [...prevSpots];
         updatedSpots[index] = DTOLotMapper(lotUpdate);
+        if(updatedSpots[index].id===selectedSpot?.id){
+          const temp = selectedSpot;
+          temp.availableSpots = updatedSpots[index].availableSpots;
+        }
         return updatedSpots;
       } else {
         // If not found, add the new lot to the list
@@ -160,8 +166,8 @@ const DriverHomePage: React.FC = () => {
         lot_id: selectedSpot?.id!,
         spot_id: spot,
         endTime: endTime,
-        occupied: false
       })
+      setOccupied(false)
       setHasReserved(true)
       setIsModalOpen(false);
       setMessage("Booking confirmed!"); // Set a success message
@@ -173,14 +179,20 @@ const DriverHomePage: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  function toggleOccupancy(): void {
-    let temp = reservedSpot;
-    temp!.occupied = ! temp?.occupied;
-    setReservedSpot(temp);
-    if (temp?.occupied){
-      
+  const toggleOccupancy= async()=>{
+    if (!occupied){
+      const response = await useSpot(reservedSpot!.lot_id, reservedSpot!.spot_id, paymentMethod);
+      if (response.ok){
+        setOccupied(true)
+        
+      }
     }else{
-      
+      const response = await freeSpot(reservedSpot!.lot_id, reservedSpot!.spot_id);
+      if(response.ok){
+        setHasReserved(false)
+        setOccupied(false)
+        setReservedSpot(null)
+      }
     }
   }
 
@@ -275,23 +287,39 @@ const DriverHomePage: React.FC = () => {
               {/* Currently Reserved Spot Section */}
               {reservedSpot && (
                 <div className="reserved-spot">
-                  <h3>Currently Reserved Spot</h3>
-                  <p>
-                    <strong>Parking Lot:</strong> {reservedSpot.lot_id}
-                  </p>
-                  <p>
-                    <strong>Parking Spot:</strong> {reservedSpot.spot_id}
-                  </p>
-                  <p>
-                    <strong>End Time:</strong> {reservedSpot.endTime}
-                  </p>
-                  <p>
-                    <strong>Status:</strong> {reservedSpot.occupied ? "Occupied" : "Unoccupied"}
-                  </p>
-                  <button onClick={toggleOccupancy}>
-                    {reservedSpot.occupied ? "Unoccupy Spot" : "Occupy Spot"}
-                  </button>
+                <h3>Currently Reserved Spot</h3>
+                <p>
+                  <strong>Parking Lot:</strong> {reservedSpot.lot_id}
+                </p>
+                <p>
+                  <strong>Parking Spot:</strong> {reservedSpot.spot_id}
+                </p>
+                <p>
+                  <strong>End Time:</strong> {reservedSpot.endTime}
+                </p>
+                <p>
+                  <strong>Status:</strong> {occupied ? "Occupied" : "Unoccupied"}
+                </p>
+                {/* Payment Method Dropdown */}
+                <div className="payment-method">
+                  <label htmlFor="paymentMethod">
+                    <strong>Payment Method:</strong>
+                  </label>
+                  <select
+                    id="paymentMethod"
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                  >
+                    <option value="cash">Cash</option>
+                    <option value="card">Card</option>
+                  </select>
                 </div>
+                <button onClick={toggleOccupancy}>
+                  {occupied ? "Unoccupy Spot" : "Occupy Spot"}
+                </button>
+              
+                
+              </div>
               )}
             </div>
           ) : (
