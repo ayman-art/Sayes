@@ -18,6 +18,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -83,6 +84,7 @@ public class ReservationService {
             //spotDAO.updateSpotState(spotId,lot_id, String.valueOf(SpotStatus.Reserved));
             System.out.println(lot_id);
             setReservationTimeOut(lot_id , spotId , driver_id);
+            setNearExpired(lot_id , spotId ,driver_id);
            connection.commit();
             Lot lot = lotDAO.getLotById(lot_id);
             notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, lot.getNum_of_spots(),
@@ -130,6 +132,7 @@ public class ReservationService {
                 if (reservation == null) {
                     throw new Exception("There is no reservation for this spot");
                 }
+                reservationDAO.updateSpotState(spot_id , lot_id , String.valueOf(SpotStatus.Occupied));
                 spotDAO.updateSpotState(spot_id, lot_id, String.valueOf(SpotStatus.Occupied));
                 setOverOccupiedTime(lot_id, spot_id, driver_id);
 
@@ -195,6 +198,7 @@ public class ReservationService {
                     Reservation reservation = reservationDAO.getReservation(spot_id, lot_id, driver_id);
                     String reservationState = reservation.getState();
                     if (String.valueOf(SpotStatus.Reserved).equals(reservationState)) {
+                        System.out.println(reservationState);
                         freeReservation(spot_id, lot_id, driver_id);
                         System.out.println("Reservation expired and spot is now available again.");
                         double penalty = lotDAO.getLotPenalty(lot_id);
@@ -230,13 +234,14 @@ public class ReservationService {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         Reservation reservation = reservationDAO.getReservation(spot_id, lot_id, driver_id);
         LocalDateTime endTime = reservation.getEnd_time();
+        Instant endTimeInstant = endTime.atZone(ZoneId.systemDefault()).toInstant(); // Convert to Instant
+        long endTimeMillis = endTimeInstant.toEpochMilli(); // Get milliseconds since epoch
+
         Date currentTime = new Date();
-        long difference = endTime.getSecond() * 1000 - currentTime.getTime();
-        System.out.println(currentTime.getTime());
-        System.out.println(endTime);
-        System.out.println(endTime.getSecond() * 1000);
+        long currentTimeMillis = currentTime.getTime();
+        long difference = endTimeMillis - currentTimeMillis; // In milliseconds
+        System.out.println(difference);
         long initialDelay = difference / (60 * 1000);
-        System.out.println(initialDelay);
         long interval = 1;
 
         scheduler.scheduleAtFixedRate(() -> {
@@ -250,8 +255,8 @@ public class ReservationService {
                         spotDAO.updateSpotState(spot_id, lot_id, String.valueOf(SpotStatus.OverOccupied));
                         reservationDAO.updateSpotState(spot_id, lot_id, String.valueOf(SpotStatus.OverOccupied));
                     }
-
                     violationService.updateFee(driver_id, lot_id);
+                    System.out.println("here");
                     System.out.println("Reservation is over-occupied.");
 
                     notificationService.notifyDriverReservation(new UpdateDriverReservationDTO(
@@ -270,13 +275,43 @@ public class ReservationService {
                             lot_id,
                             lotDAO.getLotManagerIdByLotId(lot_id),
                             lotDAO.getLotRevenue(lot_id),
-                            SpotStatus.Occupied));
+                            SpotStatus.OverOccupied));
                 }
+                }
+            } catch (Exception e) {
+                System.err.println("Error: " + e.getMessage());
+            }
+        }, initialDelay, interval, TimeUnit.MINUTES);
+    }
+    private void setNearExpired(long lot_id, long spot_id, long driver_id) {
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+        Time timeLimit = lotDAO.getTimeLimitById(lot_id);
+        long timeoutMinutes = (long) ((timeLimit.toLocalTime().toSecondOfDay()) * 0.75);
+
+        scheduler.schedule(() -> {
+            try {
+                if (reservationDAO.existsReservation(driver_id , lot_id , spot_id)){
+                    Reservation reservation = reservationDAO.getReservation(spot_id, lot_id, driver_id);
+                    String reservationState = reservation.getState();
+                    if (String.valueOf(SpotStatus.Reserved).equals(reservationState)) {
+                        System.out.println("nearExpiry");
+                        notificationService.notifyDriverReservation(new UpdateDriverReservationDTO(
+                                driver_id,
+                                lot_id,
+                                spot_id,
+                                SpotStatus.NearExpiry,
+                                0,
+                                -1,
+                                0L,
+                                null)
+                        );
+                    }
                 }
             } catch (Exception e) {
                 System.err.println("Error while checking reservation: " + e.getMessage());
             }
-        }, initialDelay, interval, TimeUnit.MINUTES);
+        }, timeoutMinutes, TimeUnit.SECONDS);
     }
 
 }

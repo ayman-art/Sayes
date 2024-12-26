@@ -43,7 +43,7 @@ public class ViolationService {
         }
     }
     public void updateFee(long driverId , long lotId){
-        double fee = feeDAO.getFee(driverId , lotId);
+        double fee = lotDAO.getLotFee(lotId);
         if(feeDAO.existsFee(driverId , lotId)){
             feeDAO.updateFee(driverId , lotId , fee);
         }
