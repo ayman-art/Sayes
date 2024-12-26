@@ -68,6 +68,7 @@ public class ReservationService {
             Lot lot = lotDAO.getLotById(lot_id);
             notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, lot.getNum_of_spots(),
                     lot.getLongitude(), lot.getLatitude(), lot.getPrice(), lot.getLot_type()));
+
             notificationService.notifyLotManager(new UpdateLotManagerLotSpotsDTO(spotId, lot_id, SpotStatus.Reserved));
 
             return spotId;
