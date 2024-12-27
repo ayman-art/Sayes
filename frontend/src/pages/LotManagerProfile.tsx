@@ -5,8 +5,13 @@ import WebSocketService from '../services/socketService';
 import { URLS } from '../API/urls';
 import '../styles/profile.css';
 import { UpdateLotManagerLotSpotsDTO } from '../models/UpdateLotManagerLotSpotsDTO';
+import TopNav from '../components/navbar';
 
-const LotManagerProfile = () => {
+interface LotManagerProfileProps {
+    onLogout: () => void;
+}
+
+const LotManagerProfile: React.FC<LotManagerProfileProps> = ({ onLogout }) => {
     const [managerName, setManagerName] = useState<string>("");
     const [revenue, setRevenue] = useState<number>(0);
     const [lots, setLots] = useState<LotDetailed[]>([]);
@@ -86,9 +91,10 @@ const LotManagerProfile = () => {
     };
 
     return (
+        <>
+        <TopNav onLogout={onLogout} />
         <div className="profile-container">
             <div className="profile-header">
-                <h2 className="text-3xl font-bold">Lot Manager Profile</h2>
                 <div className="profile-stats">
                     <div>
                         <h3 className="text-xl font-semibold">{managerName}</h3>
@@ -180,6 +186,7 @@ const LotManagerProfile = () => {
                 </div>
             )}
         </div>
+        </>
     );
 };
 
