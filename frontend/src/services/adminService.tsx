@@ -165,5 +165,29 @@ export const downloadTopLotsReport = async (token: string) => {
     }
   };
 
+  
+export const downloadViolationsReport = async (token: string) => {
+    try {
+      const response = await fetch(`${URL}/report/generate-violations-report`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to fetch the report: ' + response.statusText);
+      }
+  
+      // Get the PDF data from the response
+      const blob = await response.blob();
+  
+      // Save the PDF file
+      saveAs(blob, 'violations.pdf');
+    } catch (error) {
+      console.error('Error downloading the report:', error);
+    }
+  };
+
 
 

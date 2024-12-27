@@ -33,7 +33,7 @@ public class FeeDAO {
         return count != null && count > 0;
     }
     public void updateFee(long driverId , long lotId , double fee) {
-        String query = "UPDATE fees SET fee = fee + ? WHERE driver_id = ? AND lot_id ";
+        String query = "UPDATE fees SET fee = fee + ? WHERE driver_id = ? AND lot_id = ? ";
         int rows  = jdbcTemplate.update(query,fee,driverId,lotId);
         if(rows == 0){
             throw new RuntimeException("error updating fee");

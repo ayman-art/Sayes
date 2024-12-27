@@ -129,6 +129,7 @@ const DriverHomePage: React.FC = () => {
         break;
       case "NearExpiry":
         handleNearExpiry(data)
+        break;
     }
   }
   const handleNearExpiry = (data:any)=>{

@@ -130,4 +130,18 @@ public class ReportingFacade {
             throw new Exception(e.getMessage());
         }
     }
+    public byte[] getViolationsReport(String jwt) throws Exception {
+        try {
+            Claims claims = Authentication.parseToken(jwt);
+            Long adminId = Long.parseLong(claims.getId());
+
+            if (adminId == null) {
+                throw new Exception("Admin ID is null");
+            }
+            ByteArrayOutputStream reportStream = reportingService.generateViolationsReport();
+            return reportStream.toByteArray();
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
 }
