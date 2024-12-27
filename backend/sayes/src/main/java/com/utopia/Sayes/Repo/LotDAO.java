@@ -132,4 +132,8 @@ public class LotDAO {
         String query = "SELECT revenue FROM Lots WHERE lot_id = ?";
         return jdbcTemplate.queryForObject(query, Long.class, lotId);
     }
+    public long getTotalRevenue(long managerId){
+        String query = "SELECT SUM(revenue) FROM Lots WHERE manager = ?";
+        return jdbcTemplate.queryForObject(query, Long.class, managerId);
+    }
 }

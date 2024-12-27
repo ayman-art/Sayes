@@ -93,4 +93,17 @@ public class ReportingController {
             return new ResponseEntity<>(e.getMessage().getBytes(), HttpStatus.BAD_REQUEST);
         }
     }
+    @GetMapping("/generate-manager-report")
+    public ResponseEntity<byte[]> generateManagerReport(@RequestHeader("Authorization") String token) {
+        try {
+            token = token.replace("Bearer ", "");
+            byte[] report = reportingFacade.generateLotsReportForManager(token);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=top_lots_report.pdf");
+            headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
+            return new ResponseEntity<>(report, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage().getBytes(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }

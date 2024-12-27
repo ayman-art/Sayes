@@ -12,6 +12,8 @@ import java.util.Map;
 public class LotManagerDAO {
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    LotDAO lotDAO;
 
     LotManagerAdapter lotManagerAdapter = new LotManagerAdapter();
 
@@ -30,6 +32,9 @@ public class LotManagerDAO {
                 WHERE user_id = ?
                 """;
         Map<String, Object> resultMap = jdbcTemplate.queryForMap(query, managerId);
+        resultMap.remove("revenue");
+        long newRevenue = lotDAO.getTotalRevenue(managerId);
+        resultMap.put("revenue" , newRevenue);
         if(resultMap.isEmpty()){
             throw new Exception("error");
         }
