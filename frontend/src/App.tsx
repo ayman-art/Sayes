@@ -53,7 +53,7 @@ const App: React.FC = () => {
       <Routes>
         {isAuthenticated ? (
           <>
-            <Route path="/" element={role== 'ADMIN'? <Navigate to= "/profile"/> : (role=='DRIVER'? <DriverHomePage onLogout = {onLogout}/>: <LotManagerHomePage/>)} />
+            <Route path="/" element={role== 'ADMIN'? <Navigate to= "/profile"/> : (role=='DRIVER'? <DriverHomePage onLogout = {onLogout}/>: <LotManagerHomePage onLogout = {onLogout}/>)} />
             <Route path="/signup" element={<Navigate to="/" />}/>
             <Route path="/login" element={<Navigate to="/" />} />
             <Route path="/profile" element={role === 'DRIVER' ? (<DriverProfile />) : role === 'ADMIN' ? (<AdminProfile/>) : (

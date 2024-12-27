@@ -92,8 +92,14 @@ const LotManagerProfile: React.FC<LotManagerProfileProps> = ({ onLogout }) => {
 
     return (
         <>
-        <TopNav onLogout={onLogout} />
+        
         <div className="profile-container">
+        <div className="navbar-links">
+          <a href="/">Home</a>
+          <a href="/login" onClick={onLogout}>
+            Logout
+          </a>
+        </div>
             <div className="profile-header">
                 <div className="profile-stats">
                     <div>
