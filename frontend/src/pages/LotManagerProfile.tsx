@@ -6,6 +6,7 @@ import { URLS } from '../API/urls';
 import '../styles/profile.css';
 import { UpdateLotManagerLotSpotsDTO } from '../models/UpdateLotManagerLotSpotsDTO';
 import TopNav from '../components/navbar';
+import { Spot } from '../models/Spot';
 
 interface LotManagerProfileProps {
     onLogout: () => void;
@@ -56,21 +57,39 @@ const LotManagerProfile: React.FC<LotManagerProfileProps> = ({ onLogout }) => {
         const lotId = updateLotManagerLotSpotsDTO.lotId;
         const newState = updateLotManagerLotSpotsDTO.status;
         const newRevenue = updateLotManagerLotSpotsDTO.lotRevenue;
-        console.log("updating spot", spotId, "in lot", lotId, "to", newState);
+        const spotIdsBatch = updateLotManagerLotSpotsDTO.spotIdsBatch;
+        console.log("updating spot:", spotId, "in lot:", lotId, "to state:", newState, "new revenue:", newRevenue, "spotIdsBatch:", spotIdsBatch);
         setLots((currentLots) =>
             currentLots.map((lot) => {
                 if (lot.lot_id === lotId) {
-                    return {
-                        ...lot,
-                        revenue: newRevenue,
-                        spots: lot.spots.map((spot) =>
-                            spot.spot_id === spotId ? { ...spot, state: newState } : spot
-                        )
-                    };
+                    if (spotId === -1) {
+                        // Add new spots to the lot
+                        const newSpots: Spot[] = spotIdsBatch.map((id) => ({
+                            spot_id: id,
+                            lot_id: lotId,
+                            state: newState,
+                        }));
+        
+                        return {
+                            ...lot,
+                            spots: [...lot.spots, ...newSpots],
+                        };
+                    } else {
+                        return {
+                            ...lot,
+                            revenue: newRevenue,
+                            spots: lot.spots.map((spot) =>
+                                spot.spot_id === spotId
+                                    ? { ...spot, state: newState }
+                                    : spot
+                            ),
+                        };
+                    }
                 }
                 return lot;
             })
         );
+        
         updateRevenue();
     };
 
