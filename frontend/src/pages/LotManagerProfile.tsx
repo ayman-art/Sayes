@@ -20,7 +20,6 @@ const LotManagerProfile = () => {
         const fetchData = async () => {
             const managerData = await fetchManagerData(token!);
             setManagerName(managerData.username);
-            setRevenue(managerData.revenue);
             setLots(managerData.lotsWithSpots);
             setManagerId(localStorage.getItem('id')!);
         };
@@ -40,6 +39,7 @@ const LotManagerProfile = () => {
         };
 
         fetchData();
+        updateRevenue();
         webSocketService.connect(onConnect, onError);
 
         return () => {
@@ -54,12 +54,14 @@ const LotManagerProfile = () => {
         const spotId = updateLotManagerLotSpotsDTO.spotId;
         const lotId = updateLotManagerLotSpotsDTO.lotId;
         const newState = updateLotManagerLotSpotsDTO.status;
+        const newRevenue = updateLotManagerLotSpotsDTO.lotRevenue;
         console.log("updating spot", spotId, "in lot", lotId, "to", newState);
         setLots((currentLots) =>
             currentLots.map((lot) => {
                 if (lot.lot_id === lotId) {
                     return {
                         ...lot,
+                        revenue: newRevenue,
                         spots: lot.spots.map((spot) =>
                             spot.spot_id === spotId ? { ...spot, state: newState } : spot
                         )
@@ -68,12 +70,17 @@ const LotManagerProfile = () => {
                 return lot;
             })
         );
+        updateRevenue();
         
     };
 
 
-    const updateRevenue = (newRevenue: number) => {
-        setRevenue(newRevenue);
+    const updateRevenue = () => {
+        let totalRevenue = 0;
+        lots.forEach((lot) => {
+            totalRevenue += lot.revenue;
+        });
+        setRevenue(totalRevenue);
     };
 
 
