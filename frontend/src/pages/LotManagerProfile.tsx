@@ -107,6 +107,7 @@ const LotManagerProfile: React.FC<LotManagerProfileProps> = ({ onLogout }) => {
             console.log(`Lot ID: ${selectedLotId}, Spots to add: ${spotsToAdd}`);
             setShowPopup(false);
             setSpotsToAdd(0);
+            updateRevenue();
         }
     };
 
