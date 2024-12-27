@@ -13,12 +13,7 @@ def sign_up_and_save_tokens(num_accounts=100):
         password = random_string(12)
         plate = random_string_numbers(8)
         number = random_string_numbers(8)
-        print(username)
-        print(password)
-        print(plate)
-        print(number)
         headers = {"Content-Type": "application/json"}
-        # Make sign-up request
         response = requests.post(SIGNUP_ENDPOINT, headers=headers, json={
             "name": username,
             "password": password,

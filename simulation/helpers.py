@@ -11,7 +11,6 @@ LOTS_FILE = "lots.json"
 TOKENS_FILE = "tokens.json"
 
 def random_string(length):
-    """Generate a random string of specified length."""
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
 def random_string_numbers(length):
