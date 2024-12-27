@@ -241,8 +241,8 @@ public class ReservationService {
         long currentTimeMillis = currentTime.getTime();
         long difference = endTimeMillis - currentTimeMillis; // In milliseconds
         System.out.println(difference);
-        long initialDelay = difference / (60 * 1000);
-        long interval = 1;
+        long initialDelay = difference / 1000;
+        long interval = 60;
 
         scheduler.scheduleAtFixedRate(() -> {
             try {
@@ -281,13 +281,15 @@ public class ReservationService {
             } catch (Exception e) {
                 System.err.println("Error: " + e.getMessage());
             }
-        }, initialDelay, interval, TimeUnit.MINUTES);
+        }, initialDelay, interval, TimeUnit.SECONDS);
     }
     private void setNearExpired(long lot_id, long spot_id, long driver_id) {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
         Time timeLimit = lotDAO.getTimeLimitById(lot_id);
-        long timeoutMinutes = (long) ((timeLimit.toLocalTime().toSecondOfDay()) * 0.75);
+        long totalTimeoutMinutes = ((timeLimit.toLocalTime().toSecondOfDay()));
+        long timeoutMinutes = (long) (totalTimeoutMinutes * 0.75);
+        long remaining = totalTimeoutMinutes - timeoutMinutes;
 
         scheduler.schedule(() -> {
             try {
@@ -303,7 +305,7 @@ public class ReservationService {
                                 SpotStatus.NearExpiry,
                                 0,
                                 -1,
-                                0L,
+                                remaining,
                                 null)
                         );
                     }

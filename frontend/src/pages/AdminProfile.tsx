@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchAdminData, fetchTopUsers, fetchTopLots, fetchLogs, downloadTopUsersReport , downloadTopLotsReport} from '../services/adminService';
+import { fetchAdminData, fetchTopUsers, fetchTopLots, fetchLogs, downloadTopUsersReport , downloadTopLotsReport , downloadViolationsReport} from '../services/adminService';
 import '../styles/AdminProfile.css';
 
 const AdminProfile = () => {
@@ -70,7 +70,14 @@ const AdminProfile = () => {
 
       const handleDownloadTopLotsReport = async () => {
         if (token) {
-          await downloadTopLotsReport(token);  // Trigger report download
+          await  downloadTopLotsReport(token);  // Trigger report download
+        } else {
+          console.error('No token found');
+        }
+      };
+      const handleViolationsReport = async () => {
+        if (token) {
+          await downloadViolationsReport(token);  // Trigger report download
         } else {
           console.error('No token found');
         }
@@ -144,6 +151,7 @@ const AdminProfile = () => {
                                 </li>
                             ))}
                         </ul>
+                        <button className="btn-primary" onClick={handleViolationsReport}>see violations report</button>
                     </div>
                 )}
             </div>
