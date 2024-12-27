@@ -5,13 +5,20 @@ import WebSocketService from '../services/socketService';
 import { URLS } from '../API/urls';
 import '../styles/profile.css';
 import { UpdateLotManagerLotSpotsDTO } from '../models/UpdateLotManagerLotSpotsDTO';
-import { resolvePath } from 'react-router-dom';
+import TopNav from '../components/navbar';
 
-const LotManagerProfile = () => {
+interface LotManagerProfileProps {
+    onLogout: () => void;
+}
+
+const LotManagerProfile: React.FC<LotManagerProfileProps> = ({ onLogout }) => {
     const [managerName, setManagerName] = useState<string>("");
     const [revenue, setRevenue] = useState<number>(0);
     const [lots, setLots] = useState<LotDetailed[]>([]);
     const [managerId, setManagerId] = useState<string>("");
+    const [showPopup, setShowPopup] = useState<boolean>(false);
+    const [selectedLotId, setSelectedLotId] = useState<number | null>(null);
+    const [spotsToAdd, setSpotsToAdd] = useState<number>(0);
 
     const token = localStorage.getItem('jwtToken');
     const webSocketService = new WebSocketService(URLS.SOCKET);
@@ -20,18 +27,12 @@ const LotManagerProfile = () => {
         const fetchData = async () => {
             const managerData = await fetchManagerData(token!);
             setManagerName(managerData.username);
-            setRevenue(managerData.revenue);
             setLots(managerData.lotsWithSpots);
             setManagerId(localStorage.getItem('id')!);
         };
 
-        // WebSocket connection and subscription setup
         const onConnect = () => {
             console.log('Connected to WebSocket in LotManagerProfile');
-
-            // Subscribe to manager-specific updates
-            console.log('Subscribing to:', `/topic/lot-manager-update/${managerId}`);
-            console.log(localStorage.getItem('role'))
             webSocketService.subscribe(`/topic/lot-manager-update/${localStorage.getItem('id')}`, handleManagerUpdate);
         };
 
@@ -40,13 +41,13 @@ const LotManagerProfile = () => {
         };
 
         fetchData();
+        updateRevenue();
         webSocketService.connect(onConnect, onError);
 
         return () => {
             webSocketService.disconnect();
         };
-    }, [managerId]); // Re-run when managerId changes
-
+    }, [managerId]);
 
     const handleManagerUpdate = (message: any) => {
         const update = JSON.parse(message.body);
@@ -54,12 +55,14 @@ const LotManagerProfile = () => {
         const spotId = updateLotManagerLotSpotsDTO.spotId;
         const lotId = updateLotManagerLotSpotsDTO.lotId;
         const newState = updateLotManagerLotSpotsDTO.status;
+        const newRevenue = updateLotManagerLotSpotsDTO.lotRevenue;
         console.log("updating spot", spotId, "in lot", lotId, "to", newState);
         setLots((currentLots) =>
             currentLots.map((lot) => {
                 if (lot.lot_id === lotId) {
                     return {
                         ...lot,
+                        revenue: newRevenue,
                         spots: lot.spots.map((spot) =>
                             spot.spot_id === spotId ? { ...spot, state: newState } : spot
                         )
@@ -68,19 +71,36 @@ const LotManagerProfile = () => {
                 return lot;
             })
         );
-        
+        updateRevenue();
     };
 
-
-    const updateRevenue = (newRevenue: number) => {
-        setRevenue(newRevenue);
+    const updateRevenue = () => {
+        let totalRevenue = 0;
+        lots.forEach((lot) => {
+            totalRevenue += lot.revenue;
+        });
+        setRevenue(totalRevenue);
     };
 
+    const handleAddSpots = () => {
+        if (selectedLotId !== null) {
+            console.log(`Lot ID: ${selectedLotId}, Spots to add: ${spotsToAdd}`);
+            setShowPopup(false);
+            setSpotsToAdd(0);
+        }
+    };
 
     return (
+        <>
+        
         <div className="profile-container">
+        <div className="navbar-links">
+          <a href="/">Home</a>
+          <a href="/login" onClick={onLogout}>
+            Logout
+          </a>
+        </div>
             <div className="profile-header">
-                <h2 className="text-3xl font-bold">Lot Manager Profile</h2>
                 <div className="profile-stats">
                     <div>
                         <h3 className="text-xl font-semibold">{managerName}</h3>
@@ -139,11 +159,40 @@ const LotManagerProfile = () => {
                                     </div>
                                 ))}
                             </div>
+                            <button
+                                className="add-spots-button"
+                                onClick={() => {
+                                    setSelectedLotId(lot.lot_id);
+                                    setShowPopup(true);
+                                }}
+                            >
+                                Add Spots
+                            </button>
                         </div>
                     </div>
                 ))}
             </div>
+
+            {showPopup && (
+                <div className="popup">
+                    <div className="popup-content">
+                        <h3 className="text-xl font-bold">Add Spots</h3>
+                        <input
+                            type="number"
+                            value={spotsToAdd}
+                            onChange={(e) => setSpotsToAdd(Number(e.target.value))}
+                            placeholder="Enter number of spots"
+                            className="spots-input"
+                        />
+                        <div className="popup-actions">
+                            <button className="submit-button" onClick={handleAddSpots}>Submit</button>
+                            <button className="cancel-button" onClick={() => setShowPopup(false)}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
+        </>
     );
 };
 

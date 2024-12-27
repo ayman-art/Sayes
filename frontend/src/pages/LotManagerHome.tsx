@@ -54,7 +54,11 @@ const LocationMarker: React.FC = () => {
   );
 };
 
-const LotManagerHomePage: React.FC = () => {
+interface LotManagerHomePageProps {
+  onLogout: () => void;
+}
+
+const LotManagerHomePage: React.FC<LotManagerHomePageProps> = ({ onLogout }) => {
   const [parkingSpots, setParkingSpots] = useState<LotHomeLot[]>([]); // Correctly typed as RawLot[]
   const [newLot, setNewLot] = useState<RawLot>({
     lot_id: 0,
@@ -221,6 +225,9 @@ const LotManagerHomePage: React.FC = () => {
           <a href="/">Home</a>
           <a href="/profile">Account</a>
           <a href="/managerDashBoard">Dashboard</a>
+          <a href="/login" onClick={onLogout}>
+            Logout
+          </a>
         </div>
       </nav>
 
