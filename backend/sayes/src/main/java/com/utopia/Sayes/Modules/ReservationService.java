@@ -90,8 +90,13 @@ public class ReservationService {
             notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, lot.getNum_of_spots(),
                     lot.getLongitude(), lot.getLatitude(), lot.getPrice(), lot.getLot_type()));
             notificationService.notifyLotManager(new UpdateLotManagerLotSpotsDTO(
-                    spotId, lot_id, lotDAO.getLotManagerIdByLotId(lot_id),
-                    lotDAO.getLotRevenue(lot_id), SpotStatus.Reserved));
+                    spotId,
+                    lot_id,
+                    lotDAO.getLotManagerIdByLotId(lot_id),
+                    lotDAO.getLotRevenue(lot_id),
+                    SpotStatus.Reserved,
+                    null
+            ));
 
             return spotId;
 
@@ -142,7 +147,8 @@ public class ReservationService {
                         lot_id,
                         lotDAO.getLotManagerIdByLotId(lot_id),
                         lotDAO.getLotRevenue(lot_id),
-                        SpotStatus.Occupied));
+                        SpotStatus.Occupied,
+                        null));
             }
             else{
                 freeReservation(spot_id , lot_id , driver_id);
@@ -181,7 +187,8 @@ public class ReservationService {
                     lot_id,
                     lotDAO.getLotManagerIdByLotId(lot_id),
                     lotDAO.getLotRevenue(lot_id),
-                    SpotStatus.Available));
+                    SpotStatus.Available,
+                    null));
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -221,7 +228,8 @@ public class ReservationService {
                             lot_id,
                             lotDAO.getLotManagerIdByLotId(lot_id),
                             lotDAO.getLotRevenue(lot_id),
-                            SpotStatus.Available));
+                            SpotStatus.Available,
+                                null));
                     }
                 }
             } catch (Exception e) {
@@ -276,7 +284,8 @@ public class ReservationService {
                             lot_id,
                             lotDAO.getLotManagerIdByLotId(lot_id),
                             lotDAO.getLotRevenue(lot_id),
-                            SpotStatus.OverOccupied));
+                            SpotStatus.OverOccupied,
+                            null));
                 }
                 }
             } catch (Exception e) {

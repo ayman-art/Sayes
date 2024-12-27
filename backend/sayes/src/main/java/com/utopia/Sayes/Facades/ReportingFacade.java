@@ -144,4 +144,31 @@ public class ReportingFacade {
             throw new Exception(e.getMessage());
         }
     }
+    public byte[] generateLotsReportForManager(String jwt) throws Exception {
+        try {
+            Claims claims = Authentication.parseToken(jwt);
+            Long managerId = Long.parseLong(claims.getId());
+
+            if (managerId == null) {
+                throw new Exception("Manager ID is null");
+            }
+            List<Lot> lots = profileService.getManagerLots(managerId);
+
+            List<Map<String, Object>> lotsMap = new ArrayList<>();
+            for (Lot lot : lots) {
+                Map<String, Object> lotData = new HashMap<>();
+                lotData.put("lot_id", lot.getLot_id());
+                lotData.put("revenue", lot.getRevenue());
+                lotData.put("lot_type" , lot.getLot_type());
+                lotData.put("price" , lot.getPrice());
+                lotData.put("num_of_spots" , lot.getNum_of_spots());
+                lotData.put("occupancy_rate" , reportingService.getOccupancyRate(lot.getLot_id()));
+                lotsMap.add(lotData);
+            }
+            ByteArrayOutputStream output = reportingService.generateLotsReport(lotsMap);
+            return output.toByteArray();
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
 }

@@ -4,4 +4,5 @@ export interface UpdateLotManagerLotSpotsDTO {
     lotManagerId: number;
     lotRevenue: number;
     status: string;
+    spotIdsBatch: number[];
 }

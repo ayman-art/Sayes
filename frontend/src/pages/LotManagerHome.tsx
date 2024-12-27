@@ -224,6 +224,7 @@ const LotManagerHomePage: React.FC<LotManagerHomePageProps> = ({ onLogout }) => 
         <div className="navbar-links">
           <a href="/">Home</a>
           <a href="/profile">Account</a>
+          <a href="/managerDashBoard">Dashboard</a>
           <a href="/login" onClick={onLogout}>
             Logout
           </a>
@@ -264,9 +265,6 @@ const LotManagerHomePage: React.FC<LotManagerHomePageProps> = ({ onLogout }) => 
         )}
         <div style={styles.sidebar}>
           <h2>Add New Parking Lot</h2>
-          <div style={styles.formGroup}>
-            <label>Lot Name:</label>
-          </div>
           <div style={styles.formGroup}>
             <label>Available Spots:</label>
             <input
