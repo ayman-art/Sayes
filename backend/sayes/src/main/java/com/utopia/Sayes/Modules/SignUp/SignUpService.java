@@ -8,9 +8,16 @@ import com.utopia.Sayes.Repo.DriverDAO;
 import com.utopia.Sayes.Repo.LotManagerDAO;
 import com.utopia.Sayes.Repo.UserDAO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Map;
+import java.util.Objects;
+
 @Service
 public class SignUpService {
     @Autowired
@@ -19,62 +26,68 @@ public class SignUpService {
     DriverDAO driver_dao;
     @Autowired
     LotManagerDAO manager_dao;
-    public Driver registerDriver(String name, String password, String plate, int license){
 
-        Map<String, Object> map = Map.of(
-                "user_name", name,
-                "user_password", password,
-                "plate_number", plate,
-                "license_number", license
-        );
-        SignUpValidation validator = new SignUpValidation("Driver", map);
-        try {
-            //validator.validate();
-            Driver user = new Driver(name, password, 0, plate, license);
-            this.user_dao.addUser(user);
-            long id = user_dao.getUserId(name);
-            user.setUser_id(id);
-            this.driver_dao.addDriver(user);
-            return user;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    public Driver registerDriver(String name, String password, String plate, int license) {
+        try (Connection connection = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection();
+             CallableStatement stmt = connection.prepareCall("{CALL RegisterDriver(?, ?, ?, ?, ?)}")) {
+
+            stmt.setString(1, name);
+            stmt.setString(2, password);
+            stmt.setString(3, plate);
+            stmt.setInt(4, license);
+            stmt.registerOutParameter(5, Types.BIGINT);
+
+            stmt.execute();
+
+            long driverId = stmt.getLong(5);
+            return new Driver(name, password, driverId, plate, license);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error registering driver: " + e.getMessage(), e);
         }
     }
-    public LotManager registerManager(String name, String password){
-        Map<String, Object> map = Map.of(
-                "user_name", name,
-                "user_password", password
-        );
-        SignUpValidation validator = new SignUpValidation("LotManager", map);
-        try {
-            //validator.validate();
-            LotManager user = new LotManager(name, password, 0);
-            user_dao.addUser(user);
 
-            long id = user_dao.getUserId(name);
-            System.out.println(id);
-            user.setUser_id(id);
-            manager_dao.addLotManager(user);
-            //System.out.println(user.toString());
-            return user;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    public LotManager registerManager(String name, String password) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             CallableStatement stmt = connection.prepareCall("{CALL RegisterManager(?, ?, ?)}")) {
+
+            stmt.setString(1, name);
+            stmt.setString(2, password);
+            stmt.registerOutParameter(3, Types.BIGINT);
+
+            stmt.execute();
+
+            long managerId = stmt.getLong(3);
+            return new LotManager(name, password, managerId);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error registering manager: " + e.getMessage(), e);
         }
     }
-    public User loginUser(String name, String password){
-        LoginValidation validator = new LoginValidation(name, password);
-        System.out.println(name);
-        try {
-            //validator.validate();
-            System.out.println(password);
-            User user = user_dao.getUser(name);
-            System.out.println(user.getUsername());
 
-            if (password.equals(user.getUser_password()))
-                return user;
-            else throw new Exception("Wrong password");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    public User loginUser(String name, String password) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             CallableStatement stmt = connection.prepareCall("{CALL LoginUser(?, ?, ?)}")) {
+
+            stmt.setString(1, name);
+            stmt.setString(2, password);
+            stmt.registerOutParameter(3, Types.BOOLEAN);
+
+            stmt.execute();
+
+            boolean isAuthenticated = stmt.getBoolean(3);
+
+            if (isAuthenticated) {
+                return user_dao.getUser(name);
+            } else {
+                throw new RuntimeException("Incorrect username or password");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error logging in user: " + e.getMessage(), e);
         }
     }
+
 }
