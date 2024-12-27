@@ -32,7 +32,7 @@ const DriverProfile: React.FC<DriverProfileProps> = ({ onLogout }) => {
     }, []);
 
     const handleAddBalance = () => {
-        setBalance(balance + addBalanceAmount);  // Update balance with the entered amount
+        setBalance(balance + addBalanceAmount);
         setIsPopupOpen(false);  // Close the popup after submission
     };
 
