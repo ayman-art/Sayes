@@ -7,14 +7,11 @@ from helpers import CREATE_LOT_ENDPOINT, LOT_MANAGER_TOKEN_FILE, LOTS_FILE, rand
 
 
 def random_location(lat_range, lon_range):
-    """Generate a random location within the specified latitude and longitude ranges."""
     latitude = random.uniform(lat_range[0], lat_range[1])
     longitude = random.uniform(lon_range[0], lon_range[1])
     return {"latitude": latitude, "longitude": longitude}
 
 def create_lots(num_lots=100, lat_range=(30.0, 31.0), lon_range=(29.0, 30.0)):
-    """Create multiple lots with random locations using the lot manager's token."""
-    # Load the lot manager's token
     with open(LOT_MANAGER_TOKEN_FILE, "r") as f:
         jwt_token = json.load(f).get("token")
     
@@ -42,7 +39,6 @@ def create_lots(num_lots=100, lat_range=(30.0, 31.0), lon_range=(29.0, 30.0)):
         else:
             print(f"Failed to create lot: {response.status_code}, {response.text}")
 
-    # Save lots to a file
     with open(LOTS_FILE, "w") as f:
         json.dump(lots, f)
     print(f"Saved {len(lots)} lots to {LOTS_FILE}")
