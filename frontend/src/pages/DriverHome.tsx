@@ -176,10 +176,17 @@ const DriverHomePage: React.FC<DriverHomePageProps> = ({ onLogout }) => {
   };
 
   const confirmBooking = async() => {
-    console.log(`Booking confirmed for ${selectedSpot!.name} until ${endTime}`);
+    console.log(`Bookccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccing confirmed for ${selectedSpot!.name} until ${endTime}`);
     console.log(`Total price: $${totalPrice}`);
     const response = await reserveSpot(selectedSpot?.id!, endTime);
-    const data = await response.json();
+    console.log(response)
+    let data;
+    try{
+     data = await response.json();}
+    catch(e){
+      console.log("error", e)
+    }
+    console.log(data)
     const spot = data['spotId']
     if(response.ok){
       setReservedSpot({

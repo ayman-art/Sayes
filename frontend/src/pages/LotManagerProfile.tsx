@@ -90,7 +90,6 @@ const LotManagerProfile: React.FC<LotManagerProfileProps> = ({ onLogout }) => {
             })
         );
         
-        updateRevenue();
     };
 
     const updateRevenue = () => {
@@ -101,13 +100,16 @@ const LotManagerProfile: React.FC<LotManagerProfileProps> = ({ onLogout }) => {
         setRevenue(totalRevenue);
     };
 
+    useEffect(() => {
+        updateRevenue();
+    }, [lots]);
+
     const handleAddSpots = async () => {
         if (selectedLotId !== null) {
             await addSpots(token!, selectedLotId, spotsToAdd);
             console.log(`Lot ID: ${selectedLotId}, Spots to add: ${spotsToAdd}`);
             setShowPopup(false);
             setSpotsToAdd(0);
-            updateRevenue();
         }
     };
 
