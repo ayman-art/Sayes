@@ -6,6 +6,9 @@
   ],
   "compilerOptions": {
     "esModuleInterop": true,
-    "strict": true
+    "strict": true,
+    "lib": ["dom", "esnext"],
+    "target": "esnext", 
+    "module": "esnext", 
   }
 }

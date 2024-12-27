@@ -1,4 +1,5 @@
 import { AdminDataDTO } from "../models/AdminDataDTO";
+import { saveAs } from 'file-saver';
 
 const URL = 'http://localhost:8080';
 
@@ -116,5 +117,77 @@ export const fetchLogs = async (token: string): Promise<RawLogsResponse> => {
 
     return rawData;
 };
+
+// Download Top Users Report
+export const downloadTopUsersReport = async (token: string) => {
+  try {
+    const response = await fetch(`${URL}/report/generate-top-users-report`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch the report: ' + response.statusText);
+    }
+
+    // Get the PDF data from the response
+    const blob = await response.blob();
+
+    // Save the PDF file
+    saveAs(blob, 'top_users_report.pdf');
+  } catch (error) {
+    console.error('Error downloading the report:', error);
+  }
+};
+
+export const downloadTopLotsReport = async (token: string) => {
+    try {
+      const response = await fetch(`${URL}/report/generate-top-lots-report`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to fetch the report: ' + response.statusText);
+      }
+  
+      // Get the PDF data from the response
+      const blob = await response.blob();
+  
+      // Save the PDF file
+      saveAs(blob, 'top_lots_report.pdf');
+    } catch (error) {
+      console.error('Error downloading the report:', error);
+    }
+  };
+
+  
+export const downloadViolationsReport = async (token: string) => {
+    try {
+      const response = await fetch(`${URL}/report/generate-violations-report`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to fetch the report: ' + response.statusText);
+      }
+  
+      // Get the PDF data from the response
+      const blob = await response.blob();
+  
+      // Save the PDF file
+      saveAs(blob, 'violations.pdf');
+    } catch (error) {
+      console.error('Error downloading the report:', error);
+    }
+  };
+
 
 

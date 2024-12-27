@@ -1,6 +1,7 @@
 package com.utopia.Sayes.Modules;
 
 import com.utopia.Sayes.Repo.DriverDAO;
+import com.utopia.Sayes.Repo.FeeDAO;
 import com.utopia.Sayes.Repo.LotDAO;
 import com.utopia.Sayes.Repo.PenaltyDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ public class ViolationService {
     PenaltyDAO penaltyDAO;
     @Autowired
     DriverDAO driverDAO;
+    @Autowired
+    FeeDAO feeDAO;
 
     public boolean takePenaltyAmount(long driverId, long lotId , double penalty){
         double balance = driverDAO.getDriverBalance(driverId);
@@ -32,7 +35,18 @@ public class ViolationService {
             throw new Exception(e.getMessage());
         }
     }
-    public double getPenalty(long driverId , long lotId){
-        return penaltyDAO.getPenalty(driverId , lotId);
+    public void takeFeeAmount(long driverId, long lotId){
+        if(feeDAO.existsFee(driverId , lotId)){
+            double fee = feeDAO.getFee(driverId , lotId);
+            feeDAO.deleteFee(lotId , driverId);
+            lotDAO.updateLotRevenue((long) fee , lotId);
+        }
+    }
+    public void updateFee(long driverId , long lotId){
+        double fee = lotDAO.getLotFee(lotId);
+        if(feeDAO.existsFee(driverId , lotId)){
+            feeDAO.updateFee(driverId , lotId , fee);
+        }
+        else feeDAO.addFee(lotId ,driverId ,fee);
     }
 }

@@ -61,4 +61,12 @@ public class ProfileService {
             throw new Exception(e.getMessage());
         }
     }
+    public void addAmount(long driverId , long amount) throws Exception {
+        try {
+             driverDAO.increaseDriverBalance(amount , driverId);
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
 }
