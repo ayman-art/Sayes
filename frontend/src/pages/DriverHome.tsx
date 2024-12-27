@@ -30,7 +30,7 @@ const LocationMarker: React.FC = () => {
       setPosition(userLocation);
       map.flyTo(userLocation, map.getZoom());
     });
-    
+
   }, [map]);
 
   return position === null ? null : (
@@ -46,7 +46,7 @@ interface DriverHomePageProps {
 // Driver Home Page
 const DriverHomePage: React.FC<DriverHomePageProps> = ({ onLogout }) => {
   const [parkingSpots, setParkingSpots] = useState<ParkingLot[]>([]);
-  
+
   const [endTime, setEndTime] = useState("");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -69,7 +69,7 @@ const DriverHomePage: React.FC<DriverHomePageProps> = ({ onLogout }) => {
     setParkingSpots((prevSpots) => {
       // Check if the lot already exists in the list
       const index = prevSpots.findIndex((spot) => spot.id === lotUpdate.lotId);
-  
+
       if (index !== -1) {
         // If found, replace the existing lot with the updated one
         const updatedSpots = [...prevSpots];
@@ -85,7 +85,7 @@ const DriverHomePage: React.FC<DriverHomePageProps> = ({ onLogout }) => {
       }
     });
   }
-  
+
   useEffect(()=>{
     const onConnect = () => {
       console.log('Connected to WebSocket');
@@ -120,7 +120,7 @@ const DriverHomePage: React.FC<DriverHomePageProps> = ({ onLogout }) => {
       webSocketService.disconnect();
     };
   }, [])
-  
+
   const driverNotificationHandler = (data: any)=>{
     const status = data.status;
     switch(status){
@@ -156,7 +156,7 @@ const DriverHomePage: React.FC<DriverHomePageProps> = ({ onLogout }) => {
     setReservedSpot(null);
     setHasReserved(false);
   }
- 
+
   const getIcon = (availableSpots: number) =>
     new Icon({
       iconUrl: availableSpots > 0 ? blueIconUrl : redIconUrl,
@@ -176,17 +176,10 @@ const DriverHomePage: React.FC<DriverHomePageProps> = ({ onLogout }) => {
   };
 
   const confirmBooking = async() => {
-    console.log(`Bookccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccing confirmed for ${selectedSpot!.name} until ${endTime}`);
+    console.log(`Booking confirmed for ${selectedSpot!.name} until ${endTime}`);
     console.log(`Total price: $${totalPrice}`);
     const response = await reserveSpot(selectedSpot?.id!, endTime);
-    console.log(response)
-    let data;
-    try{
-     data = await response.json();}
-    catch(e){
-      console.log("error", e)
-    }
-    console.log(data)
+    const data = await response.json();
     const spot = data['spotId']
     if(response.ok){
       setReservedSpot({
@@ -199,7 +192,7 @@ const DriverHomePage: React.FC<DriverHomePageProps> = ({ onLogout }) => {
       setIsModalOpen(false);
       setMessage("Booking confirmed!");  
     }
-    
+
   };
 
   const closeModal = () => {
@@ -211,7 +204,7 @@ const DriverHomePage: React.FC<DriverHomePageProps> = ({ onLogout }) => {
       const response = await useSpot(reservedSpot!.lot_id, reservedSpot!.spot_id, paymentMethod);
       if (response.ok){
         setOccupied(true)
-        
+
       }
     }else{
       const response = await freeSpot(reservedSpot!.lot_id, reservedSpot!.spot_id);
@@ -235,7 +228,7 @@ const DriverHomePage: React.FC<DriverHomePageProps> = ({ onLogout }) => {
 
   return (
     <div className="app-container">
-      
+
       {/* Navbar */}
       <nav className="navbar">
         <div className="navbar-title">Sayes</div>
@@ -363,8 +356,8 @@ const DriverHomePage: React.FC<DriverHomePageProps> = ({ onLogout }) => {
                 <button onClick={toggleOccupancy}>
                   {occupied ? "Unoccupy Spot" : "Occupy Spot"}
                 </button>
-              
-                
+
+
               </div>
               )}
             </div>
@@ -388,5 +381,3 @@ const DriverHomePage: React.FC<DriverHomePageProps> = ({ onLogout }) => {
 };
 
 export default DriverHomePage;
-
-
