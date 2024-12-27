@@ -80,5 +80,19 @@ public class ProfileFacade {
             throw new Exception(e.getMessage());
         }
     }
+    public void addAmount(Map<String , Object> driverData) throws Exception {
+        try {
+            String jwt = (String) driverData.get("jwt");
+            Claims claims = Authentication.parseToken(jwt);
+            Long driverId = Long.parseLong(claims.getId());
+
+            if (driverId == null) {
+                throw new Exception("Admin ID is null");
+            }
+            profileService.addAmount(driverId , Long.valueOf((Integer) driverData.get("amount")));
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
 
 }

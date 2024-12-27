@@ -46,6 +46,13 @@ public class DriverDAO {
             throw new RuntimeException("error updating balance");
         }
     }
+    public void increaseDriverBalance(long amount , long driverId) {
+        String query = "UPDATE Drivers SET balance = balance + ? WHERE Driver_id = ? ";
+        int rows  = jdbcTemplate.update(query, amount, driverId);
+        if(rows == 0){
+            throw new RuntimeException("error updating balance");
+        }
+    }
     public Driver getDriverById(long driverId) throws Exception {
         String query = """
                 SELECT * FROM Users
