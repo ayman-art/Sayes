@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchDriverData } from '../services/profileService';
+import { addAmount, fetchDriverData } from '../services/profileService';
 import '../styles/profile.css';
 
 interface DriverProfileProps {
@@ -31,7 +31,10 @@ const DriverProfile: React.FC<DriverProfileProps> = ({ onLogout }) => {
         fetchData();
     }, []);
 
-    const handleAddBalance = () => {
+    const handleAddBalance = async () => {
+        console.log('Adding balance:', addBalanceAmount);
+        await addAmount(token!, addBalanceAmount);
+
         setBalance(balance + addBalanceAmount);
         setIsPopupOpen(false);  // Close the popup after submission
     };

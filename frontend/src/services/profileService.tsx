@@ -81,14 +81,18 @@ export const fetchDriverData = async (token: string): Promise<DriverDataDTO> => 
 };
 
 // Function to add an amount for the driver
-export const addAmount = async (token: string, amount: string): Promise<string> => {
+export const addAmount = async (token: string, amount: number): Promise<string> => {
+    const amountData = {
+        amount: amount
+    }
     const response = await fetch(`${URL}/profile/add-amount`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(amount)  // Sending the data in the request body
+        
+        body: JSON.stringify(amountData)
     });
 
     if (!response.ok) {
