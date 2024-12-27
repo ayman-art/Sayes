@@ -231,8 +231,7 @@ const DriverHomePage: React.FC = () => {
         <div className="navbar-title">Sayes</div>
         <div className="navbar-links">
           <a href="/">Home</a>
-          <a href="#">Reservations</a>
-          <a href="#">Account</a>
+          <a href="/profile">Account</a>
         </div>
       </nav>
 
