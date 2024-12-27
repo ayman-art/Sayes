@@ -79,3 +79,54 @@ export const fetchDriverData = async (token: string): Promise<DriverDataDTO> => 
     console.log('Driver data:', data);
     return data;
 };
+
+// Function to add an amount for the driver
+export const addAmount = async (token: string, amount: number): Promise<string> => {
+    const amountData = {
+        amount: amount
+    }
+    const response = await fetch(`${URL}/profile/add-amount`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        
+        body: JSON.stringify(amountData)
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to add amount');
+    }
+
+    const result = await response.text();  // Assuming the response is a plain text message
+    console.log('Response:', result);
+    return result;
+};
+
+
+export const addSpots = async (token: string, lotId: number, count: number): Promise<string> => {
+
+    console.log('Adding spots:', lotId, count, token);
+    const response = await fetch(`${URL}/lot-management/add-spots`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        
+        body: JSON.stringify({
+            lotId: lotId,
+            count: count
+        })
+            
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to add spots');
+    }
+
+    const result = await response.text();  // Assuming the response is a plain text message
+    console.log('Response:', result);
+    return result;
+};

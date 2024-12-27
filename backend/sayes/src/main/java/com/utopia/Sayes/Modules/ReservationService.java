@@ -14,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -62,33 +59,44 @@ public class ReservationService {
 
     public long reserveSpot(long lot_id, long driver_id, Timestamp endTime) throws Exception {
         Connection connection = null;
+        CallableStatement callableStatement = null;
+
+        java.sql.Timestamp startTimestamp = new java.sql.Timestamp(new Date().getTime());
+        java.sql.Timestamp endTimestamp = new java.sql.Timestamp(endTime.getTime());
+        double price = dynamicPricing.getPrice(
+                lot_id,
+                new Time(startTimestamp.getTime()),
+                new Time(endTimestamp.getTime())
+                ,driver_id);
         try {
             connection = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection();
-            connection.setAutoCommit(false);
 
-            Long spotId = spotDAO.getAndUpdateFirstAvailableSpotId(connection, lot_id,
-                    String.valueOf(SpotStatus.Available), String.valueOf(SpotStatus.Reserved));
+            callableStatement = connection.prepareCall("{CALL ReserveSpot(?, ?, ?, ?, ?)}");
 
-            if (spotId == null) {
-                throw new Exception("Spot doesn't exist or is unavailable.");
+            callableStatement.setLong(1, lot_id);
+            callableStatement.setLong(2, driver_id);
+            callableStatement.setTimestamp(3, endTime);
+            callableStatement.setDouble(4, price);
+
+            callableStatement.registerOutParameter(5, Types.BIGINT);
+
+            callableStatement.execute();
+
+            long spotId = callableStatement.getLong(5);
+
+            if (spotId == 0) {
+                throw new Exception("Failed to reserve a spot: No available spot found.");
             }
 
-            java.sql.Timestamp startTimestamp = new java.sql.Timestamp(new Date().getTime());
-            java.sql.Timestamp endTimestamp = new java.sql.Timestamp(endTime.getTime());
-            double price = dynamicPricing.getPrice(lot_id,
-                    new Time(startTimestamp.getTime()),
-                    new Time(endTimestamp.getTime())
-                    ,driver_id);
-            reservationDAO.addReservation(spotId, lot_id, startTimestamp, endTimestamp,
-                    String.valueOf(SpotStatus.Reserved), driver_id, price, connection);
-            //spotDAO.updateSpotState(spotId,lot_id, String.valueOf(SpotStatus.Reserved));
-            System.out.println(lot_id);
-            setReservationTimeOut(lot_id , spotId , driver_id);
-            setNearExpired(lot_id , spotId ,driver_id);
-           connection.commit();
             Lot lot = lotDAO.getLotById(lot_id);
-            notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, lot.getNum_of_spots(),
-                    lot.getLongitude(), lot.getLatitude(), lot.getPrice(), lot.getLot_type()));
+            notificationService.notifyLotUpdate(new UpdateLotDTO(
+                    lot_id,
+                    lot.getNum_of_spots(),
+                    lot.getLongitude(),
+                    lot.getLatitude(),
+                    lot.getPrice(),
+                    lot.getLot_type()
+            ));
             notificationService.notifyLotManager(new UpdateLotManagerLotSpotsDTO(
                     spotId,
                     lot_id,
@@ -100,22 +108,21 @@ public class ReservationService {
 
             return spotId;
 
-        } catch (Exception e) {
-            if (connection != null) {
+        } catch (SQLException sqlEx) {
+            throw new Exception("Error while reserving spot: " + sqlEx.getMessage(), sqlEx);
+        } finally {
+            if (callableStatement != null) {
                 try {
-                    connection.rollback();
-                } catch (SQLException rollbackEx) {
-                    throw new Exception("Error rolling back the transaction: " + rollbackEx.getMessage(), rollbackEx);
+                    callableStatement.close();
+                } catch (SQLException closeEx) {
+                    System.err.println("Error closing CallableStatement: " + closeEx.getMessage());
                 }
             }
-            throw new Exception("Error while reserving spot: " + e.getMessage(), e);
-        } finally {
             if (connection != null) {
                 try {
-                    connection.setAutoCommit(true);
                     connection.close();
                 } catch (SQLException closeEx) {
-                    System.err.println("Error closing the connection: " + closeEx.getMessage());
+                    System.err.println("Error closing Connection: " + closeEx.getMessage());
                 }
             }
         }
