@@ -105,7 +105,8 @@ public class ReservationService {
                     SpotStatus.Reserved,
                     null
             ));
-
+            setNearExpired(lot_id , spotId , driver_id);
+            setReservationTimeOut(lot_id , spotId , driver_id);
             return spotId;
 
         } catch (SQLException sqlEx) {
@@ -182,7 +183,7 @@ public class ReservationService {
             }
             violationService.takeFeeAmount(driver_id , lot_id);
             spotDAO.updateSpotState(spot_id,lot_id, String.valueOf(SpotStatus.Available));
-            reservationDAO.deleteReservation(spot_id , lot_id);
+            //reservationDAO.deleteReservation(spot_id , lot_id);
             Date date = Date.from(reservation.getStart_time().atZone(ZoneId.systemDefault()).toInstant());
             java.sql.Timestamp endTimestamp = new java.sql.Timestamp(new Date().getTime());
             logDAO.addlog(spot_id , lot_id, date , endTimestamp,driver_id);
@@ -258,6 +259,7 @@ public class ReservationService {
         long difference = endTimeMillis - currentTimeMillis; // In milliseconds
         System.out.println(difference);
         long initialDelay = difference / 1000;
+        System.out.println(initialDelay);
         long interval = 60;
 
         scheduler.scheduleAtFixedRate(() -> {
@@ -294,6 +296,9 @@ public class ReservationService {
                             SpotStatus.OverOccupied,
                             null));
                 }
+                }else{
+                    scheduler.shutdown();
+                    System.out.println("Scheduler shut down as reservation no longer exists.");
                 }
             } catch (Exception e) {
                 System.err.println("Error: " + e.getMessage());
