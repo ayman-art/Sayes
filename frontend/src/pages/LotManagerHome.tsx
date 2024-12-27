@@ -217,6 +217,10 @@ const LotManagerHomePage: React.FC = () => {
     <div style={styles.appContainer}>
       <nav style={styles.navbar}>
         <div style={styles.navbarTitle}>Lot Manager</div>
+        <div className="navbar-links">
+          <a href="/">Home</a>
+          <a href="/profile">Account</a>
+        </div>
       </nav>
 
       <div style={styles.content}>
