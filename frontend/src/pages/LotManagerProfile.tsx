@@ -5,13 +5,15 @@ import WebSocketService from '../services/socketService';
 import { URLS } from '../API/urls';
 import '../styles/profile.css';
 import { UpdateLotManagerLotSpotsDTO } from '../models/UpdateLotManagerLotSpotsDTO';
-import { resolvePath } from 'react-router-dom';
 
 const LotManagerProfile = () => {
     const [managerName, setManagerName] = useState<string>("");
     const [revenue, setRevenue] = useState<number>(0);
     const [lots, setLots] = useState<LotDetailed[]>([]);
     const [managerId, setManagerId] = useState<string>("");
+    const [showPopup, setShowPopup] = useState<boolean>(false);
+    const [selectedLotId, setSelectedLotId] = useState<number | null>(null);
+    const [spotsToAdd, setSpotsToAdd] = useState<number>(0);
 
     const token = localStorage.getItem('jwtToken');
     const webSocketService = new WebSocketService(URLS.SOCKET);
@@ -24,13 +26,8 @@ const LotManagerProfile = () => {
             setManagerId(localStorage.getItem('id')!);
         };
 
-        // WebSocket connection and subscription setup
         const onConnect = () => {
             console.log('Connected to WebSocket in LotManagerProfile');
-
-            // Subscribe to manager-specific updates
-            console.log('Subscribing to:', `/topic/lot-manager-update/${managerId}`);
-            console.log(localStorage.getItem('role'))
             webSocketService.subscribe(`/topic/lot-manager-update/${localStorage.getItem('id')}`, handleManagerUpdate);
         };
 
@@ -45,8 +42,7 @@ const LotManagerProfile = () => {
         return () => {
             webSocketService.disconnect();
         };
-    }, [managerId]); // Re-run when managerId changes
-
+    }, [managerId]);
 
     const handleManagerUpdate = (message: any) => {
         const update = JSON.parse(message.body);
@@ -71,9 +67,7 @@ const LotManagerProfile = () => {
             })
         );
         updateRevenue();
-        
     };
-
 
     const updateRevenue = () => {
         let totalRevenue = 0;
@@ -83,6 +77,13 @@ const LotManagerProfile = () => {
         setRevenue(totalRevenue);
     };
 
+    const handleAddSpots = () => {
+        if (selectedLotId !== null) {
+            console.log(`Lot ID: ${selectedLotId}, Spots to add: ${spotsToAdd}`);
+            setShowPopup(false);
+            setSpotsToAdd(0);
+        }
+    };
 
     return (
         <div className="profile-container">
@@ -146,10 +147,38 @@ const LotManagerProfile = () => {
                                     </div>
                                 ))}
                             </div>
+                            <button
+                                className="add-spots-button"
+                                onClick={() => {
+                                    setSelectedLotId(lot.lot_id);
+                                    setShowPopup(true);
+                                }}
+                            >
+                                Add Spots
+                            </button>
                         </div>
                     </div>
                 ))}
             </div>
+
+            {showPopup && (
+                <div className="popup">
+                    <div className="popup-content">
+                        <h3 className="text-xl font-bold">Add Spots</h3>
+                        <input
+                            type="number"
+                            value={spotsToAdd}
+                            onChange={(e) => setSpotsToAdd(Number(e.target.value))}
+                            placeholder="Enter number of spots"
+                            className="spots-input"
+                        />
+                        <div className="popup-actions">
+                            <button className="submit-button" onClick={handleAddSpots}>Submit</button>
+                            <button className="cancel-button" onClick={() => setShowPopup(false)}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
