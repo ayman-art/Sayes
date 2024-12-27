@@ -37,6 +37,7 @@ public class SignUpService {
             this.driver_dao.addDriver(user);
             return user;
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             throw new RuntimeException(e);
         }
     }
