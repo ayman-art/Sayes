@@ -1,17 +1,20 @@
 package com.utopia.Sayes.Modules;
 
 import com.utopia.Sayes.DTOs.UpdateLotDTO;
+import com.utopia.Sayes.DTOs.UpdateLotManagerLotSpotsDTO;
 import com.utopia.Sayes.Models.Lot;
 import com.utopia.Sayes.Modules.DynamicPricing.DynamicPricing;
 import com.utopia.Sayes.Modules.WebSocket.NotificationService;
 import com.utopia.Sayes.Repo.LotDAO;
 import com.utopia.Sayes.Repo.LotManagerDAO;
 import com.utopia.Sayes.Repo.SpotDAO;
+import com.utopia.Sayes.enums.SpotStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Time;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -40,14 +43,6 @@ public class LotManagement {
                     ,revenue,price,lot_type, penalty,fee, time);
             long lotId =  lotDAO.addLot(lot);
             addSpots(lotId , numOfSpots);
-            notificationService.notifyLotUpdate(new UpdateLotDTO(
-                    lotId,
-                    numOfSpots,
-                    longitude,
-                    latitude,
-                    price,
-                    lot_type
-            ));
             return lotId;
         }
         catch (Exception e){
@@ -61,8 +56,9 @@ public class LotManagement {
             if (lot == null){
                 throw new Exception("there is no lot with this id");
             }
+            List<Long> spotIds = new ArrayList<>(count);
             for(int i = 0;i < count;i++){
-                spotDAO.addSpot(lot_id,"Available");
+                spotIds.add(spotDAO.addSpot(lot_id,"Available"));
             }
             notificationService.notifyLotUpdate(new UpdateLotDTO(
                     lot_id,
@@ -71,6 +67,15 @@ public class LotManagement {
                     lot.getLatitude(),
                     lot.getPrice(),
                     lot.getLot_type()
+            ));
+
+            notificationService.notifyLotManager(new UpdateLotManagerLotSpotsDTO(
+                    -1L, // flag for batch update
+                    lot_id,
+                    lot.getManager_id(),
+                    lot.getRevenue(),
+                    SpotStatus.Available,
+                    spotIds
             ));
         }
         catch (Exception e){
