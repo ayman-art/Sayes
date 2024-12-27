@@ -106,6 +106,10 @@ public class LotDAO {
         String query = "SELECT penalty FROM Lots WHERE lot_id = ?";
         return jdbcTemplate.queryForObject(query, Double.class, lot_id);
     }
+    public double getLotFee(long lot_id){
+        String query = "SELECT fee FROM Lots WHERE lot_id = ?";
+        return jdbcTemplate.queryForObject(query, Double.class, lot_id);
+    }
     public void updateLotRevenue(long price , long lotId) {
         String query = "UPDATE Lots SET revenue = revenue + ? WHERE lot_id = ? ";
         int rows  = jdbcTemplate.update(query, price, lotId);
@@ -127,5 +131,9 @@ public class LotDAO {
     public long getLotRevenue(long lotId){
         String query = "SELECT revenue FROM Lots WHERE lot_id = ?";
         return jdbcTemplate.queryForObject(query, Long.class, lotId);
+    }
+    public long getTotalRevenue(long managerId){
+        String query = "SELECT SUM(revenue) FROM Lots WHERE manager = ?";
+        return jdbcTemplate.queryForObject(query, Long.class, managerId);
     }
 }

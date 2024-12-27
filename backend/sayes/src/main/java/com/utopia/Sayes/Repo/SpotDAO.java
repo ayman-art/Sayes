@@ -5,6 +5,8 @@ import com.utopia.Sayes.Models.Spot;
 import com.utopia.Sayes.enums.SpotStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,14 +25,24 @@ public class SpotDAO {
 
     private SpotAdapter spotAdapter = new SpotAdapter();
 
-    public void addSpot(long lot_id, String state){
-        String query = "INSERT INTO spots " +
-                " (lot_id, state) VALUES (?, ?)";
-        int rows =  jdbcTemplate.update(query,lot_id,state);
-        if(rows == 0){
-            throw new RuntimeException("can't insert this spot");
+    public long addSpot(long lot_id, String state) {
+        String query = "INSERT INTO spots (lot_id, state) VALUES (?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        int rows = jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(query, new String[]{"id"});
+            ps.setLong(1, lot_id);
+            ps.setString(2, state);
+            return ps;
+        }, keyHolder);
+
+        if (rows == 0) {
+            throw new RuntimeException("Can't insert this spot");
         }
+
+        return keyHolder.getKey().longValue();
     }
+
     public void updateSpotState(long spot_id,long lot_id, String newState) {
         String query = "UPDATE spots SET state = ? WHERE spot_id = ? AND lot_id = ?";
         int rowsUpdated = jdbcTemplate.update(query, newState, spot_id, lot_id);

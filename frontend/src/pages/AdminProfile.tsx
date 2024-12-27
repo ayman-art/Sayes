@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { fetchAdminData, fetchTopUsers, fetchTopLots, fetchLogs, downloadTopUsersReport , downloadTopLotsReport} from '../services/adminService';
+import { fetchAdminData, fetchTopUsers, fetchTopLots, fetchLogs, downloadTopUsersReport , downloadTopLotsReport , downloadViolationsReport} from '../services/adminService';
 import '../styles/AdminProfile.css';
 
-const AdminProfile = () => {
+interface AdminProfileProps {
+    onLogout: () => void;
+}
+
+const AdminProfile: React.FC<AdminProfileProps> = ({ onLogout }) => {
     // States for admin data, top users, top lots, and logs
     const [adminName, setAdminName] = useState<string>('');
     const [topUsers, setTopUsers] = useState<any[]>([]);
@@ -70,7 +74,14 @@ const AdminProfile = () => {
 
       const handleDownloadTopLotsReport = async () => {
         if (token) {
-          await downloadTopLotsReport(token);  // Trigger report download
+          await  downloadTopLotsReport(token);  // Trigger report download
+        } else {
+          console.error('No token found');
+        }
+      };
+      const handleViolationsReport = async () => {
+        if (token) {
+          await downloadViolationsReport(token);  // Trigger report download
         } else {
           console.error('No token found');
         }
@@ -78,6 +89,11 @@ const AdminProfile = () => {
 
     return (
         <div className="profile-container">
+            <div className="navbar-links">
+                <a href="/login" onClick={onLogout}>
+                    Logout
+                </a>
+            </div>
             <div className="profile-header">
                 <h2 className="text-3xl font-bold">Admin Profile</h2>
                 <div className="profile-stats">
@@ -144,6 +160,7 @@ const AdminProfile = () => {
                                 </li>
                             ))}
                         </ul>
+                        <button className="btn-primary" onClick={handleViolationsReport}>see violations report</button>
                     </div>
                 )}
             </div>

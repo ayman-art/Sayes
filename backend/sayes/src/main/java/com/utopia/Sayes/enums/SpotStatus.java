@@ -7,4 +7,5 @@ public enum SpotStatus {
     ReservationTimeOut,
     OverOccupied,
     Faulty,
+    NearExpiry
 }

@@ -60,6 +60,25 @@ public class ReportingService {
         JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
         return outputStream;
     }
+    public ByteArrayOutputStream generateLotsReport(List<Map<String , Object>> lotsData) throws Exception {
+        String reportPath = "src/main/resources/reports/LotsReport.jrxml";
+        JasperReport jasperReport = JasperCompileManager.compileReport(reportPath);
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(lotsData);
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, null, dataSource);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
+        return outputStream;
+    }
+    public ByteArrayOutputStream generateViolationsReport() throws Exception {
+        List<Map<String, Object>> violations = logDAO.getViolations();
+        String reportPath = "src/main/resources/reports/ViolationsReport.jrxml";
+        JasperReport jasperReport = JasperCompileManager.compileReport(reportPath);
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(violations);
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, null, dataSource);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
+        return outputStream;
+    }
     public List<Map<String , Object>> getTopUsers() throws Exception {
         try {
             return logDAO.getTopUsers();
@@ -71,6 +90,14 @@ public class ReportingService {
     public List<Map<String , Object>> getTopLots() throws Exception {
         try {
             return lotDAO.getTopLots();
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+    public List<Map<String , Object>> getViolations() throws Exception {
+        try {
+            return logDAO.getViolations();
         }
         catch (Exception e){
             throw new Exception(e.getMessage());

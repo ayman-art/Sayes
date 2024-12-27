@@ -40,8 +40,11 @@ const LocationMarker: React.FC = () => {
   );
 };
 
+interface DriverHomePageProps {
+  onLogout: () => void;
+}
 // Driver Home Page
-const DriverHomePage: React.FC = () => {
+const DriverHomePage: React.FC<DriverHomePageProps> = ({ onLogout }) => {
   const [parkingSpots, setParkingSpots] = useState<ParkingLot[]>([]);
   
   const [endTime, setEndTime] = useState("");
@@ -129,6 +132,7 @@ const DriverHomePage: React.FC = () => {
         break;
       case "NearExpiry":
         handleNearExpiry(data)
+        break;
     }
   }
   const handleNearExpiry = (data:any)=>{
@@ -231,6 +235,7 @@ const DriverHomePage: React.FC = () => {
         <div className="navbar-links">
           <a href="/">Home</a>
           <a href="/profile">Account</a>
+          <a href="/login" onClick={onLogout}> Logout</a>
         </div>
       </nav>
 

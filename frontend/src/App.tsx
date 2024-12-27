@@ -10,6 +10,7 @@ import DriverProfile from "./pages/DriverProfile";
 import LotManagerProfile from "./pages/LotManagerProfile";
 import NotificationListener from "./services/notificationService";
 import AdminProfile from "./pages/AdminProfile";
+import ManagerDashBoard from "./pages/ManagerDashboard";
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -53,11 +54,12 @@ const App: React.FC = () => {
       <Routes>
         {isAuthenticated ? (
           <>
-            <Route path="/" element={role== 'ADMIN'? <Navigate to= "/profile"/> : (role=='DRIVER'? <DriverHomePage/>: <LotManagerHomePage/>)} />
+            <Route path="/" element={role== 'ADMIN'? <Navigate to= "/profile"/> : (role=='DRIVER'? <DriverHomePage onLogout = {onLogout}/>: <LotManagerHomePage onLogout = {onLogout}/>)} />
             <Route path="/signup" element={<Navigate to="/" />}/>
             <Route path="/login" element={<Navigate to="/" />} />
-            <Route path="/profile" element={role === 'DRIVER' ? (<DriverProfile />) : role === 'ADMIN' ? (<AdminProfile/>) : (
-                    <LotManagerProfile />
+            <Route path="/managerDashBoard" element={role === 'MANAGER' ? (<ManagerDashBoard />) : (<Navigate to="/" />)} />
+            <Route path="/profile" element={role === 'DRIVER' ? (<DriverProfile onLogout={onLogout} />) : role === 'ADMIN' ? (<AdminProfile onLogout = {onLogout}/>) : (
+                    <LotManagerProfile onLogout={onLogout} />
                     )
                   }
                 />
@@ -66,7 +68,7 @@ const App: React.FC = () => {
           </>
         ):(
           <>
-            <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="*" element={<Navigate to="/login" />} />
             <Route path="/login" element={<Login onLogin={onLogin} />} />
             <Route path="/signup" element={<SignUp onLogin={onLogin} />} />
             </>
