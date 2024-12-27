@@ -1,0 +1,3 @@
+Label,# Samples,Average,Min,Max,Std. Dev.,Error %,Throughput,Received KB/sec,Sent KB/sec,Avg. Bytes
+Reserve Spot,1300,129591,30143,239651,65121.80,96.231%,5.35716,1.99,2.25,380.2
+TOTAL,1300,129591,30143,239651,65121.80,96.231%,5.35716,1.99,2.25,380.2
