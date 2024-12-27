@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchManagerData } from '../services/profileService';
+import { addSpots, fetchManagerData } from '../services/profileService';
 import { LotDetailed } from '../models/LotDetailed';
 import WebSocketService from '../services/socketService';
 import { URLS } from '../API/urls';
@@ -82,8 +82,9 @@ const LotManagerProfile: React.FC<LotManagerProfileProps> = ({ onLogout }) => {
         setRevenue(totalRevenue);
     };
 
-    const handleAddSpots = () => {
+    const handleAddSpots = async () => {
         if (selectedLotId !== null) {
+            await addSpots(token!, selectedLotId, spotsToAdd);
             console.log(`Lot ID: ${selectedLotId}, Spots to add: ${spotsToAdd}`);
             setShowPopup(false);
             setSpotsToAdd(0);

@@ -107,6 +107,7 @@ export const addAmount = async (token: string, amount: number): Promise<string> 
 
 export const addSpots = async (token: string, lotId: number, count: number): Promise<string> => {
 
+    console.log('Adding spots:', lotId, count, token);
     const response = await fetch(`${URL}/lot-management/add-spots`, {
         method: 'POST',
         headers: {
@@ -115,7 +116,7 @@ export const addSpots = async (token: string, lotId: number, count: number): Pro
         },
         
         body: JSON.stringify({
-            lot_id: lotId,
+            lotId: lotId,
             count: count
         })
             
