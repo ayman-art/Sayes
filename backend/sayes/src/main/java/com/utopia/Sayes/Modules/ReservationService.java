@@ -175,7 +175,7 @@ public class ReservationService {
             }
             violationService.takeFeeAmount(driver_id , lot_id);
             spotDAO.updateSpotState(spot_id,lot_id, String.valueOf(SpotStatus.Available));
-            reservationDAO.deleteReservation(spot_id , lot_id);
+            //reservationDAO.deleteReservation(spot_id , lot_id);
             Date date = Date.from(reservation.getStart_time().atZone(ZoneId.systemDefault()).toInstant());
             java.sql.Timestamp endTimestamp = new java.sql.Timestamp(new Date().getTime());
             logDAO.addlog(spot_id , lot_id, date , endTimestamp,driver_id);
