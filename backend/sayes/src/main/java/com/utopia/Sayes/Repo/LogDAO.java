@@ -47,11 +47,19 @@ public class LogDAO {
         return rows;
     }
     public List<Map<String, Object>> getViolations() {
-        String query = "SELECT u.username, f.lot_id, SUM(f.fee) AS total_fee, SUM(p.penalty_amount) AS total_penalty " +
+        String query = "SELECT u.username, combined.lot_id, " +
+                "COALESCE(SUM(combined.fee), 0) AS total_fee, " +
+                "COALESCE(SUM(combined.penalty_amount), 0) AS total_penalty " +
                 "FROM Users u " +
-                "JOIN fees f ON u.user_id = f.driver_id " +
-                "LEFT JOIN penalties p ON u.user_id = p.driver_id AND f.lot_id = p.lot_id " +
-                "GROUP BY u.user_id, u.username, f.lot_id";
+                "LEFT JOIN (" +
+                "    SELECT f.driver_id, f.lot_id, f.fee, 0 AS penalty_amount " +
+                "    FROM fees f " +
+                "    UNION ALL " +
+                "    SELECT p.driver_id, p.lot_id, 0 AS fee, p.penalty_amount " +
+                "    FROM penalties p" +
+                ") combined ON u.user_id = combined.driver_id " +
+                "WHERE combined.lot_id IS NOT NULL " +
+                "GROUP BY u.user_id, u.username, combined.lot_id";
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
         return rows;
     }
