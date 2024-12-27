@@ -60,6 +60,15 @@ public class ReportingService {
         JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
         return outputStream;
     }
+    public ByteArrayOutputStream generateLotsReport(List<Map<String , Object>> lotsData) throws Exception {
+        String reportPath = "src/main/resources/reports/LotsReport.jrxml";
+        JasperReport jasperReport = JasperCompileManager.compileReport(reportPath);
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(lotsData);
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, null, dataSource);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
+        return outputStream;
+    }
     public ByteArrayOutputStream generateViolationsReport() throws Exception {
         List<Map<String, Object>> violations = logDAO.getViolations();
         String reportPath = "src/main/resources/reports/ViolationsReport.jrxml";
