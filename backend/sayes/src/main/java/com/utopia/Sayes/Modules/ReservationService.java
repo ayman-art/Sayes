@@ -65,10 +65,10 @@ public class ReservationService {
             connection = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection();
             connection.setAutoCommit(false);
 
-            long spotId = spotDAO.getAndUpdateFirstAvailableSpotId(connection, lot_id,
+            Long spotId = spotDAO.getAndUpdateFirstAvailableSpotId(connection, lot_id,
                     String.valueOf(SpotStatus.Available), String.valueOf(SpotStatus.Reserved));
 
-            if (spotId == 0) {
+            if (spotId == null) {
                 throw new Exception("Spot doesn't exist or is unavailable.");
             }
 
@@ -83,7 +83,7 @@ public class ReservationService {
             //spotDAO.updateSpotState(spotId,lot_id, String.valueOf(SpotStatus.Reserved));
             System.out.println(lot_id);
             setReservationTimeOut(lot_id , spotId , driver_id);
-           connection.commit();
+            connection.commit();
             Lot lot = lotDAO.getLotById(lot_id);
             notificationService.notifyLotUpdate(new UpdateLotDTO(lot_id, lot.getNum_of_spots(),
                     lot.getLongitude(), lot.getLatitude(), lot.getPrice(), lot.getLot_type()));
@@ -113,6 +113,7 @@ public class ReservationService {
             }
         }
     }
+
     public void useReservation(long spot_id ,long lot_id,long driver_id, String method) throws Exception {
         try {
             double price = reservationDAO.getReservationPrice(spot_id, lot_id);
