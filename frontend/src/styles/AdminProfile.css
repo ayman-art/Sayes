@@ -154,6 +154,22 @@
     .profile-content h3 {
         font-size: 1.6rem;
     }
+    
 }
+@media print {
+    .profile-header, .profile-actions, .profile-container {
+        display: none;
+    }
+
+    .profile-content {
+        width: 100%;
+        padding: 0;
+    }
+
+    button {
+        display: none;
+    }
+}
+
 
 

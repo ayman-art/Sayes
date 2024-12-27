@@ -60,5 +60,18 @@ public class ReservationDAO {
             throw new RuntimeException("reservation doesn't exist");
         }
     }
+    public void updateSpotState(long spot_id,long lot_id, String newState) {
+        String query = "UPDATE reserved_spots SET state = ? WHERE spot_id = ? AND lot_id = ?";
+        int rowsUpdated = jdbcTemplate.update(query, newState, spot_id, lot_id);
+        if(rowsUpdated == 0){
+            throw new RuntimeException("Can't update spot state");
+        }
+    }
+    public boolean existsReservation(long driverId, long lotId , long spotId) {
+        String query = "SELECT COUNT(*) FROM reserved_spots WHERE driver_id = ? AND lot_id = ?" +
+                " AND spot_id = ?";
+        Integer count = jdbcTemplate.queryForObject(query, Integer.class, driverId, lotId , spotId);
+        return count != null && count > 0;
+    }
 
 }

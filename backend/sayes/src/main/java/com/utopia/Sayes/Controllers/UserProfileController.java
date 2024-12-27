@@ -46,5 +46,17 @@ public class UserProfileController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+    @PostMapping ("/add-amount")
+    public ResponseEntity<?> addAmount(@RequestHeader("Authorization") String token ,
+                                       @RequestBody Map<String, Object> driverData) {
+        try {
+            token = token.replace("Bearer ", "");
+            driverData.put("jwt" , token);
+            profileFacade.addAmount(driverData);
+            return new ResponseEntity<>("amount added successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 
 }

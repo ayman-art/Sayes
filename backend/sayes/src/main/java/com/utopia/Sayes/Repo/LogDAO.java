@@ -46,4 +46,13 @@ public class LogDAO {
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
         return rows;
     }
+    public List<Map<String, Object>> getViolations() {
+        String query = "SELECT u.username, f.lot_id, SUM(f.fee) AS total_fee, SUM(p.penalty_amount) AS total_penalty " +
+                "FROM Users u " +
+                "JOIN fees f ON u.user_id = f.driver_id " +
+                "LEFT JOIN penalties p ON u.user_id = p.driver_id AND f.lot_id = p.lot_id " +
+                "GROUP BY u.user_id, u.username, f.lot_id";
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
+        return rows;
+    }
 }

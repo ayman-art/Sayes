@@ -25,6 +25,7 @@ public class DynamicPricing {
         double penalty = 0;
         if (penaltyDAO.existsPenalty(driverId , lotId)) {
              penalty = penaltyDAO.getPenalty(driverId, lotId);
+             penaltyDAO.deletePenalty(lotId, driverId);
         }
         double ratio = priceOnDemand(lot.getNum_of_spots(), lotDAO.getLotTotalSpots(lotId)) + priceOnTime(fromTime);
         double price = lot.getPrice() * totalTime(fromTime, toTime) * ratio + penalty;
