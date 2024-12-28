@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="9ae80caf-8799-4218-b0df-8226bcae283c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/sayes/.idea/misc.xml" beforeDir="false" />
+    <list default="true" id="2cd1c8cf-957e-4955-91a5-860f1461e1e0" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Modules/ReservationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Modules/ReservationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sayes/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/sayes/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/LotManagerProfile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/LotManagerProfile.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -12,32 +18,62 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 6
-}]]></component>
-  <component name="ProjectId" id="2oip0xDHKrIUW3beT5LwyYgTjsh" />
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="2qRvoBvBRFTlPls10caU1Z9wsuS" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "Application.Unnamed.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "database__creation",
+    "git-widget-placeholder": "SAYES-28-Driver-home-GUI",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/Sayes/backend/sayes"
+    "last_opened_file_path": "D:/projects/Sayes/backend/Sayes"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration name="Unnamed" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.utopia.Sayes.SayesApplication" />
+      <module name="Sayes" />
+      <extension name="net.ashald.envfile">
+        <option name="IS_ENABLED" value="false" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+        </ENTRIES>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="9ae80caf-8799-4218-b0df-8226bcae283c" name="Changes" comment="" />
-      <created>1731362030524</created>
+      <changelist id="2cd1c8cf-957e-4955-91a5-860f1461e1e0" name="Changes" comment="" />
+      <created>1734638374169</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1731362030524</updated>
+      <updated>1734638374169</updated>
     </task>
     <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/sayes/src/main/java/com/utopia/Sayes/Modules/ReservationService.java</url>
+          <line>69</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

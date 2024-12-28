@@ -1,7 +1,7 @@
 package com.utopia.Sayes.Models;
 
 public class User {
-    private long user_id;
+    protected long user_id;
     private String username;
     private String user_password;
 

@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import '../styles/components.css';
-import { loginUser } from "../services/authService";
+import { loginUser, saveData } from "../services/authService";
 import { Link } from 'react-router-dom';
-
-const Login: React.FC = () => {
+interface loginProps{
+  onLogin: ()=> void
+}
+const Login: React.FC<loginProps> = ({onLogin}) => {
   const [username, setUsername] = useState<string>(""); 
   const [password, setPassword] = useState<string>("");
   const navigate = useNavigate();
@@ -12,10 +14,11 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await loginUser(username, password); 
-      if (response.token) {
-        navigate("/dashboard");
-      }
+      await loginUser(username, password);
+      const token = localStorage.getItem('jwtToken')
+      saveData(token!) 
+      onLogin()
+      navigate("/");
     } catch (error) {
       console.error("Login error:", error);
       alert("Login failed. Please check your credentials.");
@@ -44,6 +47,7 @@ const Login: React.FC = () => {
             required 
           />
         </div>
+        
         <button type="submit" className="submit-button">Login</button>
       </form>
       <div className="link-container">

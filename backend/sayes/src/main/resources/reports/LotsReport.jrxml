@@ -1,0 +1,125 @@
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+                                  http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="TopLotsReport" pageWidth="595" pageHeight="842" columnWidth="515"
+              leftMargin="40" rightMargin="40" topMargin="50" bottomMargin="50"
+              uuid="a1234567-b89c-12d3-a456-426614174000">
+
+    <!-- Define fields for the report -->
+    <field name="lot_id" class="java.lang.Long"/>
+    <field name="revenue" class="java.lang.Long"/>
+    <field name="lot_type" class="java.lang.String"/>
+    <field name="price" class="java.lang.Double"/>
+    <field name="num_of_spots" class="java.lang.Long"/>
+    <field name="occupancy_rate" class="java.lang.Double"/>
+
+    <!-- Title Section -->
+    <title>
+        <band height="50">
+            <staticText>
+                <reportElement x="0" y="10" width="515" height="30" uuid="7c9f4f3c-8232-462d-bbfc-24d8f7d4aee7"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="16" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Lots Report]]></text>
+            </staticText>
+        </band>
+    </title>
+
+    <!-- Column Header -->
+    <columnHeader>
+        <band height="20">
+            <staticText>
+                <reportElement x="0" y="0" width="70" height="20" uuid="e9843b5c-6ab0-4c44-9c78-b083ad54498f"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Lot ID]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="80" y="0" width="80" height="20" uuid="5d3d22cf-50ed-4f59-a575-222bde5607b5"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Revenue]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="170" y="0" width="100" height="20" uuid="5d3d22cf-50ed-4f59-a575-222bde5607b5"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Lot Type]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="280" y="0" width="80" height="20" uuid="5d3d22cf-50ed-4f59-a575-222bde5607b5"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Price]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="370" y="0" width="80" height="20" uuid="5d3d22cf-50ed-4f59-a575-222bde5607b5"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Available Spots]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="460" y="0" width="55" height="20" uuid="5d3d22cf-50ed-4f59-a575-222bde5607b5"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Occupancy]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <!-- Detail Section -->
+    <detail>
+        <band height="20">
+            <textField>
+                <reportElement x="0" y="0" width="70" height="20" uuid="604a4656-9d24-42e0-a23a-679cb1cc111b"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{lot_id}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="80" y="0" width="80" height="20" uuid="7d3bfa5a-dada-46b9-91fc-98eaf233f9a6"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{revenue}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="170" y="0" width="100" height="20" uuid="7d3bfa5a-dada-46b9-91fc-98eaf233f9a6"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{lot_type}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="280" y="0" width="80" height="20" uuid="7d3bfa5a-dada-46b9-91fc-98eaf233f9a6"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{price}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="370" y="0" width="80" height="20" uuid="7d3bfa5a-dada-46b9-91fc-98eaf233f9a6"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{num_of_spots}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="460" y="0" width="55" height="20" uuid="7d3bfa5a-dada-46b9-91fc-98eaf233f9a6"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{occupancy_rate}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <!-- Page Footer -->
+    <pageFooter>
+        <band height="20">
+            <staticText>
+                <reportElement x="0" y="0" width="515" height="20" uuid="3f7e29d7-51e6-4c7c-ae2e-241e616c8b35"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <text><![CDATA[Generated by JasperReports]]></text>
+            </staticText>
+        </band>
+    </pageFooter>
+
+</jasperReport>
