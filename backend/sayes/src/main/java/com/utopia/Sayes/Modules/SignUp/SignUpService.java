@@ -43,7 +43,10 @@ public class SignUpService {
             stmt.execute();
 
             long driverId = stmt.getLong(5);
-            return new Driver(name, password, driverId, plate, license);
+            System.out.println(driverId);
+            Driver d = new Driver(name, password, 0, plate, license);
+            d.setUser_id(driverId);
+            return d;
 
         } catch (SQLException e) {
             throw new RuntimeException("Error registering driver: " + e.getMessage(), e);
@@ -61,7 +64,9 @@ public class SignUpService {
             stmt.execute();
 
             long managerId = stmt.getLong(3);
-            return new LotManager(name, password, managerId);
+            LotManager m = new LotManager(name, password, 0);
+            m.setUser_id(managerId);
+            return m;
 
         } catch (SQLException e) {
             throw new RuntimeException("Error registering manager: " + e.getMessage(), e);
