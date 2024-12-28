@@ -5,11 +5,9 @@ from helpers import CREATE_LOT_ENDPOINT, LOT_MANAGER_TOKEN_FILE, LOTS_FILE, SIGN
 
 
 def register_lot_manager():
-    """Register a lot manager user and save their JWT token."""
     username = random_string(8)
     password = random_string(12)
     
-    # Make sign-up request
     response = requests.post(SIGNUP_ENDPOINT, json={
         "name": username,
         "password": password,
@@ -19,7 +17,6 @@ def register_lot_manager():
     if response.status_code == 200:
         jwt_token = response.json().get("jwt")
         if jwt_token:
-            # Save the token to a file
             with open(LOT_MANAGER_TOKEN_FILE, "w") as f:
                 json.dump({"token": jwt_token}, f)
             print(f"Lot manager created: {username}")

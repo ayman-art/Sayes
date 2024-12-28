@@ -53,7 +53,6 @@ const DriverProfile: React.FC<DriverProfileProps> = ({ onLogout }) => {
                 <p><strong>Name:</strong> {driverName}</p>
                 <p><strong>Balance:</strong> ${balance.toFixed(2)}</p>
                 <p><strong>Plate Number:</strong> {plateNumber}</p>
-                <p><strong>Payment Method:</strong> {paymentMethod}</p>
                 <p><strong>License Number:</strong> {licenseNumber}</p>
             </div>
             <button className="add-balance-btn" onClick={() => setIsPopupOpen(true)}>
