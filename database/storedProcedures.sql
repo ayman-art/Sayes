@@ -1,5 +1,6 @@
 DELIMITER $$
 
+DROP PROCEDURE IF EXISTS ReserveSpot $$
 CREATE PROCEDURE ReserveSpot(
     IN lot_id BIGINT,
     IN driver_id BIGINT,
@@ -22,7 +23,7 @@ BEGIN
 
     IF spot_found IS NULL THEN
         ROLLBACK;
-        SET spot_id = NULL; -- Indicate no reservation
+        SET spot_id = NULL;
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No available spot found';
     END IF;
 
@@ -37,12 +38,9 @@ BEGIN
 
     SET spot_id = spot_found;
 
-END$$
+END $$
 
-DELIMITER ;
-
-DELIMITER $$
-
+DROP PROCEDURE IF EXISTS RegisterDriver $$
 CREATE PROCEDURE RegisterDriver(
     IN user_name VARCHAR(255),
     IN user_password VARCHAR(255),
@@ -68,10 +66,7 @@ BEGIN
     SET driver_id = new_user_id;
 END $$
 
-DELIMITER ;
-
-DELIMITER $$
-
+DROP PROCEDURE IF EXISTS RegisterManager $$
 CREATE PROCEDURE RegisterManager(
     IN user_name VARCHAR(255),
     IN user_password VARCHAR(255),
@@ -95,10 +90,7 @@ BEGIN
     SET manager_id = new_user_id;
 END $$
 
-DELIMITER ;
-
-DELIMITER $$
-
+DROP PROCEDURE IF EXISTS LoginUser $$
 CREATE PROCEDURE LoginUser(
     IN user_name VARCHAR(255),
     IN user_password VARCHAR(255),
@@ -119,8 +111,3 @@ BEGIN
 END $$
 
 DELIMITER ;
-
-DROP PROCEDURE REGISTERDRIVER;
-DROP PROCEDURE REGISTERMANAGER;
-CALL ReserveSpot(1, 1, '2024-12-31 23:59:59', 50.0, @spot_id);
-SELECT @spot_id;
